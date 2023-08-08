@@ -355,6 +355,15 @@ endif()
 if(BUILD_AVDECC_BINDINGS_CSHARP)
 	include(${CU_BASE_DIR}/helpers/SetupSwig.cmake REQUIRED)
 
+	# Prepare dependencies
+	foreach(SWIG_LANG ${AVDECC_SWIG_LANGUAGES})
+		if(${SWIG_LANG} STREQUAL "python")
+			find_package(Python 3.8 REQUIRED COMPONENTS Development Development.Module)
+
+			message(STATUS "Using python ${Python_VERSION} from ${Python_RUNTIME_LIBRARY_DIRS}/ for SWIG bindings")
+		endif()
+	endforeach()
+
 	# avdecc entity model
 	set(TARGET_PREFIX ${PROJECT_NAME}EntityModel)
 	set(SWIG_INTERFACE_FILE "${CU_ROOT_DIR}/include/la/avdecc/internals/entityModel.i")
@@ -362,6 +371,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/utils.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/chrono.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/csharp_optional.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/python_optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
@@ -378,8 +388,28 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		set_property(TARGET ${SWIG_TARGET_NAME} PROPERTY SWIG_DEPENDS ${PUBLIC_HEADER_FILES})
 		# Setup common options like any other project
 		cu_setup_library_options(${SWIG_TARGET_NAME} ALIAS_NAME ${SWIG_LANG} NO_ALIAS_TARGET)
+
+		# Target specific options
 		if(${SWIG_LANG} STREQUAL "lua")
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE liblua)
+		endif()
+		if(${SWIG_LANG} STREQUAL "python")	
+			string(REPLACE "-python" "" SWIG_TARGET_OUTPUT_NAME ${SWIG_TARGET_NAME})
+			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES OUTPUT_NAME _${SWIG_TARGET_OUTPUT_NAME})
+
+			# Supress generated python binding warnings
+			if(MSVC)
+				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244")
+			endif()
+
+			# Add python library references
+			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE ${Python_LIBRARIES})
+			target_include_directories(${SWIG_TARGET_NAME} PRIVATE ${Python_INCLUDE_DIRS})
+
+			# Copy swig generated python file to output folder
+			get_property(SWIG_SUPPORT_FILES TARGET ${SWIG_TARGET_NAME} PROPERTY SWIG_SUPPORT_FILES)
+			add_custom_command(TARGET ${SWIG_TARGET_NAME}
+							COMMAND ${CMAKE_COMMAND} -E copy ${SWIG_SUPPORT_FILES} $<TARGET_FILE_DIR:${SWIG_TARGET_NAME}>)
 		endif()
 
 		# Setup install (and signing)
@@ -394,6 +424,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/utils.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/chrono.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/csharp_optional.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/python_optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
@@ -411,8 +442,28 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		set_property(TARGET ${SWIG_TARGET_NAME} PROPERTY SWIG_DEPENDS ${PUBLIC_HEADER_FILES})
 		# Setup common options like any other project
 		cu_setup_library_options(${SWIG_TARGET_NAME} ALIAS_NAME ${SWIG_LANG} NO_ALIAS_TARGET)
+
+		# Target specific options
 		if(${SWIG_LANG} STREQUAL "lua")
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE liblua)
+		endif()
+		if(${SWIG_LANG} STREQUAL "python")	
+			string(REPLACE "-python" "" SWIG_TARGET_OUTPUT_NAME ${SWIG_TARGET_NAME})
+			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES OUTPUT_NAME _${SWIG_TARGET_OUTPUT_NAME})
+
+			# Supress generated python binding warnings
+			if(MSVC)
+				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244")
+			endif()
+
+			# Add python library references
+			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE ${Python_LIBRARIES})
+			target_include_directories(${SWIG_TARGET_NAME} PRIVATE ${Python_INCLUDE_DIRS})
+
+			# Copy swig generated python file to output folder
+			get_property(SWIG_SUPPORT_FILES TARGET ${SWIG_TARGET_NAME} PROPERTY SWIG_SUPPORT_FILES)
+			add_custom_command(TARGET ${SWIG_TARGET_NAME}
+							COMMAND ${CMAKE_COMMAND} -E copy ${SWIG_SUPPORT_FILES} $<TARGET_FILE_DIR:${SWIG_TARGET_NAME}>)
 		endif()
 
 		# Setup install (and signing)
