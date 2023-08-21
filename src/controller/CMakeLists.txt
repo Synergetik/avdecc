@@ -196,8 +196,12 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		# Target specific options
 		if(${SWIG_LANG} STREQUAL "lua")
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE liblua)
-		endif()
-		if(${SWIG_LANG} STREQUAL "python")	
+		elseif(${SWIG_LANG} STREQUAL "csharp")
+			# Supress generated python binding warnings
+			if(MSVC)
+				add_definitions("/wd4702")
+			endif()
+		elseif(${SWIG_LANG} STREQUAL "python")	
 			string(REPLACE "-python" "" SWIG_TARGET_OUTPUT_NAME ${SWIG_TARGET_NAME})
 			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES OUTPUT_NAME _${SWIG_TARGET_OUTPUT_NAME})
 
