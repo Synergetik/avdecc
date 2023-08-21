@@ -14,6 +14,14 @@
 #define %std_tuple_cs_unpack_out_getter(pos, type)  arg##pos = get##pos();
 #define %std_tuple_cs_unpack_getter(pos, type)      self.get##pos()
 
+%define %std_tuple_py_unpack_getter(pos, type)
+{
+  auto const result = std::get<##pos>(result_tuple);
+  $typemap(out, type, result=auto tuple_py_##pos)
+  PyTuple_SetItem($result,##pos,tuple_py_##pos); 
+}
+%enddef
+
 
 %define %std_tuple(Name, ...)
 
@@ -27,6 +35,13 @@
       return (%foreach(%std_tuple_cs_unpack_getter, __VA_ARGS__));
     }
   %}
+#elif defined(SWIGPYTHON)
+   %typemap(out) std::tuple<__VA_ARGS__> {
+    auto $1_tuple = static_cast<$1_type>($1);
+    $result = PyTuple_New(std::tuple_size<decltype($1_tuple)>::value);
+
+    %foreach_plain(%std_tuple_py_unpack_getter, __VA_ARGS__)	
+   }
 #endif
 
 %rename(Name) std::tuple<__VA_ARGS__>;
