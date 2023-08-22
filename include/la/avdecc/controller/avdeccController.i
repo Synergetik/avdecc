@@ -59,6 +59,7 @@
 %define DEFINE_CONTROLLED_ENTITY_MODEL_NODE(name)
 	%nspaceapp(la::avdecc::controller::model::name##Node);
 	%rename("%s") la::avdecc::controller::model::name##Node; // Unignore class
+	// DO NOT extend the struct with copy-constructor (we don't want to copy the full hierarchy, and also there is no default constructor)
 
 #if defined(SWIGPYTHON)
 %typemap(out) la::avdecc::controller::model::name##Node (la::avdecc::controller::model::name##Node* inter = 0) %{
@@ -162,9 +163,11 @@ DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Entity)
 // AVDECC CONTROLLED ENTITY
 ////////////////////////////////////////
 // Bind enums
+#if defined(SWIGPYTHON)
 %typemap(out) la::avdecc::controller::ControlledEntity::CompatibilityFlags %{
 	// TODO: Fix Pyhton - CompatibilityFlags
 %}
+#endif
 
 DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "byte")
 
@@ -178,6 +181,27 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "
 
 %nspaceapp(la::avdecc::controller::ControlledEntity::Diagnostics);
 %rename("%s") la::avdecc::controller::ControlledEntity::Diagnostics; // Unignore class
+// Extend the struct
+%extend la::avdecc::controller::ControlledEntity::Diagnostics
+{
+	// Add default constructor
+	Diagnostics()
+	{
+		return new la::avdecc::controller::ControlledEntity::Diagnostics();
+	}
+	// Add a copy-constructor
+	Diagnostics(la::avdecc::controller::ControlledEntity::Diagnostics const& other)
+	{
+		return new la::avdecc::controller::ControlledEntity::Diagnostics(other);
+	}
+#if defined(SWIGCSHARP)
+  // Provide a more native Equals() method
+  bool Equals(la::avdecc::controller::ControlledEntity::Diagnostics const& other) const noexcept
+  {
+    return $self->redundancyWarning == other.redundancyWarning && $self->streamInputOverLatency == other.streamInputOverLatency;
+  }
+#endif
+};
 
 %nspaceapp(la::avdecc::controller::ControlledEntityGuard);
 %rename("%s") la::avdecc::controller::ControlledEntityGuard; // Unignore class

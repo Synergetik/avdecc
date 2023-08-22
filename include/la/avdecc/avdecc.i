@@ -443,9 +443,19 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::Delegate, EntityController
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-	// Extend the class
+	// Extend the struct
 	%extend la::avdecc::entity::model::name
 	{
+		// Add default constructor
+		name()
+		{
+			return new la::avdecc::entity::model::name();
+		}
+		// Add a copy-constructor
+		name(la::avdecc::entity::model::name const& other)
+		{
+			return new la::avdecc::entity::model::name(other);
+		}
 #if defined(SWIGCSHARP)
 		// Provide a more native Equals() method
 		bool Equals(la::avdecc::entity::model::name const& other) const noexcept
@@ -464,16 +474,72 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::Delegate, EntityController
 %define DEFINE_AEM_TREE_MODELS(name)
 	%nspaceapp(la::avdecc::entity::model::name##NodeDynamicModel);
 	%rename("%s") la::avdecc::entity::model::name##NodeDynamicModel; // Unignore class
+	// Extend the struct
+	%extend la::avdecc::entity::model::name##NodeDynamicModel
+	{
+		// Add default constructor
+		name##NodeDynamicModel()
+		{
+			return new la::avdecc::entity::model::name##NodeDynamicModel();
+		}
+		// Add a copy-constructor
+		name##NodeDynamicModel(la::avdecc::entity::model::name##NodeDynamicModel const& other)
+		{
+			return new la::avdecc::entity::model::name##NodeDynamicModel(other);
+		}
+	}
 	%nspaceapp(la::avdecc::entity::model::name##NodeStaticModel);
 	%rename("%s") la::avdecc::entity::model::name##NodeStaticModel; // Unignore class
+	// Extend the struct
+	%extend la::avdecc::entity::model::name##NodeStaticModel
+	{
+		// Add default constructor
+		name##NodeStaticModel()
+		{
+			return new la::avdecc::entity::model::name##NodeStaticModel();
+		}
+		// Add a copy-constructor
+		name##NodeStaticModel(la::avdecc::entity::model::name##NodeStaticModel const& other)
+		{
+			return new la::avdecc::entity::model::name##NodeStaticModel(other);
+		}
+	}
 %enddef
 %define DEFINE_AEM_TREE_NODE(name)
 	%nspaceapp(la::avdecc::entity::model::name##Tree);
 	%rename("%s") la::avdecc::entity::model::name##Tree; // Unignore class
+	// Extend the struct
+	%extend la::avdecc::entity::model::name##Tree
+	{
+		// Add default constructor
+		name##Tree()
+		{
+			return new la::avdecc::entity::model::name##Tree();
+		}
+		// Add a copy-constructor
+		name##Tree(la::avdecc::entity::model::name##Tree const& other)
+		{
+			return new la::avdecc::entity::model::name##Tree(other);
+		}
+	}
 %enddef
 %define DEFINE_AEM_TREE_LEAF(name)
 	%nspaceapp(la::avdecc::entity::model::name##NodeModels);
 	%rename("%s") la::avdecc::entity::model::name##NodeModels; // Unignore class
+	// Extend the struct
+	%extend la::avdecc::entity::model::name##NodeModels
+	{
+		// Add default constructor
+		name##NodeModels()
+		{
+			return new la::avdecc::entity::model::name##NodeModels();
+		}
+		// Add a copy-constructor
+		name##NodeModels(la::avdecc::entity::model::name##NodeModels const& other)
+		{
+			return new la::avdecc::entity::model::name##NodeModels(other);
+		}
+	}
 %enddef
 
 // Define optionals
