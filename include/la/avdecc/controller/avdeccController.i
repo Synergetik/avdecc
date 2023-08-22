@@ -57,7 +57,7 @@
 ////////////////////////////////////////
 // Define some macros
 %define DEFINE_CONTROLLED_ENTITY_MODEL_NODE(name)
-	%nspace la::avdecc::controller::model::name##Node;
+	%nspaceapp(la::avdecc::controller::model::name##Node);
 	%rename("%s") la::avdecc::controller::model::name##Node; // Unignore class
 
 #if defined(SWIGPYTHON)
@@ -69,10 +69,10 @@
 %enddef
 
 // Bind enums
-%nspace la::avdecc::controller::model::AcquireState;
-%nspace la::avdecc::controller::model::LockState;
-%nspace la::avdecc::controller::model::MediaClockChainNode::Type;
-%nspace la::avdecc::controller::model::MediaClockChainNode::Status;
+%nspaceapp(la::avdecc::controller::model::AcquireState);
+%nspaceapp(la::avdecc::controller::model::LockState);
+%nspaceapp(la::avdecc::controller::model::MediaClockChainNode::Type);
+%nspaceapp(la::avdecc::controller::model::MediaClockChainNode::Status);
 
 // Define optionals
 DEFINE_OPTIONAL_CLASS(la::avdecc::entity::model, MilanInfo, OptMilanInfo)
@@ -171,15 +171,15 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "
 // Bind structs and classes
 %rename($ignore, %$isclass) ""; // Ignore all structs/classes, manually re-enable
 
-%nspace la::avdecc::controller::ControlledEntity;
+%nspaceapp(la::avdecc::controller::ControlledEntity);
 %rename("%s") la::avdecc::controller::ControlledEntity; // Unignore class
 %rename("lockEntity") la::avdecc::controller::ControlledEntity::lock; // Rename method
 %rename("unlockEntity") la::avdecc::controller::ControlledEntity::unlock; // Rename method
 
-%nspace la::avdecc::controller::ControlledEntity::Diagnostics;
+%nspaceapp(la::avdecc::controller::ControlledEntity::Diagnostics);
 %rename("%s") la::avdecc::controller::ControlledEntity::Diagnostics; // Unignore class
 
-%nspace la::avdecc::controller::ControlledEntityGuard;
+%nspaceapp(la::avdecc::controller::ControlledEntityGuard);
 %rename("%s") la::avdecc::controller::ControlledEntityGuard; // Unignore class
 %ignore la::avdecc::controller::ControlledEntityGuard::operator bool; // Ignore operator bool, isValid() is already defined
 
@@ -259,10 +259,10 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::Controller, QueryCommandError, "uint")
 // Bind structs and classes
 %rename($ignore, %$isclass) ""; // Ignore all structs/classes, manually re-enable
 
-%nspace la::avdecc::controller::CompileOptionInfo;
+%nspaceapp(la::avdecc::controller::CompileOptionInfo);
 %rename("%s") la::avdecc::controller::CompileOptionInfo; // Unignore class
 
-%nspace la::avdecc::controller::Controller;
+%nspaceapp(la::avdecc::controller::Controller);
 %rename("%s") la::avdecc::controller::Controller; // Unignore class
 %ignore la::avdecc::controller::Controller::Exception; // Ignore Exception, will be created as native exception
 %unique_ptr(la::avdecc::controller::Controller) // Define unique_ptr for Controller
@@ -300,7 +300,7 @@ public:
 DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::Observer, ControllerObserver)
 
 #if SUPPORT_EXCLUSIVE_ACCESS
-%nspace la::avdecc::controller::Controller::ExclusiveAccessToken;
+%nspaceapp(la::avdecc::controller::Controller::ExclusiveAccessToken);
 %rename("%s") la::avdecc::controller::Controller::ExclusiveAccessToken; // Unignore class
 %unique_ptr(la::avdecc::controller::Controller::ExclusiveAccessToken) // Define unique_ptr for ExclusiveAccessToken // FIXME need second template parameter for deleter (see https://github.com/swig/swig/issues/2411)
 #else

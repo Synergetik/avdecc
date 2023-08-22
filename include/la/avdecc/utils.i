@@ -4,7 +4,10 @@
 
 %include <stdint.i>
 
-#if defined(SWIGPYTHON)
+#if defined(SWIGCSHARP)
+#define %nspaceapp(...) %nspace __VA_ARGS__
+#elif defined(SWIGPYTHON)
+#define %nspaceapp(...)
 %rename(Unknown) None;  // Rename all "None" identifiers to "Unknown"
 %ignore hash;           // Ignore any hash structres (not needed)
 #endif
@@ -165,7 +168,7 @@ public:
 ////////////////////////////////////////
 
 %define DEFINE_ENUM_CLASS(nspacename, bitname, type)
-	%nspace nspacename::bitname;
+	%nspaceapp(nspacename::bitname);
 #if defined(SWIGCSHARP)
 	%typemap(csbase) nspacename::bitname "uint" // Currently hardcode as uint because of SWIG issue https://github.com/swig/swig/issues/2576
 // #elif defined(SWIGPYTHON)
@@ -207,7 +210,7 @@ public:
 
 %define DEFINE_OBSERVER_CLASS(classname, py_username)
 #if defined(SWIGCSHARP)
-	%nspace classname;
+	%nspaceapp(classname);
 #endif
 	%rename("%s") classname; // Unignore class
 	%feature("director") classname;

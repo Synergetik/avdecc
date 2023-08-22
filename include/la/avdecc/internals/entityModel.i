@@ -47,7 +47,7 @@
 ////////////////////////////////////////
 // UniqueIdentifier
 ////////////////////////////////////////
-%nspace la::avdecc::UniqueIdentifier;
+%nspaceapp(la::avdecc::UniqueIdentifier);
 %ignore la::avdecc::UniqueIdentifier::operator value_type() const noexcept; // Ignore, don't need it (already have getValue() method)
 %ignore la::avdecc::UniqueIdentifier::operator bool() const noexcept; // Ignore, don't need it (already have isValid() method)
 #if defined(SWIGCSHARP)
@@ -93,7 +93,7 @@
 ////////////////////////////////////////
 // Define some macros
 %define DEFINE_AEM_TYPES_ENUM_CLASS(name, type)
-	%nspace la::avdecc::entity::model::name;
+	%nspaceapp(la::avdecc::entity::model::name);
 #if defined(SWIGCSHARP)
 	%typemap(csbase) la::avdecc::entity::model::name type
 	%rename("isEqual") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
@@ -103,7 +103,7 @@
 	%rename("$ignore") la::avdecc::entity::model::operator==(name const, std::underlying_type_t<name> const);
 %enddef
 %define DEFINE_AEM_TYPES_STRUCT(name)
-	%nspace la::avdecc::entity::model::name;
+	%nspaceapp(la::avdecc::entity::model::name);
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
 #if defined(SWIGCSHARP)
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
@@ -130,7 +130,7 @@
 	}
 %enddef
 %define DEFINE_AEM_TYPES_CLASS_BASE(name)
-	%nspace la::avdecc::entity::model::name;
+	%nspaceapp(la::avdecc::entity::model::name);
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
 	%ignore la::avdecc::entity::model::name::name(name&&); // Ignore move constructor
 	%ignore la::avdecc::entity::model::name::operator=; // Ignore copy operator
@@ -295,7 +295,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, MilanInfoFeaturesFlags, MilanInfo
 // Protocol Defines
 ////////////////////////////////////////
 %define DEFINE_BASE_PROTOCOL_CLASS(name)
-	%nspace la::avdecc::protocol::name;
+	%nspaceapp(la::avdecc::protocol::name);
 	%rename("%s") la::avdecc::protocol::name; // Unignore class
 	%ignore la::avdecc::protocol::name::name(); // Ignore default constructor
 	%rename("toString") la::avdecc::protocol::name::operator std::string() const noexcept;
@@ -359,11 +359,11 @@ DEFINE_TYPED_PROTOCOL_CLASS(AcmpStatus, AcmpStatusTypedDefine, std::uint8_t)
 
 // Define some macros
 %define DEFINE_AEM_DESCRIPTOR(name)
-	%nspace la::avdecc::entity::model::name;
+	%nspaceapp(la::avdecc::entity::model::name);
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
 %enddef
 %define DEFINE_AEM_STRUCT(name)
-	%nspace la::avdecc::entity::model::name;
+	%nspaceapp(la::avdecc::entity::model::name);
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
 #if defined(SWIGCSHARP)
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459

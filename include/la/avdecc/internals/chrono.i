@@ -4,6 +4,11 @@
 #include <chrono>
 %}
 
+////////////////////////////////////////
+// Utils
+////////////////////////////////////////
+%include "la/avdecc/utils.i"
+
 namespace std {
   // ratio class
   template <intmax_t _Nx, intmax_t _Dx = 1>
@@ -59,10 +64,10 @@ namespace std::chrono {
   using seconds      = duration<long long>;
 } // namespace std::chrono
 
-%nspace std::chrono::duration<long long, std::nano>;
-%nspace std::chrono::duration<long long, std::micro>;
-%nspace std::chrono::duration<long long, std::milli>;
-%nspace std::chrono::duration<long long>;
+%nspaceapp(std::chrono::duration<long long, std::nano>);
+%nspaceapp(std::chrono::duration<long long, std::micro>);
+%nspaceapp(std::chrono::duration<long long, std::milli>);
+%nspaceapp(std::chrono::duration<long long>);
 
 %template(nanoseconds) std::chrono::duration<long long, std::nano>;
 %template(microseconds) std::chrono::duration<long long, std::micro>;
