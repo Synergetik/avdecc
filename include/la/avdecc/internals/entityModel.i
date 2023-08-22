@@ -50,9 +50,15 @@
 %nspace la::avdecc::UniqueIdentifier;
 %ignore la::avdecc::UniqueIdentifier::operator value_type() const noexcept; // Ignore, don't need it (already have getValue() method)
 %ignore la::avdecc::UniqueIdentifier::operator bool() const noexcept; // Ignore, don't need it (already have isValid() method)
+#if defined(SWIGCSHARP)
 %rename("isEqual") operator==(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("isDifferent") operator!=(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("isLess") operator<(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#elif defined(SWIGPYTHON)
+%rename("UniqueIdentifier_isEqual") operator==(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+%rename("UniqueIdentifier_isDifferent") operator!=(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+%rename("UniqueIdentifier_isLess") operator<(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#endif
 %ignore la::avdecc::UniqueIdentifier::hash::operator(); // Ignore hash functor
 %ignore la::avdecc::UniqueIdentifier::UniqueIdentifier(UniqueIdentifier&&); // Ignore move constructor
 %ignore la::avdecc::UniqueIdentifier::operator=; // Ignore copy operator
@@ -68,6 +74,15 @@
 #endif
 }
 
+#if defined(SWIGPYTHON)
+%typemap(out) la::avdecc::UniqueIdentifier (la::avdecc::UniqueIdentifier* inter = 0) %{
+	inter = new la::avdecc::UniqueIdentifier($1);
+	$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::UniqueIdentifier*), SWIG_POINTER_OWN |  0 );
+%}
+#endif
+
+%rename("%s") la::avdecc::UniqueIdentifier::~UniqueIdentifier;
+
 
 // Include c++ declaration file
 %include "la/avdecc/internals/uniqueIdentifier.hpp"
@@ -79,15 +94,29 @@
 // Define some macros
 %define DEFINE_AEM_TYPES_ENUM_CLASS(name, type)
 	%nspace la::avdecc::entity::model::name;
+#if defined(SWIGCSHARP)
 	%typemap(csbase) la::avdecc::entity::model::name type
 	%rename("isEqual") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
+#elif defined(SWIGPYTHON)
+	%rename(#name "_isEqual") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
+#endif
 	%rename("$ignore") la::avdecc::entity::model::operator==(name const, std::underlying_type_t<name> const);
 %enddef
 %define DEFINE_AEM_TYPES_STRUCT(name)
 	%nspace la::avdecc::entity::model::name;
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
+#if defined(SWIGCSHARP)
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#elif defined(SWIGPYTHON)
+	%rename(#name "_isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename(#name "_isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	
+	%typemap(out) la::avdecc::entity::model::name (la::avdecc::entity::model::name* inter = 0) %{
+		inter = new la::avdecc::entity::model::name($1);
+		$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::entity::model::name*), SWIG_POINTER_OWN |  0 );
+	%}
+#endif
 	// Extend the class
 	%extend la::avdecc::entity::model::name
 	{
@@ -110,9 +139,15 @@
 	DEFINE_AEM_TYPES_CLASS_BASE(name)
 	%ignore la::avdecc::entity::model::name::operator value_type() const noexcept;
 	%ignore la::avdecc::entity::model::name::operator bool() const noexcept;
+#if defined(SWIGCSHARP)
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isLess") operator<(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#elif defined(SWIGPYTHON)
+	%rename(#name "_isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename(#name "_isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename(#name "_isLess") operator<(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#endif
 	// Extend the class
 	%extend la::avdecc::entity::model::name
 	{
@@ -151,9 +186,15 @@ DEFINE_AEM_TYPES_CLASS_BASE(AvdeccFixedString);
 %ignore la::avdecc::entity::model::AvdeccFixedString::data() const; // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
 %ignore la::avdecc::entity::model::AvdeccFixedString::AvdeccFixedString(void const* const ptr, size_t const size) noexcept; // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
 %ignore la::avdecc::entity::model::AvdeccFixedString::assign(void const* const ptr, size_t const size) noexcept; // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
+#if defined(SWIGCSHARP)
 %rename("isEqual") la::avdecc::entity::model::AvdeccFixedString::operator==;
 %rename("isDifferent") la::avdecc::entity::model::AvdeccFixedString::operator!=;
 %rename("toString") la::avdecc::entity::model::AvdeccFixedString::operator std::string;
+#elif defined(SWIGPYTHON)
+%rename("AvdeccFixedString_isEqual") la::avdecc::entity::model::AvdeccFixedString::operator==;
+%rename("AvdeccFixedString_isDifferent") la::avdecc::entity::model::AvdeccFixedString::operator!=;
+%rename("AvdeccFixedString_toString") la::avdecc::entity::model::AvdeccFixedString::operator std::string;
+#endif
 %ignore la::avdecc::entity::model::AvdeccFixedString::operator[](size_t const pos);
 %ignore la::avdecc::entity::model::AvdeccFixedString::operator[](size_t const pos) const;
 %ignore operator<<(std::ostream&, la::avdecc::entity::model::AvdeccFixedString const&);
@@ -273,6 +314,12 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, MilanInfoFeaturesFlags, MilanInfo
 		}
 #endif
 	}
+#if defined(SWIGPYTHON)
+%typemap(out) la::avdecc::protocol::name (la::avdecc::protocol::name* inter = 0) %{
+	inter = new la::avdecc::protocol::name($1);
+	$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::protocol::name*), SWIG_POINTER_OWN |  0 );
+%}
+#endif
 %enddef
 %define DEFINE_TYPED_PROTOCOL_CLASS(name, typedName, underlyingType)
 	DEFINE_BASE_PROTOCOL_CLASS(name)
@@ -318,8 +365,18 @@ DEFINE_TYPED_PROTOCOL_CLASS(AcmpStatus, AcmpStatusTypedDefine, std::uint8_t)
 %define DEFINE_AEM_STRUCT(name)
 	%nspace la::avdecc::entity::model::name;
 	%rename("%s") la::avdecc::entity::model::name; // Unignore class
+#if defined(SWIGCSHARP)
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+#elif defined(SWIGPYTHON)
+	%rename(#name "_isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename(#name "_isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+
+	%typemap(out) la::avdecc::entity::model::name (la::avdecc::entity::model::name* inter = 0) %{
+		inter = new la::avdecc::entity::model::name($1);
+		$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::entity::model::name*), SWIG_POINTER_OWN |  0 );
+	%}
+#endif
 	// Extend the class
 	%extend la::avdecc::entity::model::name
 	{

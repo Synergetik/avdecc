@@ -336,12 +336,18 @@
 
 %enddef
 
-%csmethodmodifiers std::unordered_map::size "private"
-%csmethodmodifiers std::unordered_map::getitem "private"
-%csmethodmodifiers std::unordered_map::setitem "private"
-%csmethodmodifiers std::unordered_map::create_iterator_begin "private"
-%csmethodmodifiers std::unordered_map::get_next_key "private"
-%csmethodmodifiers std::unordered_map::destroy_iterator "private"
+#if defined(SWIGCSHARP)
+    %csmethodmodifiers std::unordered_map::size "private"
+    %csmethodmodifiers std::unordered_map::getitem "private"
+    %csmethodmodifiers std::unordered_map::setitem "private"
+    %csmethodmodifiers std::unordered_map::create_iterator_begin "private"
+    %csmethodmodifiers std::unordered_map::get_next_key "private"
+    %csmethodmodifiers std::unordered_map::destroy_iterator "private"
+#elif defined(SWIGPYTHON)
+    
+#else
+    #error "No OptionalValue<> typemaps for this language."
+#endif
 
 // Default implementation
 namespace std {   

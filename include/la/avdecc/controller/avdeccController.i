@@ -4,6 +4,8 @@
 
 %module(directors="1") avdeccController
 
+#define SWIG_STD_PAIR_ASVAL
+
 %include <stl.i>
 %include <std_string.i>
 %include <std_set.i>
@@ -20,6 +22,7 @@
 // Generated wrapper file needs to include our header file (include as soon as possible using 'insert(runtime)' as target language exceptions are defined early in the generated wrapper file)
 %insert(runtime) %{
 	#include <la/avdecc/controller/avdeccController.hpp>
+	#include <la/avdecc/executor.hpp>
 %}
 
 // Optimize code generation be enabling RVO
@@ -56,6 +59,13 @@
 %define DEFINE_CONTROLLED_ENTITY_MODEL_NODE(name)
 	%nspace la::avdecc::controller::model::name##Node;
 	%rename("%s") la::avdecc::controller::model::name##Node; // Unignore class
+
+#if defined(SWIGPYTHON)
+%typemap(out) la::avdecc::controller::model::name##Node (la::avdecc::controller::model::name##Node* inter = 0) %{
+	inter = new la::avdecc::controller::model::name##Node($1);
+	$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::controller::model::name##Node*), SWIG_POINTER_OWN |  0 );
+%}
+#endif
 %enddef
 
 // Bind enums
@@ -70,10 +80,9 @@ DEFINE_OPTIONAL_CLASS(la::avdecc::entity::model, MilanInfo, OptMilanInfo)
 // Bind structs and classes
 %rename($ignore, %$isclass) ""; // Ignore all structs/classes, manually re-enable
 
-DEFINE_OBSERVER_CLASS(la::avdecc::controller::model::EntityModelVisitor)
+DEFINE_OBSERVER_CLASS(la::avdecc::controller::model::EntityModelVisitor, ControllerModelEntityModelVisitor)
 
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(MediaClockChain)
-DEFINE_CONTROLLED_ENTITY_MODEL_NODE()
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(EntityModel)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Virtual)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Control)
@@ -107,25 +116,45 @@ DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Entity)
 
 // Define templates
 // WARNING: Requires https://github.com/swig/swig/issues/2625 to be fixed (or a modified version of the std_map.i file)
+%ignore std::map<la::avdecc::entity::model::ClusterIndex, la::avdecc::controller::model::AudioClusterNode>::get_allocator; // ignore allocators, need for python bindings
 %template(AudioClusterNodeMap) std::map<la::avdecc::entity::model::ClusterIndex, la::avdecc::controller::model::AudioClusterNode>;
+%ignore std::map<la::avdecc::entity::model::MapIndex, la::avdecc::controller::model::AudioMapNode>::get_allocator; // ignore allocators, need for python bindings
 %template(AudioMapNodeMap) std::map<la::avdecc::entity::model::MapIndex, la::avdecc::controller::model::AudioMapNode>;
+%ignore std::map<la::avdecc::entity::model::ControlIndex, la::avdecc::controller::model::ControlNode>::get_allocator; // ignore allocators, need for python bindings
 %template(ControlNodeMap) std::map<la::avdecc::entity::model::ControlIndex, la::avdecc::controller::model::ControlNode>;
+%ignore std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::controller::model::StreamPortInputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamPortInputsNodeMap) std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::controller::model::StreamPortInputNode>;
+%ignore std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::controller::model::StreamPortOutputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamPortOutputNodeMap) std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::controller::model::StreamPortOutputNode>;
+%ignore std::map<la::avdecc::entity::model::StringsIndex, la::avdecc::controller::model::StringsNode>::get_allocator; // ignore allocators, need for python bindings
 %template(StringNodeMap) std::map<la::avdecc::entity::model::StringsIndex, la::avdecc::controller::model::StringsNode>;
+%ignore std::map<la::avdecc::entity::model::AudioUnitIndex, la::avdecc::controller::model::AudioUnitNode>::get_allocator; // ignore allocators, need for python bindings
 %template(AudioUnitNodeMap) std::map<la::avdecc::entity::model::AudioUnitIndex, la::avdecc::controller::model::AudioUnitNode>;
+%ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::controller::model::StreamInputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamInputNodeMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::controller::model::StreamInputNode>;
+%ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::controller::model::StreamOutputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamOutputNodeMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::controller::model::StreamOutputNode>;
+%ignore std::map<la::avdecc::entity::model::JackIndex, la::avdecc::controller::model::JackInputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(JackInputNodeMap) std::map<la::avdecc::entity::model::JackIndex, la::avdecc::controller::model::JackInputNode>;
+%ignore std::map<la::avdecc::entity::model::JackIndex, la::avdecc::controller::model::JackOutputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(JackOutputNodeMap) std::map<la::avdecc::entity::model::JackIndex, la::avdecc::controller::model::JackOutputNode>;
+%ignore std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::controller::model::AvbInterfaceNode>::get_allocator; // ignore allocators, need for python bindings
 %template(AvbInterfaceNodeMap) std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::controller::model::AvbInterfaceNode>;
+%ignore std::map<la::avdecc::entity::model::ClockSourceIndex, la::avdecc::controller::model::ClockSourceNode>::get_allocator; // ignore allocators, need for python bindings
 %template(ClockSourceNodeMap) std::map<la::avdecc::entity::model::ClockSourceIndex, la::avdecc::controller::model::ClockSourceNode>;
+%ignore std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::controller::model::MemoryObjectNode>::get_allocator; // ignore allocators, need for python bindings
 %template(MemoryObjectNodeMap) std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::controller::model::MemoryObjectNode>;
+%ignore std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::controller::model::LocaleNode>::get_allocator; // ignore allocators, need for python bindings
 %template(LocaleNodeMap) std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::controller::model::LocaleNode>;
+%ignore std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::controller::model::ClockDomainNode>::get_allocator; // ignore allocators, need for python bindings
 %template(ClockDomainNodeMap) std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::controller::model::ClockDomainNode>;
+%ignore std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamInputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(RedundantStreamInputNodeMap) std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamInputNode>;
+%ignore std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamOutputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(RedundantStreamOutputNodeMap) std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamOutputNode>;
+%ignore std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::controller::model::ConfigurationNode>::get_allocator; // ignore allocators, need for python bindings
 %template(ConfigurationNodeMap) std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::controller::model::ConfigurationNode>;
+%ignore std::deque<la::avdecc::controller::model::MediaClockChainNode>::get_allocator; // ignore allocators, need for python bindings
 %template(MediaClockChainDeque) std::deque<la::avdecc::controller::model::MediaClockChainNode>;
 
 
@@ -133,6 +162,10 @@ DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Entity)
 // AVDECC CONTROLLED ENTITY
 ////////////////////////////////////////
 // Bind enums
+%typemap(out) la::avdecc::controller::ControlledEntity::CompatibilityFlags %{
+	// TODO: Fix Pyhton - CompatibilityFlags
+%}
+
 DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "byte")
 
 // Bind structs and classes
@@ -151,10 +184,22 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "
 %ignore la::avdecc::controller::ControlledEntityGuard::operator bool; // Ignore operator bool, isValid() is already defined
 
 // Throw typemap
+#if defined(SWIGCSHARP)
 %typemap (throws, canthrow=1) la::avdecc::controller::ControlledEntity::Exception %{
 	SWIG_CSharpSetPendingExceptionControlledEntity($1.getType(), $1.what());
 	return $null;
 %}
+#elif defined(SWIGPYTHON)
+%typemap (throws, canthrow=1) la::avdecc::controller::ControlledEntity::Exception %{
+	SWIG_exception_fail(SWIG_RuntimeError, _e.what());
+%}
+#endif
+
+#if defined(SWIGPYTHON)
+%ignore la::avdecc::controller::ControlledEntity::getStreamPortInputInvalidAudioMappingsForStreamFormat;	// TODO: Python fix
+%ignore la::avdecc::controller::Controller::getControlledEntityGuard;										// TODO: Python fix
+%ignore la::avdecc::controller::Controller::chooseBestStreamFormat;											// TODO: Python fix
+#endif
 
 // Define catches for methods that can throw
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::isStreamInputRunning;
@@ -194,7 +239,9 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "
 
 // Define templates
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlags, CompatibilityFlag, std::uint8_t)
-%template("StreamPortInvalidAudioMappings") std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::AudioMappings>;
+%ignore std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::AudioMappings>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamPortInvalidAudioMappings) std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::AudioMappings>;
+
 
 
 ////////////////////////////////////////
@@ -238,14 +285,19 @@ public:
 		}
 		catch (la::avdecc::controller::Controller::Exception const& e)
 		{
+			#if defined(SWIGCSHARP)
 			SWIG_CSharpSetPendingExceptionController(e.getError(), e.what());
+			#elif defined(SWIGPYTHON)
+			SWIG_exception(SWIG_RuntimeError, e.what());
+			fail:
+			#endif
 			return nullptr;
 		}
 	}
 };
 %ignore la::avdecc::controller::Controller::create; // Ignore it, will be wrapped (because std::unique_ptr doesn't support custom deleters - Ticket #2411)
 
-DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::Observer)
+DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::Observer, ControllerObserver)
 
 #if SUPPORT_EXCLUSIVE_ACCESS
 %nspace la::avdecc::controller::Controller::ExclusiveAccessToken;
@@ -259,10 +311,17 @@ DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::Observer)
 // %rename("%s") la::avdecc::controller::Controller::QueryCommandError; // Must unignore the enum since it's inside a class
 
 // Throw typemap
+#if defined(SWIGCSHARP)
 %typemap (throws, canthrow=1) la::avdecc::controller::Controller::Exception %{
 	SWIG_CSharpSetPendingExceptionController($1.getError(), $1.what());
 	return $null;
 %}
+#elif defined(SWIGPYTHON)
+%typemap (throws, canthrow=1) la::avdecc::controller::Controller::Exception %{
+	SWIG_exception(SWIG_RuntimeError, $1.what());
+	return $null;
+%}
+#endif
 
 // Define catches for methods that can throw
 %catches(la::avdecc::controller::Controller::Exception) la::avdecc::controller::Controller::create;
@@ -332,6 +391,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller, CompileOptions, CompileOption
 
 
 // Define C# exception handling
+#if defined(SWIGCSHARP)
 %insert(runtime) %{
 	// la::avdecc::controller::ControlledEntity::Exception
 	typedef void (SWIGSTDCALL* ControlledEntityExceptionCallback_t)(la::avdecc::controller::ControlledEntity::Exception::Type const type, char const* const message);
@@ -461,3 +521,4 @@ namespace la.avdecc.controller
 	}
 }
 %}
+#endif

@@ -4,6 +4,12 @@
 
 %include <stdint.i>
 
+#if defined(SWIGPYTHON)
+%rename(Unknown) None;  // Rename all "None" identifiers to "Unknown"
+%ignore hash;           // Ignore any hash structres (not needed)
+#endif
+
+
 // Define a helper template to handle std::underlying_type_t
 %inline %{
 namespace la::avdecc::utils
@@ -162,6 +168,7 @@ public:
 	%nspace nspacename::bitname;
 #if defined(SWIGCSHARP)
 	%typemap(csbase) nspacename::bitname "uint" // Currently hardcode as uint because of SWIG issue https://github.com/swig/swig/issues/2576
+// #elif defined(SWIGPYTHON)
 #else
 	%typemap(csbase) nspacename::bitname type
 #endif
@@ -189,10 +196,22 @@ public:
 	%apply underlyingtype { la::avdecc::utils::UnderlyingType<nspacename::bitname>::value_type };
 //#endif
 	%template(bitfieldname) la::avdecc::utils::EnumBitfield<nspacename::bitname>;
+
+#if defined(SWIGPYTHON)
+%typemap(out) nspacename::bitfieldname (nspacename::bitfieldname* inter = 0) %{
+	inter = new nspacename::bitfieldname($1);
+	$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(nspacename::bitfieldname*), SWIG_POINTER_OWN |  0 );
+%}
+#endif
 %enddef
 
-%define DEFINE_OBSERVER_CLASS(classname)
+%define DEFINE_OBSERVER_CLASS(classname, py_username)
+#if defined(SWIGCSHARP)
 	%nspace classname;
+#endif
 	%rename("%s") classname; // Unignore class
 	%feature("director") classname;
+#if defined(SWIGPYTHON)
+	%rename(py_username) classname;
+#endif
 %enddef

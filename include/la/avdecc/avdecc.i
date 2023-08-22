@@ -229,25 +229,26 @@ DEFINE_OPTIONAL_CLASS(la::networkInterface, MacAddress, OptMacAddress)
 %typemap(csbase) la::avdecc::entity::LocalEntity::AdvertiseFlag "uint" // Currently hardcode as uint because of SWIG issue https://github.com/swig/swig/issues/2576
 %rename("not") operator!(LocalEntity::AemCommandStatus const status); // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("or") operator|(LocalEntity::AemCommandStatus const lhs, LocalEntity::AemCommandStatus const rhs); // Not put in a namespace https://github.com/swig/swig/issues/2459
-%ignore operator|=(LocalEntity::AemCommandStatus& lhs, LocalEntity::AemCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
+%ignore la::avdecc::entity::operator|=(LocalEntity::AemCommandStatus& lhs, LocalEntity::AemCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
 %rename("not") operator!(LocalEntity::AaCommandStatus const status); // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("or") operator|(LocalEntity::AaCommandStatus const lhs, LocalEntity::AaCommandStatus const rhs); // Not put in a namespace https://github.com/swig/swig/issues/2459
-%ignore operator|=(LocalEntity::AaCommandStatus& lhs, LocalEntity::AaCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
+%ignore la::avdecc::entity::operator|=(LocalEntity::AaCommandStatus& lhs, LocalEntity::AaCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
 %rename("not") operator!(LocalEntity::MvuCommandStatus const status); // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("or") operator|(LocalEntity::MvuCommandStatus const lhs, LocalEntity::MvuCommandStatus const rhs); // Not put in a namespace https://github.com/swig/swig/issues/2459
-%ignore operator|=(LocalEntity::MvuCommandStatus& lhs, LocalEntity::MvuCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
+%ignore la::avdecc::entity::operator|=(LocalEntity::MvuCommandStatus& lhs, LocalEntity::MvuCommandStatus const rhs); // Don't know how to properly bind this with correct type defined (SWIG generates a SWIGTYPE_p file for this)
 %rename("not") operator!(LocalEntity::ControlStatus const status); // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("or") operator|(LocalEntity::ControlStatus const lhs, LocalEntity::ControlStatus const rhs); // Not put in a namespace https://github.com/swig/swig/issues/2459
-%ignore operator|=(LocalEntity::ControlStatus& lhs, LocalEntity::ControlStatus const rhs); // Don't know how to properly bind this due to const overload
-%ignore operator|=(LocalEntity::ControlStatus const lhs, LocalEntity::ControlStatus const rhs); // Don't know how to properly bind this due to const overload
-
+%ignore la::avdecc::entity::operator|=(LocalEntity::ControlStatus& lhs, LocalEntity::ControlStatus const rhs); // Don't know how to properly bind this due to const overload
+%ignore la::avdecc::entity::operator|=(LocalEntity::ControlStatus const lhs, LocalEntity::ControlStatus const rhs); // Don't know how to properly bind this due to const overload
+ 
 // Include c++ declaration file
 %include "la/avdecc/internals/entity.hpp"
 %rename("%s", %$isclass) ""; // Undo the ignore all structs/classes
 
 // Define templates
+%ignore std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::entity::Entity::InterfaceInformation>::get_allocator; // ignore allocators, need for python bindings
 %template(InterfaceInformationMap) std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::entity::Entity::InterfaceInformation>;
-
+ 
 ////////////////////////////////////////
 // ControllerEntity
 ////////////////////////////////////////
@@ -264,7 +265,7 @@ DEFINE_OPTIONAL_CLASS(la::networkInterface, MacAddress, OptMacAddress)
 %ignore la::avdecc::entity::controller::Interface::operator=; // Ignore copy operator
 // TODO: Must wrap all result handlers
 
-DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::Delegate)
+DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::Delegate, EntityControllerDelegate)
 %ignore la::avdecc::entity::controller::Delegate::Delegate(Delegate&&); // Ignore move constructor
 %ignore la::avdecc::entity::controller::Delegate::operator=; // Ignore copy operator
 
@@ -453,6 +454,12 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::Delegate)
 		}
 #endif
 	}
+#if defined(SWIGPYTHON)
+%typemap(out) la::avdecc::entity::model::name (la::avdecc::entity::model::name* inter = 0) %{
+	inter = new la::avdecc::entity::model::name($1);
+	$result = SWIG_NewPointerObj(SWIG_as_voidptr(inter), $descriptor(la::avdecc::entity::model::name*), SWIG_POINTER_OWN |  0 );
+%}
+#endif
 %enddef
 %define DEFINE_AEM_TREE_MODELS(name)
 	%nspace la::avdecc::entity::model::name##NodeDynamicModel;
@@ -519,6 +526,51 @@ DEFINE_AEM_TREE_NODE(AudioUnit);
 DEFINE_AEM_TREE_NODE(Configuration);
 DEFINE_AEM_TREE_NODE(Entity);
 
+// Define templates
+%template(StreamIdentificationSet) std::set<la::avdecc::entity::model::StreamIdentification>;
+%ignore std::map<la::avdecc::entity::model::ControlIndex, la::avdecc::entity::model::ControlNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(ControlNodeModelMap) std::map<la::avdecc::entity::model::ControlIndex, la::avdecc::entity::model::ControlNodeModels>;
+%ignore std::map<la::avdecc::entity::model::StringsIndex, la::avdecc::entity::model::StringsNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(StringsNodeModelMap) std::map<la::avdecc::entity::model::StringsIndex, la::avdecc::entity::model::StringsNodeModels>;
+%ignore std::map<la::avdecc::entity::model::ClusterIndex, la::avdecc::entity::model::AudioClusterNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(AudioClusterNodeModelMap) std::map<la::avdecc::entity::model::ClusterIndex, la::avdecc::entity::model::AudioClusterNodeModels>;
+%ignore std::map<la::avdecc::entity::model::MapIndex, la::avdecc::entity::model::AudioMapNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(AudioMapNodeModelMap) std::map<la::avdecc::entity::model::MapIndex, la::avdecc::entity::model::AudioMapNodeModels>;
+%ignore std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::StreamPortTree>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamPortTreeMap) std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::StreamPortTree>;
+%ignore std::map<la::avdecc::entity::model::AudioUnitIndex, la::avdecc::entity::model::AudioUnitTree>::get_allocator; // ignore allocators, need for python bindings
+%template(AudioUnitTreeMap) std::map<la::avdecc::entity::model::AudioUnitIndex, la::avdecc::entity::model::AudioUnitTree>;
+%ignore std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::entity::model::LocaleTree>::get_allocator; // ignore allocators, need for python bindings
+%template(LocaleTreeMap) std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::entity::model::LocaleTree>;
+%ignore std::map<la::avdecc::entity::model::JackIndex, la::avdecc::entity::model::JackTree>::get_allocator; // ignore allocators, need for python bindings
+%template(JackTreeMap) std::map<la::avdecc::entity::model::JackIndex, la::avdecc::entity::model::JackTree>;
+%ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamInputNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamInputNodeModelMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamInputNodeModels>;
+%ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamOutputNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamOutputNodeModelMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamOutputNodeModels>;
+%ignore std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::entity::model::AvbInterfaceNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(AvbInterfaceNodeModelMap) std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::entity::model::AvbInterfaceNodeModels>;
+%ignore std::map<la::avdecc::entity::model::ClockSourceIndex, la::avdecc::entity::model::ClockSourceNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(ClockSourceNodeModelMap) std::map<la::avdecc::entity::model::ClockSourceIndex, la::avdecc::entity::model::ClockSourceNodeModels>;
+%ignore std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::entity::model::MemoryObjectNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(MemoryObjectNodeModelMap) std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::entity::model::MemoryObjectNodeModels>;
+%ignore std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::entity::model::ClockDomainNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(ClockDomainNodeModelMap) std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::entity::model::ClockDomainNodeModels>;
+%ignore std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::entity::model::ConfigurationTree>::get_allocator; // ignore allocators, need for python bindings
+%template(ConfigurationTreeMap) std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::entity::model::ConfigurationTree>;
+%ignore std::map<la::avdecc::entity::EntityCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(EntityCounters) std::map<la::avdecc::entity::EntityCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+%ignore std::map<la::avdecc::entity::StreamInputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamInputCounters) std::map<la::avdecc::entity::StreamInputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+%ignore std::map<la::avdecc::entity::StreamOutputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamOutputCounters) std::map<la::avdecc::entity::StreamOutputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+%ignore std::map<la::avdecc::entity::AvbInterfaceCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(AvbInterfaceCounters) std::map<la::avdecc::entity::AvbInterfaceCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+%ignore std::map<la::avdecc::entity::ClockDomainCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(ClockDomainCounters) std::map<la::avdecc::entity::ClockDomainCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+// %template(LocalizedStringMap) std::unordered_map<la::avdecc::entity::model::StringsIndex, la::avdecc::entity::model::AvdeccFixedString>;
+
+
 // Include c++ declaration file
 %include "la/avdecc/internals/entityModelTreeCommon.hpp"
 %include "la/avdecc/internals/entityModelTreeDynamic.hpp"
@@ -526,29 +578,6 @@ DEFINE_AEM_TREE_NODE(Entity);
 %include "la/avdecc/internals/entityModelTree.hpp"
 %rename("%s", %$isclass) ""; // Undo the ignore all structs/classes
 
-// Define templates
-%template(StreamIdentificationSet) std::set<la::avdecc::entity::model::StreamIdentification>;
-%template(ControlNodeModelMap) std::map<la::avdecc::entity::model::ControlIndex, la::avdecc::entity::model::ControlNodeModels>;
-%template(StringsNodeModelMap) std::map<la::avdecc::entity::model::StringsIndex, la::avdecc::entity::model::StringsNodeModels>;
-%template(AudioClusterNodeModelMap) std::map<la::avdecc::entity::model::ClusterIndex, la::avdecc::entity::model::AudioClusterNodeModels>;
-%template(AudioMapNodeModelMap) std::map<la::avdecc::entity::model::MapIndex, la::avdecc::entity::model::AudioMapNodeModels>;
-%template(StreamPortTreeMap) std::map<la::avdecc::entity::model::StreamPortIndex, la::avdecc::entity::model::StreamPortTree>;
-%template(AudioUnitTreeMap) std::map<la::avdecc::entity::model::AudioUnitIndex, la::avdecc::entity::model::AudioUnitTree>;
-%template(LocaleTreeMap) std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::entity::model::LocaleTree>;
-%template(JackTreeMap) std::map<la::avdecc::entity::model::JackIndex, la::avdecc::entity::model::JackTree>;
-%template(StreamInputNodeModelMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamInputNodeModels>;
-%template(StreamOutputNodeModelMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamOutputNodeModels>;
-%template(AvbInterfaceNodeModelMap) std::map<la::avdecc::entity::model::AvbInterfaceIndex, la::avdecc::entity::model::AvbInterfaceNodeModels>;
-%template(ClockSourceNodeModelMap) std::map<la::avdecc::entity::model::ClockSourceIndex, la::avdecc::entity::model::ClockSourceNodeModels>;
-%template(MemoryObjectNodeModelMap) std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::entity::model::MemoryObjectNodeModels>;
-%template(ClockDomainNodeModelMap) std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::entity::model::ClockDomainNodeModels>;
-%template(ConfigurationTreeMap) std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::entity::model::ConfigurationTree>;
-%template(EntityCounters) std::map<la::avdecc::entity::EntityCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
-%template(StreamInputCounters) std::map<la::avdecc::entity::StreamInputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
-%template(StreamOutputCounters) std::map<la::avdecc::entity::StreamOutputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
-%template(AvbInterfaceCounters) std::map<la::avdecc::entity::AvbInterfaceCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
-%template(ClockDomainCounters) std::map<la::avdecc::entity::ClockDomainCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
-%template(LocalizedStringMap) std::unordered_map<la::avdecc::entity::model::StringsIndex, la::avdecc::entity::model::AvdeccFixedString>;
 
 ////////////////////////////////////////
 // JSON SERIALIZATION
