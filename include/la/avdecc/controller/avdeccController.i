@@ -272,8 +272,8 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller::ControlledEntity, Compatibili
 // AVDECC CONTROLLER
 ////////////////////////////////////////
 // Define Observer templates
-%template("ControllerSubject") la::avdecc::utils::Subject<la::avdecc::controller::Controller, std::recursive_mutex>;
-%template("ControllerObserver") la::avdecc::utils::Observer<la::avdecc::controller::Controller>;
+%template("ControllerSubjectBase") la::avdecc::utils::Subject<la::avdecc::controller::Controller, std::recursive_mutex>;
+%template("ControllerObserverBase") la::avdecc::utils::Observer<la::avdecc::controller::Controller>;
 
 // Bind enums
 DEFINE_ENUM_CLASS(la::avdecc::controller, CompileOption, "uint")
@@ -322,6 +322,7 @@ public:
 %ignore la::avdecc::controller::Controller::create; // Ignore it, will be wrapped (because std::unique_ptr doesn't support custom deleters - Ticket #2411)
 
 DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::Observer, ControllerObserver)
+DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::DefaultedObserver, ControllerDefaultedObserver)
 
 #if SUPPORT_EXCLUSIVE_ACCESS
 %nspaceapp(la::avdecc::controller::Controller::ExclusiveAccessToken);
