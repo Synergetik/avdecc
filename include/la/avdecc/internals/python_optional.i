@@ -33,8 +33,21 @@ DEFINE_OPTIONAL_HELPER(OptT, T)
 // defining this nested variable with the same name as the original one, but
 // with the right type. I.e. this $1 intentionally hides the real $1, of type
 // "std::optional<T>*", so that $typemap() code compiles correctly.
-%typemap(in,implicitconv=1) std::optional< T >, const std::optional< T >& (std::optional< T > tmp_ov) %{
-  // WWW
+%typemap(in,implicitconv=1) std::optional< T > %{
+  if ($input != Py_None)
+  {
+    $typemap(in, T)
+  }
+  %}
+
+%typemap(in,implicitconv=1) const std::optional< T >& (std::optional< T > val) %{
+  $1 = &val;
+  if ($input != Py_None)
+  {
+    T $1;
+    $typemap(in, T)
+    val.emplace($1);
+  }
   %}
 
 // For dynamic languages, such as Python, there should be a typecheck typemap
