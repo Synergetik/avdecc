@@ -2,7 +2,7 @@
 // AVDECC LIBRARY SWIG file
 ////////////////////////////////////////
 
-%module(directors="1") avdecc
+%module(directors="1", threads="1") avdecc
 
 %include <stl.i>
 %include <std_string.i>

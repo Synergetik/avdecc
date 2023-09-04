@@ -2,7 +2,7 @@
 // AVDECC ENTITY MODEL SWIG file
 ////////////////////////////////////////
 
-%module avdeccEntityModel
+%module(directors="1", threads="1") avdeccEntityModel
 
 %include <stdint.i>
 %include <std_string.i>

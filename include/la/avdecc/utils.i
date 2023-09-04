@@ -13,6 +13,8 @@
     #define %nspaceapp(...)
   #endif
 
+  %feature("nothreadallow");
+
   %feature("flatnested", "1");              // Flatten nested classes
   %feature("python:annotations", "c");      // Enable annotations for python type hints
   

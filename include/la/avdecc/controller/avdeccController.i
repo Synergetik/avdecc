@@ -2,7 +2,7 @@
 // AVDECC CONTROLLER LIBRARY SWIG file
 ////////////////////////////////////////
 
-%module(directors="1") avdeccController
+%module(directors="1", threads="1") avdeccController
 
 #define SWIG_STD_PAIR_ASVAL
 
