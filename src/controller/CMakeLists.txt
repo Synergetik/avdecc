@@ -182,6 +182,9 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/entityModel.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/avdecc.i"
 	)
+	if(${AVDECC_SWIG_LANGUAGES} STREQUAL "python") # TODO: Extend for multiple languages
+		set_property(SOURCE ${SWIG_INTERFACE_FILE} PROPERTY COMPILE_OPTIONS -interface _${TARGET_PREFIX})
+	endif()
 	cu_setup_swig_target(VERSION 4.2 TARGET_NAME ${PROJECT_NAME}::shared INTERFACE_FILE "${SWIG_INTERFACE_FILE}" LANGUAGES ${AVDECC_SWIG_LANGUAGES} SWIG_TARGET_PREFIX ${TARGET_PREFIX} REQUIRED INSTALL_SUPPORT_FILES FILE_DEPENDENCIES ${SWIG_FILE_DEPENDENCIES} INSTALL_CONFIGURATIONS Release Debug)
 
 	# Post process generated targets
@@ -197,17 +200,17 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		if(${SWIG_LANG} STREQUAL "lua")
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE liblua)
 		elseif(${SWIG_LANG} STREQUAL "csharp")
-			# Supress generated python binding warnings
+			# Supress generated csharp binding warnings
 			if(MSVC)
 				add_definitions("/wd4702")
 			endif()
-		elseif(${SWIG_LANG} STREQUAL "python")	
-			string(REPLACE "-python" "" SWIG_TARGET_OUTPUT_NAME ${SWIG_TARGET_NAME})
-			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES OUTPUT_NAME _${SWIG_TARGET_OUTPUT_NAME})
+		elseif(${SWIG_LANG} STREQUAL "python")
+			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES DEBUG_POSTFIX "_d")
+			set_target_properties(${SWIG_TARGET_NAME} PROPERTIES OUTPUT_NAME _${TARGET_PREFIX})
 
 			# Supress generated python binding warnings
 			if(MSVC)
-				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244")
+				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244 /wd4457")
 			endif()
 
 			# Add python library references
