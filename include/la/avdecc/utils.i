@@ -5,12 +5,24 @@
 %include <stdint.i>
 
 #if defined(SWIGCSHARP)
+#if !defined(%nspaceapp)
 #define %nspaceapp(...) %nspace __VA_ARGS__
-#elif defined(SWIGPYTHON)
-#define %nspaceapp(...)
-%rename(Unknown) None;  // Rename all "None" identifiers to "Unknown"
-%ignore hash;           // Ignore any hash structres (not needed)
 #endif
+#elif defined(SWIGPYTHON)
+  #if !defined(%nspaceapp)
+    #define %nspaceapp(...)
+  #endif
+
+  %feature("flatnested", "1");              // Flatten nested classes
+  %feature("python:annotations", "c");      // Enable annotations for python type hints
+  
+  %rename(Unknown) None;                    // Rename all "None" identifiers to "Unknown"
+  
+  %rename(__repr__) operator std::string;   // Converty any operator std::string() method to python __repr__
+  %rename(__int__) operator int;            // Converty any operator int() method to python __int__
+#endif
+
+%ignore hash;                             // Ignore any hash structres (not needed)
 
 
 // Define a helper template to handle std::underlying_type_t
@@ -208,13 +220,13 @@ public:
 #endif
 %enddef
 
-%define DEFINE_OBSERVER_CLASS(classname, py_username)
+%define DEFINE_OBSERVER_CLASS(classname, py_userclassname)
 #if defined(SWIGCSHARP)
 	%nspaceapp(classname);
 #endif
 	%rename("%s") classname; // Unignore class
 	%feature("director") classname;
 #if defined(SWIGPYTHON)
-	%rename(py_username) classname;
+	%rename(py_userclassname) classname;
 #endif
 %enddef
