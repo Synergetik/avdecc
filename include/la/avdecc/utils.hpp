@@ -44,12 +44,27 @@
 #include <vector>
 #include <mutex>
 
+#if !defined(__GNUC__) || __GNUC__ >= 10 /* <version> is not present in earier versions of gcc (not sure which version exactly, using 10 here) */
+#	include <version>
+#endif
+
+#if __cpp_lib_filesystem >= 201703L
+#	define LA_AVDECC_USES_STD_FILESYSTEM
+#	include <filesystem>
+#endif // __cpp_lib_filesystem >= 201703L
+
 namespace la
 {
 namespace avdecc
 {
 namespace utils
 {
+#ifdef LA_AVDECC_USES_STD_FILESYSTEM
+using FilePath = std::filesystem::path;
+#else // !LA_AVDECC_USES_STD_FILESYSTEM
+using FilePath = std::string;
+#endif // LA_AVDECC_USES_STD_FILESYSTEM
+
 enum class ThreadPriority
 {
 	Idle = 0,
@@ -96,6 +111,15 @@ bool avdeccAssertRelease(Cond const condition) noexcept
 {
 	bool const result = !!condition;
 	return result;
+}
+
+inline FilePath filePathFromUTF8String(std::string const& utf8FilePath) noexcept
+{
+#ifdef LA_AVDECC_USES_STD_FILESYSTEM
+	return std::filesystem::u8path(utf8FilePath);
+#else // !LA_AVDECC_USES_STD_FILESYSTEM
+	return utf8FilePath;
+#endif // LA_AVDECC_USES_STD_FILESYSTEM
 }
 
 } // namespace utils

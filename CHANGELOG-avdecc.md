@@ -11,10 +11,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - [Support for CONTROL_SELECTOR type for CONTROL descriptors](https://github.com/L-Acoustics/avdecc/issues/128)
 - *numberOfValues* field in the CONTROL descriptor
 - Support for float special values in json dumps (ie. NaN, -inf, +inf)
+- Support for UTF8 file paths
 
 ### Changed
 - la::avdecc::entity::controller::Delegate is now virtual pure, but a new derivated visitor (with all default implementation) has been added: la::avdecc::entity::controller::DefaultedDelegate
 - [Executor name can be provided when creating an EndStation](https://github.com/L-Acoustics/avdecc/issues/132)
+- *entity::model::validateControlValues* now returns an enum value as well as an error message
+
+### Fixed
+- Crash when unpacking vendor specific control values
 
 ## [3.4.1] - 2023-01-11
 
