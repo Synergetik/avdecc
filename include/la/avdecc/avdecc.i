@@ -28,6 +28,7 @@
 	#include <la/avdecc/memoryBuffer.hpp>
 	#include <la/avdecc/executor.hpp>
 	#include <la/avdecc/avdecc.hpp>
+	#include <la/avdecc/watchDog.hpp>
 	#include <la/avdecc/internals/exception.hpp>
 	#include <la/avdecc/internals/entity.hpp>
 	#include <la/avdecc/internals/controllerEntity.hpp>
@@ -42,6 +43,29 @@
 
 #define LA_AVDECC_API
 #define LA_AVDECC_CALL_CONVENTION
+
+////////////////////////////////////////
+// Watchdog control
+////////////////////////////////////////
+#if defined(SWIGPYTHON)
+%insert(init) %{
+	la::avdecc::watchDog::IsCustomDebuggerPresent = []() -> bool {
+  		bool attached = false;
+
+		SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+		auto gettrace = PySys_GetObject("gettrace");
+		if (gettrace != nullptr) {
+			auto trace = PyObject_CallObject(gettrace, nullptr);
+			if (trace != nullptr) {
+				attached = true;
+			}
+		}
+		SWIG_PYTHON_THREAD_END_BLOCK;
+		return attached; 
+	};
+%}
+#endif
+
 
 ////////////////////////////////////////
 // Utils

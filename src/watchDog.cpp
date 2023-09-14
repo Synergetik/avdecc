@@ -38,6 +38,9 @@ namespace avdecc
 {
 namespace watchDog
 {
+/* Global watchdog control */
+std::function<bool()> IsCustomDebuggerPresent { nullptr };
+
 class WatchDogImpl final : public WatchDog
 {
 private:
@@ -75,6 +78,10 @@ public:
 									watchInfo.lastAlive = currentTime;
 								}
 #endif // _WIN32
+								if (IsCustomDebuggerPresent && IsCustomDebuggerPresent())
+								{
+									watchInfo.lastAlive = currentTime;
+								}
 
 								// Check if we timed out
 								if (!watchInfo.ignore && std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - watchInfo.lastAlive).count() > watchInfo.maximumInterval.count())
