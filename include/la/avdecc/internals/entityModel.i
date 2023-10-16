@@ -169,6 +169,8 @@ DEFINE_AEM_TYPES_ENUM_CLASS(DescriptorType, "ushort")
 DEFINE_AEM_TYPES_ENUM_CLASS(JackType, "ushort")
 DEFINE_AEM_TYPES_ENUM_CLASS(MemoryObjectOperationType, "ushort")
 DEFINE_AEM_TYPES_ENUM_CLASS(MemoryObjectType, "ushort")
+DEFINE_AEM_TYPES_ENUM_CLASS(TimingAlgorithm, "ushort")
+DEFINE_AEM_TYPES_ENUM_CLASS(PtpPortType, "ushort")
 DEFINE_AEM_TYPES_ENUM_CLASS(StandardControlType, "ulong")
 DEFINE_AEM_TYPES_ENUM_CLASS(ProbingStatus, "byte")
 DEFINE_AEM_TYPES_ENUM_CLASS(MsrpFailureCode, "byte")
@@ -252,6 +254,8 @@ DEFINE_ENUM_CLASS(la::avdecc::entity, JackFlag, "ushort")
 DEFINE_ENUM_CLASS(la::avdecc::entity, AvbInterfaceFlag, "ushort")
 DEFINE_ENUM_CLASS(la::avdecc::entity, ClockSourceFlag, "ushort")
 DEFINE_ENUM_CLASS(la::avdecc::entity, PortFlag, "ushort")
+DEFINE_ENUM_CLASS(la::avdecc::entity, PtpInstanceFlag, "uint")
+DEFINE_ENUM_CLASS(la::avdecc::entity, PtpPortFlag, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, StreamInfoFlag, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, StreamInfoFlagEx, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, AvbInfoFlag, "byte")
@@ -260,6 +264,7 @@ DEFINE_ENUM_CLASS(la::avdecc::entity, AvbInterfaceCounterValidFlag, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, ClockDomainCounterValidFlag, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, StreamInputCounterValidFlag, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, StreamOutputCounterValidFlag, "uint")
+DEFINE_ENUM_CLASS(la::avdecc::entity, StreamOutputCounterValidFlag17221, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, MilanInfoFeaturesFlag, "uint")
 
 // Bind structs and classes
@@ -280,6 +285,8 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, JackFlags, JackFlag, std::uint16_
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, AvbInterfaceFlags, AvbInterfaceFlag, std::uint16_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, ClockSourceFlags, ClockSourceFlag, std::uint16_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, PortFlags, PortFlag, std::uint16_t)
+DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, PtpInstanceFlags, PtpInstanceFlag, std::uint32_t)
+DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, PtpPortFlags, PtpPortFlag, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, StreamInfoFlags, StreamInfoFlag, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, StreamInfoFlagsEx, StreamInfoFlagEx, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, AvbInfoFlags, AvbInfoFlag, std::uint8_t)
@@ -288,6 +295,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, AvbInterfaceCounterValidFlags, Av
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, ClockDomainCounterValidFlags, ClockDomainCounterValidFlag, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, StreamInputCounterValidFlags, StreamInputCounterValidFlag, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, StreamOutputCounterValidFlags, StreamOutputCounterValidFlag, std::uint32_t)
+DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, StreamOutputCounterValidFlags17221, StreamOutputCounterValidFlag17221, std::uint32_t)
 DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity, MilanInfoFeaturesFlags, MilanInfoFeaturesFlag, std::uint32_t)
 
 
@@ -425,6 +433,9 @@ DEFINE_AEM_DESCRIPTOR(AudioClusterDescriptor);
 DEFINE_AEM_DESCRIPTOR(AudioMapDescriptor);
 DEFINE_AEM_DESCRIPTOR(ControlDescriptor);
 DEFINE_AEM_DESCRIPTOR(ClockDomainDescriptor);
+DEFINE_AEM_DESCRIPTOR(TimingDescriptor);
+DEFINE_AEM_DESCRIPTOR(PtpInstanceDescriptor);
+DEFINE_AEM_DESCRIPTOR(PtpPortDescriptor);
 DEFINE_AEM_STRUCT(StreamInfo);
 DEFINE_AEM_STRUCT(AvbInfo);
 DEFINE_AEM_STRUCT(AsPath);

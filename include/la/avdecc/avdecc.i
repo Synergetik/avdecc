@@ -196,16 +196,23 @@ public:
 ////////////////////////////////////////
 // Exception class
 ////////////////////////////////////////
-%nspaceapp(la::avdecc::Exception);
-// Currently no resolution is performed in order to match function parameters. This means function parameter types must match exactly. For example, namespace qualifiers and typedefs will not work.
-%ignore la::avdecc::Exception::operator=;
-// Ignore char* constructor
-%ignore la::avdecc::Exception::Exception(char const* const);
-// Ignore move constructor
-%ignore la::avdecc::Exception::Exception(Exception&&);
+// Ignore Exception, will be created as native exception
+
+// Throw typemap
+%typemap (throws, canthrow=1) la::avdecc::Exception %{
+	SWIG_CSharpSetPendingException($1.what());
+	return $null;
+%}
+
+// Define catches for methods that can throw
+%catches(la::avdecc::Exception) la::avdecc::entity::Entity::Entity;
+%catches(la::avdecc::Exception) la::avdecc::entity::Entity::getInterfaceInformation(model::AvbInterfaceIndex const interfaceIndex) const;
+%catches(la::avdecc::Exception) la::avdecc::entity::Entity::getInterfaceInformation(model::AvbInterfaceIndex const interfaceIndex);
+%catches(la::avdecc::Exception) la::avdecc::entity::Entity::getAnyMacAddress() const;
 
 // Include c++ declaration file
 %include "la/avdecc/internals/exception.hpp"
+
 
 ////////////////////////////////////////
 // Entity Model
@@ -319,6 +326,9 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::DefaultedDelegate, EntityC
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_MapIndex_AudioMapDescriptor;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ControlIndex_ControlDescriptor;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClockDomainIndex_ClockDomainDescriptor;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_TimingIndex_TimingDescriptor;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpInstanceIndex_PtpInstanceDescriptor;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpPortIndex_PtpPortDescriptor;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_StreamIndex_StreamFormat;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_StreamPortIndex_MapIndex_MapIndex_AudioMappings;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_StreamPortIndex_AudioMappings;
@@ -336,6 +346,9 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::DefaultedDelegate, EntityC
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClusterIndex_AvdeccFixedString;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ControlIndex_AvdeccFixedString;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClockDomainIndex_AvdeccFixedString;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_TimingIndex_AvdeccFixedString;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpInstanceIndex_AvdeccFixedString;
+%rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpPortIndex_AvdeccFixedString;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_AudioUnitIndex_SamplingRate;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_ClusterIndex_SamplingRate;
 %rename("%s") Handler_UniqueIdentifier_AemCommandStatus_StreamIndex;
@@ -382,6 +395,9 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::DefaultedDelegate, EntityC
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_MapIndex_AudioMapDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::MapIndex const mapIndex, la::avdecc::entity::model::AudioMapDescriptor const& descriptor);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ControlIndex_ControlDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::ControlIndex const controlIndex, la::avdecc::entity::model::ControlDescriptor const& descriptor);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClockDomainIndex_ClockDomainDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::ClockDomainIndex const clockDomainIndex, la::avdecc::entity::model::ClockDomainDescriptor const& descriptor);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_TimingIndex_TimingDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::TimingIndex const timingIndex, la::avdecc::entity::model::TimingDescriptor const& descriptor);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpInstanceIndex_PtpInstanceDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::PtpInstanceIndex const ptpInstanceIndex, la::avdecc::entity::model::PtpInstanceDescriptor const& descriptor);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpPortIndex_PtpPortDescriptor, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::PtpPortIndex const ptpPortIndex, la::avdecc::entity::model::PtpPortDescriptor const& descriptor);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_StreamIndex_StreamFormat, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::StreamIndex const streamIndex, la::avdecc::entity::model::StreamFormat const streamFormat);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_StreamPortIndex_MapIndex_MapIndex_AudioMappings, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::StreamPortIndex const streamPortIndex, la::avdecc::entity::model::MapIndex const numberOfMaps, la::avdecc::entity::model::MapIndex const mapIndex, la::avdecc::entity::model::AudioMappings const& mappings);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_StreamPortIndex_AudioMappings, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::StreamPortIndex const streamPortIndex, la::avdecc::entity::model::AudioMappings const& mappings);
@@ -399,6 +415,9 @@ DEFINE_OBSERVER_CLASS(la::avdecc::entity::controller::DefaultedDelegate, EntityC
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClusterIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::ClusterIndex const audioClusterIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ControlIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::ControlIndex const controlIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_ClockDomainIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::ClockDomainIndex const clockDomainIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_TimingIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::TimingIndex const timingIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpInstanceIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::PtpInstanceIndex const ptpInstanceIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
+%std_function(Handler_UniqueIdentifier_AemCommandStatus_ConfigurationIndex_PtpPortIndex_AvdeccFixedString, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ConfigurationIndex const configurationIndex, la::avdecc::entity::model::PtpPortIndex const ptpPortIndex, la::avdecc::entity::model::AvdeccFixedString const& name);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_AudioUnitIndex_SamplingRate, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::AudioUnitIndex const audioUnitIndex, la::avdecc::entity::model::SamplingRate const samplingRate);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_ClusterIndex_SamplingRate, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::ClusterIndex const clusterIndex, la::avdecc::entity::model::SamplingRate const samplingRate);
 %std_function(Handler_UniqueIdentifier_AemCommandStatus_StreamIndex, void, la::avdecc::entity::controller::Interface const* const controller, la::avdecc::UniqueIdentifier const entityID, la::avdecc::entity::LocalEntity::AemCommandStatus const status, la::avdecc::entity::model::StreamIndex const streamIndex);
@@ -601,6 +620,9 @@ DEFINE_AEM_TREE_MODELS(AudioCluster)
 DEFINE_AEM_TREE_MODELS(AudioMap)
 DEFINE_AEM_TREE_MODELS(Control)
 DEFINE_AEM_TREE_MODELS(ClockDomain)
+DEFINE_AEM_TREE_MODELS(Timing)
+DEFINE_AEM_TREE_MODELS(PtpInstance)
+DEFINE_AEM_TREE_MODELS(PtpPort)
 DEFINE_AEM_TREE_MODELS(Configuration)
 DEFINE_AEM_TREE_MODELS(Entity)
 DEFINE_AEM_TREE_LEAF(StreamInput);
@@ -613,10 +635,13 @@ DEFINE_AEM_TREE_LEAF(AudioCluster);
 DEFINE_AEM_TREE_LEAF(AudioMap);
 DEFINE_AEM_TREE_LEAF(Control);
 DEFINE_AEM_TREE_LEAF(ClockDomain);
+DEFINE_AEM_TREE_LEAF(Timing);
+DEFINE_AEM_TREE_LEAF(PtpPort);
 DEFINE_AEM_TREE_NODE(Jack);
 DEFINE_AEM_TREE_NODE(Locale);
 DEFINE_AEM_TREE_NODE(StreamPort);
 DEFINE_AEM_TREE_NODE(AudioUnit);
+DEFINE_AEM_TREE_NODE(PtpInstance);
 DEFINE_AEM_TREE_NODE(Configuration);
 DEFINE_AEM_TREE_NODE(Entity);
 
@@ -638,6 +663,8 @@ DEFINE_AEM_TREE_NODE(Entity);
 %template(LocaleTreeMap) std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::entity::model::LocaleTree>;
 %ignore std::map<la::avdecc::entity::model::JackIndex, la::avdecc::entity::model::JackTree>::get_allocator; // ignore allocators, need for python bindings
 %template(JackTreeMap) std::map<la::avdecc::entity::model::JackIndex, la::avdecc::entity::model::JackTree>;
+%ignore std::map<la::avdecc::entity::model::PtpInstanceIndex, la::avdecc::entity::model::PtpInstanceTree>::get_allocator; // ignore allocators, need for python bindings
+%template(PtpInstanceTreeMap) std::map<la::avdecc::entity::model::PtpInstanceIndex, la::avdecc::entity::model::PtpInstanceTree>;
 %ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamInputNodeModels>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamInputNodeModelMap) std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamInputNodeModels>;
 %ignore std::map<la::avdecc::entity::model::StreamIndex, la::avdecc::entity::model::StreamOutputNodeModels>::get_allocator; // ignore allocators, need for python bindings
@@ -650,6 +677,10 @@ DEFINE_AEM_TREE_NODE(Entity);
 %template(MemoryObjectNodeModelMap) std::map<la::avdecc::entity::model::MemoryObjectIndex, la::avdecc::entity::model::MemoryObjectNodeModels>;
 %ignore std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::entity::model::ClockDomainNodeModels>::get_allocator; // ignore allocators, need for python bindings
 %template(ClockDomainNodeModelMap) std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::entity::model::ClockDomainNodeModels>;
+%ignore std::map<la::avdecc::entity::model::TimingIndex, la::avdecc::entity::model::TimingNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(TimingNodeModelMap) std::map<la::avdecc::entity::model::TimingIndex, la::avdecc::entity::model::TimingNodeModels>;
+%ignore std::map<la::avdecc::entity::model::PtpPortIndex, la::avdecc::entity::model::PtpPortNodeModels>::get_allocator; // ignore allocators, need for python bindings
+%template(PtpPortNodeModelMap) std::map<la::avdecc::entity::model::PtpPortIndex, la::avdecc::entity::model::PtpPortNodeModels>;
 %ignore std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::entity::model::ConfigurationTree>::get_allocator; // ignore allocators, need for python bindings
 %template(ConfigurationTreeMap) std::map<la::avdecc::entity::model::ConfigurationIndex, la::avdecc::entity::model::ConfigurationTree>;
 %ignore std::map<la::avdecc::entity::EntityCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
@@ -658,6 +689,8 @@ DEFINE_AEM_TREE_NODE(Entity);
 %template(StreamInputCounters) std::map<la::avdecc::entity::StreamInputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
 %ignore std::map<la::avdecc::entity::StreamOutputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
 %template(StreamOutputCounters) std::map<la::avdecc::entity::StreamOutputCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
+%ignore std::map<la::avdecc::entity::StreamOutputCounterValidFlag17221, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
+%template(StreamOutputCounters17221) std::map<la::avdecc::entity::StreamOutputCounterValidFlag17221, la::avdecc::entity::model::DescriptorCounter>;
 %ignore std::map<la::avdecc::entity::AvbInterfaceCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
 %template(AvbInterfaceCounters) std::map<la::avdecc::entity::AvbInterfaceCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>;
 %ignore std::map<la::avdecc::entity::ClockDomainCounterValidFlag, la::avdecc::entity::model::DescriptorCounter>::get_allocator; // ignore allocators, need for python bindings
@@ -720,14 +753,43 @@ public:
 };
 %ignore la::avdecc::EndStation::create; // Ignore it, will be wrapped (because std::unique_ptr doesn't support custom deleters - Ticket #2411)
 
-// Define C# exception handling for la::avdecc::EndStation::Exception
+// Throw typemap
+%typemap (throws, canthrow=1) la::avdecc::EndStation::Exception %{
+	SWIG_CSharpSetPendingExceptionEndStation($1.getError(), $1.what());
+	return $null;
+%}
+
+// Define catches for methods that can throw
+%catches(la::avdecc::EndStation::Exception) la::avdecc::EndStation::create;
+
+// Include c++ declaration file
+%include "la/avdecc/internals/endStation.hpp"
+%rename("%s", %$isclass) ""; // Undo the ignore all structs/classes
+
+
+// Define C# exception handling
 %insert(runtime) %{
+	// la::avdecc::Exception
+	typedef void (SWIGSTDCALL* ExceptionCallback_t)(char const* const message);
+	ExceptionCallback_t exceptionCallback = NULL;
+
+	extern "C" SWIGEXPORT void SWIGSTDCALL ExceptionRegisterCallback(ExceptionCallback_t cb)
+	{
+		exceptionCallback = cb;
+	}
+
+	static void SWIG_CSharpSetPendingException(char const* const message)
+	{
+		exceptionCallback(message);
+	}
+
+	// la::avdecc::EndStation::Exception
 	typedef void (SWIGSTDCALL* EndStationExceptionCallback_t)(la::avdecc::EndStation::Error const error, char const* const message);
 	EndStationExceptionCallback_t endStationExceptionCallback = NULL;
 
-	extern "C" SWIGEXPORT void SWIGSTDCALL EndStationExceptionRegisterCallback(EndStationExceptionCallback_t exceptionCallback)
+	extern "C" SWIGEXPORT void SWIGSTDCALL EndStationExceptionRegisterCallback(EndStationExceptionCallback_t cb)
 	{
-		endStationExceptionCallback = exceptionCallback;
+		endStationExceptionCallback = cb;
 	}
 
 	static void SWIG_CSharpSetPendingExceptionEndStation(la::avdecc::EndStation::Error const error, char const* const message)
@@ -736,6 +798,28 @@ public:
 	}
 %}
 %pragma(csharp) imclasscode=%{
+	// la::avdecc::Exception
+	class ExceptionHelper
+	{
+		public delegate void ExceptionDelegate(string message);
+		static ExceptionDelegate exceptionDelegate = new ExceptionDelegate(SetPendingException);
+
+		[global::System.Runtime.InteropServices.DllImport(DllImportPath, EntryPoint="ExceptionRegisterCallback")]
+		public static extern void ExceptionRegisterCallback(ExceptionDelegate exceptionDelegate);
+
+		static void SetPendingException(string message)
+		{
+			SWIGPendingException.Set(new la.avdecc.Exception(message));
+		}
+
+		static ExceptionHelper()
+		{
+			ExceptionRegisterCallback(exceptionDelegate);
+		}
+	}
+	static ExceptionHelper exceptionHelper = new ExceptionHelper();
+
+	// la::avdecc::EndStation::Exception
 	class EndStationExceptionHelper
 	{
 		public delegate void EndStationExceptionDelegate(la.avdecc.EndStationException.Error error, string message);
@@ -754,11 +838,21 @@ public:
 			EndStationExceptionRegisterCallback(endStationDelegate);
 		}
 	}
-	static EndStationExceptionHelper exceptionHelper = new EndStationExceptionHelper();
+	static EndStationExceptionHelper endStationExceptionHelper = new EndStationExceptionHelper();
 %}
 %pragma(csharp) moduleimports=%{
 namespace la.avdecc
 {
+	// la::avdecc::Exception
+	class Exception : global::System.ApplicationException
+	{
+		public Exception(string message)
+			: base(message)
+		{
+		}
+	}
+
+	// la::avdecc::EndStation::Exception
 	class EndStationException : global::System.ApplicationException
 	{
 		public enum Error
@@ -787,15 +881,3 @@ namespace la.avdecc
 	}
 }
 %}
-// Throw typemap
-%typemap (throws, canthrow=1) la::avdecc::EndStation::Exception %{
-	SWIG_CSharpSetPendingExceptionEndStation($1.getError(), $1.what());
-	return $null;
-%}
-
-// Define catches for methods that can throw
-%catches(la::avdecc::EndStation::Exception) la::avdecc::EndStation::create;
-
-// Include c++ declaration file
-%include "la/avdecc/internals/endStation.hpp"
-%rename("%s", %$isclass) ""; // Undo the ignore all structs/classes

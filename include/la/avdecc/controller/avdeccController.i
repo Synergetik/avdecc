@@ -108,6 +108,9 @@ DEFINE_CONTROLLED_ENTITY_MODEL_NODE(MemoryObject)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Strings)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Locale)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(ClockDomain)
+DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Timing)
+DEFINE_CONTROLLED_ENTITY_MODEL_NODE(PtpInstance)
+DEFINE_CONTROLLED_ENTITY_MODEL_NODE(PtpPort)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Configuration)
 DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Entity)
 
@@ -149,6 +152,12 @@ DEFINE_CONTROLLED_ENTITY_MODEL_NODE(Entity)
 %template(LocaleNodeMap) std::map<la::avdecc::entity::model::LocaleIndex, la::avdecc::controller::model::LocaleNode>;
 %ignore std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::controller::model::ClockDomainNode>::get_allocator; // ignore allocators, need for python bindings
 %template(ClockDomainNodeMap) std::map<la::avdecc::entity::model::ClockDomainIndex, la::avdecc::controller::model::ClockDomainNode>;
+%ignore std::map<la::avdecc::entity::model::TimingIndex, la::avdecc::controller::model::TimingNode>::get_allocator; // ignore allocators, need for python bindings
+%template(TimingNodeMap) std::map<la::avdecc::entity::model::TimingIndex, la::avdecc::controller::model::TimingNode>;
+%ignore std::map<la::avdecc::entity::model::PtpInstanceIndex, la::avdecc::controller::model::PtpInstanceNode>::get_allocator; // ignore allocators, need for python bindings
+%template(PtpInstanceNodeMap) std::map<la::avdecc::entity::model::PtpInstanceIndex, la::avdecc::controller::model::PtpInstanceNode>;
+%ignore std::map<la::avdecc::entity::model::PtpPortIndex, la::avdecc::controller::model::PtpPortNode>::get_allocator; // ignore allocators, need for python bindings
+%template(PtpPortNodeMap) std::map<la::avdecc::entity::model::PtpPortIndex, la::avdecc::controller::model::PtpPortNode>;
 %ignore std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamInputNode>::get_allocator; // ignore allocators, need for python bindings
 %template(RedundantStreamInputNodeMap) std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamInputNode>;
 %ignore std::map<la::avdecc::controller::model::VirtualIndex, la::avdecc::controller::model::RedundantStreamOutputNode>::get_allocator; // ignore allocators, need for python bindings
@@ -247,6 +256,9 @@ DEFINE_ENUM_CLASS(la::avdecc::controller::ControlledEntity, CompatibilityFlag, "
 //%catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getAudioMapNode;
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getControlNode;
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getClockDomainNode;
+%catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getTimingNode;
+%catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getPtpInstanceNode;
+%catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getPtpPortNode;
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::findLocaleNode;
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getLocalizedString;
 %catches(la::avdecc::controller::ControlledEntity::Exception) la::avdecc::controller::ControlledEntity::getSinkConnectionInformation;
@@ -422,9 +434,9 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller, CompileOptions, CompileOption
 	typedef void (SWIGSTDCALL* ControlledEntityExceptionCallback_t)(la::avdecc::controller::ControlledEntity::Exception::Type const type, char const* const message);
 	ControlledEntityExceptionCallback_t controlledEntityExceptionCallback = NULL;
 
-	extern "C" SWIGEXPORT void SWIGSTDCALL ControlledEntityExceptionRegisterCallback(ControlledEntityExceptionCallback_t exceptionCallback)
+	extern "C" SWIGEXPORT void SWIGSTDCALL ControlledEntityExceptionRegisterCallback(ControlledEntityExceptionCallback_t cb)
 	{
-		controlledEntityExceptionCallback = exceptionCallback;
+		controlledEntityExceptionCallback = cb;
 	}
 
 	static void SWIG_CSharpSetPendingExceptionControlledEntity(la::avdecc::controller::ControlledEntity::Exception::Type const type, char const* const message)
@@ -436,9 +448,9 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller, CompileOptions, CompileOption
 	typedef void (SWIGSTDCALL* ControllerExceptionCallback_t)(la::avdecc::controller::Controller::Error const error, char const* const message);
 	ControllerExceptionCallback_t controllerExceptionCallback = NULL;
 
-	extern "C" SWIGEXPORT void SWIGSTDCALL ControllerExceptionRegisterCallback(ControllerExceptionCallback_t exceptionCallback)
+	extern "C" SWIGEXPORT void SWIGSTDCALL ControllerExceptionRegisterCallback(ControllerExceptionCallback_t cb)
 	{
-		controllerExceptionCallback = exceptionCallback;
+		controllerExceptionCallback = cb;
 	}
 
 	static void SWIG_CSharpSetPendingExceptionController(la::avdecc::controller::Controller::Error const error, char const* const message)
