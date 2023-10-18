@@ -88,6 +88,15 @@ enum class ThreadPriority
 };
 } // namespace la::avdecc::utils
 
+// Define OnSetCurrentThreadName hook
+%std_function(Handler_ThreadCreation, void, std::string const&);
+
+%nspaceapp(la::avdecc::utils::OnSetCurrentThreadName);
+namespace la::avdecc::utils
+{
+extern std::function<void(std::string const&)> OnSetCurrentThreadName;
+} // namespace la::avdecc::utils
+
 
 ////////////////////////////////////////
 // MemoryBuffer class
@@ -149,6 +158,7 @@ DEFINE_OPTIONAL_CLASS(std, string, OptStdString)
 public:
 	static std::unique_ptr<la::avdecc::Executor> create(std::optional<std::string> const& name = std::nullopt, utils::ThreadPriority const prio = utils::ThreadPriority::Normal) noexcept
 	{
+		SWIG_PYTHON_THREAD_BEGIN_ALLOW;
 		return std::unique_ptr<la::avdecc::Executor>{ la::avdecc::ExecutorWithDispatchQueue::create(name, prio).release() };
 	}
 };
@@ -742,6 +752,7 @@ public:
 		try
 		{
 			// Right now, force PCap as we cannot bind the protocolInterfaceType enum correctly
+			SWIG_PYTHON_THREAD_BEGIN_ALLOW;
 			return std::unique_ptr<la::avdecc::EndStation>{ la::avdecc::EndStation::create(la::avdecc::protocol::ProtocolInterface::Type::PCap, networkInterfaceName, executorName).release() };
 		}
 		catch (la::avdecc::EndStation::Exception const& e)
@@ -753,11 +764,18 @@ public:
 };
 %ignore la::avdecc::EndStation::create; // Ignore it, will be wrapped (because std::unique_ptr doesn't support custom deleters - Ticket #2411)
 
+#ifdef SWIGCSHARP
 // Throw typemap
 %typemap (throws, canthrow=1) la::avdecc::EndStation::Exception %{
 	SWIG_CSharpSetPendingExceptionEndStation($1.getError(), $1.what());
 	return $null;
 %}
+#elif defined(SWIGPYTHON)
+%typemap (throws, canthrow=1) la::avdecc::EndStation::Exception %{
+	SWIG_CSharpSetPendingException($1.what());
+	return NULL;
+%}
+#endif
 
 // Define catches for methods that can throw
 %catches(la::avdecc::EndStation::Exception) la::avdecc::EndStation::create;

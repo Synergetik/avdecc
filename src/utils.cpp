@@ -84,8 +84,15 @@ static bool IsDebuggerPresent()
 }
 #endif // __APPLE__
 
+LA_AVDECC_API std::function<void(std::string const&)> OnSetCurrentThreadName = nullptr;
+
 bool LA_AVDECC_CALL_CONVENTION setCurrentThreadName(std::string const& name)
 {
+	if (OnSetCurrentThreadName)
+	{
+		OnSetCurrentThreadName(name);
+	}
+
 #if defined(_WIN32)
 	struct
 	{
