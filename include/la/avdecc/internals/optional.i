@@ -23,11 +23,9 @@ namespace std {
 } // namespace std
 
 #if defined(SWIGCSHARP)
-    %include "csharp_optional.i"
-#elif defined(SWIGJAVA)
-    %include "java_optional.i"
+    %include "optional_csharp.i"
 #elif defined(SWIGPYTHON)
-    %include "python_optional.i"
+    %include "optional_python.i"
 #else
     #error "No OptionalValue<> typemaps for this language."
 #endif

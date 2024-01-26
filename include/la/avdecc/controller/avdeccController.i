@@ -355,8 +355,7 @@ DEFINE_OBSERVER_CLASS(la::avdecc::controller::Controller::DefaultedObserver, Con
 %}
 #elif defined(SWIGPYTHON)
 %typemap (throws, canthrow=1) la::avdecc::controller::Controller::Exception %{
-	SWIG_exception(SWIG_RuntimeError, $1.what());
-	return $null;
+ 	SWIG_exception(SWIG_RuntimeError, $1.what());
 %}
 #endif
 

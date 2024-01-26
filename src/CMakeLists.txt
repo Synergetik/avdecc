@@ -369,8 +369,8 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 	set(SWIG_FILE_DEPENDENCIES
 		"${CU_ROOT_DIR}/include/la/avdecc/utils.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/chrono.i"
-		"${CU_ROOT_DIR}/include/la/avdecc/internals/csharp_optional.i"
-		"${CU_ROOT_DIR}/include/la/avdecc/internals/python_optional.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_csharp.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_python.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
@@ -405,7 +405,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 
 			# Supress generated python binding warnings
 			if(MSVC)
-				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244")
+				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244 /wd4457 /wd4996")
 			endif()
 
 			# Add python library references
@@ -429,8 +429,8 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 	set(SWIG_FILE_DEPENDENCIES
 		"${CU_ROOT_DIR}/include/la/avdecc/utils.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/chrono.i"
-		"${CU_ROOT_DIR}/include/la/avdecc/internals/csharp_optional.i"
-		"${CU_ROOT_DIR}/include/la/avdecc/internals/python_optional.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_csharp.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_python.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
@@ -466,7 +466,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 
 			# Supress generated python binding warnings
 			if(MSVC)
-				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244")
+				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244 /wd4457 /wd4996")
 			endif()
 
 			# Add python library references
