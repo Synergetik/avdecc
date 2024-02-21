@@ -344,7 +344,34 @@
     %csmethodmodifiers std::unordered_map::get_next_key "private"
     %csmethodmodifiers std::unordered_map::destroy_iterator "private"
 #elif defined(SWIGPYTHON)
-    
+    %rename("__getitem__") std::unordered_map::getitem;
+    %rename("__setitem__") std::unordered_map::setitem;
+    %rename("__create_iterator_begin") std::unordered_map::create_iterator_begin;
+    %rename("__get_next_key") std::unordered_map::get_next_key;
+    %rename("__destroy_iterator") std::unordered_map::destroy_iterator;
+
+    %extend std::unordered_map {
+        int __len__() { return $self->size(); }
+
+        %pythoncode %{
+            def keys(self):
+                it = None
+                try:
+                    it = self.__create_iterator_begin()
+                    for i in range(0, len(self)):
+                        yield self.__get_next_key(it)
+                finally:
+                    if it is not None:
+                        self.__destroy_iterator(it)
+
+            def items(self):
+                return {key: self[key] for key in self.keys()}
+
+            del __repr__
+            def __repr__(self):
+                return "<%s.%s; %s>" % (self.__class__.__module__, self.__class__.__name__, repr(self.items()))
+            %}
+        }
 #else
     #error "No OptionalValue<> typemaps for this language."
 #endif
