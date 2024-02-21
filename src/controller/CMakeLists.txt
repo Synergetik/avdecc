@@ -176,6 +176,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_python.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_facility.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_tuple.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_unordered_map.i"

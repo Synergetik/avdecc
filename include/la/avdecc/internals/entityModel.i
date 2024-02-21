@@ -12,6 +12,7 @@
 %include <std_set.i>
 %include "la/avdecc/internals/std_unordered_map.i" // From https://github.com/microsoft/CNTK/blob/master/bindings/csharp/Swig/std_unordered_map.i and https://github.com/swig/swig/pull/2480
 %include "la/avdecc/internals/optional.i"
+%include "la/avdecc/internals/swig_facility.i"
 
 // Generated wrapper file needs to include our header file
 %{
@@ -55,9 +56,9 @@
 %rename("isDifferent") operator!=(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 %rename("isLess") operator<(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 #elif defined(SWIGPYTHON)
-%rename("UniqueIdentifier_isEqual") operator==(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-%rename("UniqueIdentifier_isDifferent") operator!=(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-%rename("UniqueIdentifier_isLess") operator<(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+%rename("__eq__") la::avdecc::UniqueIdentifier::operator==(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+%rename("__ne__") la::avdecc::UniqueIdentifier::operator!=(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+%rename("__lt__") la::avdecc::UniqueIdentifier::operator<(UniqueIdentifier const& lhs, UniqueIdentifier const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 #endif
 %ignore la::avdecc::UniqueIdentifier::hash::operator(); // Ignore hash functor
 %ignore la::avdecc::UniqueIdentifier::UniqueIdentifier(UniqueIdentifier&&); // Ignore move constructor
@@ -81,6 +82,16 @@
 %}
 #endif
 
+SWIG_PY_REPR(la::avdecc::UniqueIdentifier, {
+			if ($self->isValid())
+			{
+				oss << fmt::format("{:08X}", $self->getValue());
+			} else
+			{
+				oss << "invalid";
+			}
+});
+
 %rename("%s") la::avdecc::UniqueIdentifier::~UniqueIdentifier;
 
 
@@ -98,7 +109,7 @@
 	%typemap(csbase) la::avdecc::entity::model::name type
 	%rename("isEqual") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
 #elif defined(SWIGPYTHON)
-	%rename(#name "_isEqual") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__eq__") la::avdecc::entity::model::operator==(name const, name const); // Not put in a namespace https://github.com/swig/swig/issues/2459
 #endif
 	%rename("$ignore") la::avdecc::entity::model::operator==(name const, std::underlying_type_t<name> const);
 %enddef
@@ -109,8 +120,8 @@
 	%rename("isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 #elif defined(SWIGPYTHON)
-	%rename(#name "_isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-	%rename(#name "_isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__eq__") la::avdecc::entity::model::##name::operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__ne__") la::avdecc::entity::model::##name::operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	
 	%typemap(out) la::avdecc::entity::model::name (la::avdecc::entity::model::name* inter = 0) %{
 		inter = new la::avdecc::entity::model::name($1);
@@ -144,9 +155,9 @@
 	%rename("isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 	%rename("isLess") operator<(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 #elif defined(SWIGPYTHON)
-	%rename(#name "_isEqual") operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-	%rename(#name "_isDifferent") operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
-	%rename(#name "_isLess") operator<(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__eq__") la::avdecc::entity::model::##name::operator==(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__ne__") la::avdecc::entity::model::##name::operator!=(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
+	%rename("__lt__") la::avdecc::entity::model::##name::operator<(name const& lhs, name const& rhs) noexcept; // Not put in a namespace https://github.com/swig/swig/issues/2459
 #endif
 	// Extend the class
 	%extend la::avdecc::entity::model::name
@@ -193,9 +204,9 @@ DEFINE_AEM_TYPES_CLASS_BASE(AvdeccFixedString);
 %rename("isDifferent") la::avdecc::entity::model::AvdeccFixedString::operator!=;
 %rename("toString") la::avdecc::entity::model::AvdeccFixedString::operator std::string;
 #elif defined(SWIGPYTHON)
-%rename("AvdeccFixedString_isEqual") la::avdecc::entity::model::AvdeccFixedString::operator==;
-%rename("AvdeccFixedString_isDifferent") la::avdecc::entity::model::AvdeccFixedString::operator!=;
-%rename("AvdeccFixedString_toString") la::avdecc::entity::model::AvdeccFixedString::operator std::string;
+%rename("__eq__") la::avdecc::entity::model::AvdeccFixedString::operator==;
+%rename("__ne__") la::avdecc::entity::model::AvdeccFixedString::operator!=;
+%rename("__str__") la::avdecc::entity::model::AvdeccFixedString::operator std::string;
 #endif
 %ignore la::avdecc::entity::model::AvdeccFixedString::operator[](size_t const pos);
 %ignore la::avdecc::entity::model::AvdeccFixedString::operator[](size_t const pos) const;
@@ -216,6 +227,16 @@ DEFINE_AEM_TYPES_CLASS_BASE(AvdeccFixedString);
 	}
 #endif
 }
+SWIG_PY_REPR(la::avdecc::entity::model::AvdeccFixedString, {
+			if (!$self->empty())
+			{
+				oss << fmt::format("'{}'", $self->str());
+			} else
+			{
+				oss << "empty";
+			}
+});
+
 DEFINE_AEM_TYPES_CLASS(SamplingRate);
 DEFINE_AEM_TYPES_CLASS(StreamFormat);
 DEFINE_AEM_TYPES_CLASS(LocalizedStringReference);

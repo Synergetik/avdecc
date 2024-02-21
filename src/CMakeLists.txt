@@ -373,6 +373,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_python.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_facility.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_tuple.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_unordered_map.i"
@@ -408,6 +409,10 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244 /wd4457 /wd4996")
 			endif()
 
+			# Include fmtlib
+			target_include_directories(${SWIG_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../externals/3rdparty/fmtlib/include)
+			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE fmt-header-only)
+
 			# Add python library references
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE ${Python_LIBRARIES})
 			target_include_directories(${SWIG_TARGET_NAME} PRIVATE ${Python_INCLUDE_DIRS})
@@ -433,6 +438,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional_python.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/optional.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_foreach.i"
+		"${CU_ROOT_DIR}/include/la/avdecc/internals/swig_facility.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_function.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_tuple.i"
 		"${CU_ROOT_DIR}/include/la/avdecc/internals/std_unordered_map.i"
@@ -468,6 +474,10 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 			if(MSVC)
 				add_definitions("/wd4100 /wd4127 /wd4456 /wd4701 /wd4702 /wd4706 /wd4244 /wd4457 /wd4996")
 			endif()
+
+			# Include fmtlib
+			target_include_directories(${SWIG_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/../externals/3rdparty/fmtlib/include)
+			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE fmt-header-only)
 
 			# Add python library references
 			target_link_libraries(${SWIG_TARGET_NAME} PRIVATE ${Python_LIBRARIES})
