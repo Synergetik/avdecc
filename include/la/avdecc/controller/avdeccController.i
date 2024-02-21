@@ -25,10 +25,10 @@
 	#include <la/avdecc/executor.hpp>
 %}
 
-// Optimize code generation be enabling RVO
+// Optimize code generation by enabling RVO
 %typemap(out, optimal="1") SWIGTYPE
 %{
-	$result = new $1_ltype((const $1_ltype &)$1);
+	$result = new $1_ltype($1);
 %}
 
 #define LA_AVDECC_CONTROLLER_API
@@ -464,7 +464,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller, CompileOptions, CompileOption
 		public delegate void ControlledEntityExceptionDelegate(la.avdecc.controller.ControlledEntityException.Type type, string message);
 		static ControlledEntityExceptionDelegate controlledEntityDelegate = new ControlledEntityExceptionDelegate(SetPendingControlledEntityException);
 
-		[global::System.Runtime.InteropServices.DllImport(DllImportPath, EntryPoint="ControlledEntityExceptionRegisterCallback")]
+		[global::System.Runtime.InteropServices.DllImport("$dllimport", EntryPoint="ControlledEntityExceptionRegisterCallback")]
 		public static extern void ControlledEntityExceptionRegisterCallback(ControlledEntityExceptionDelegate controlledEntityDelegate);
 
 		static void SetPendingControlledEntityException(la.avdecc.controller.ControlledEntityException.Type type, string message)
@@ -485,7 +485,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::controller, CompileOptions, CompileOption
 		public delegate void ControllerExceptionDelegate(la.avdecc.controller.ControllerException.Error error, string message);
 		static ControllerExceptionDelegate controllerDelegate = new ControllerExceptionDelegate(SetPendingControllerException);
 
-		[global::System.Runtime.InteropServices.DllImport(DllImportPath, EntryPoint="ControllerExceptionRegisterCallback")]
+		[global::System.Runtime.InteropServices.DllImport("$dllimport", EntryPoint="ControllerExceptionRegisterCallback")]
 		public static extern void ControllerExceptionRegisterCallback(ControllerExceptionDelegate controllerDelegate);
 
 		static void SetPendingControllerException(la.avdecc.controller.ControllerException.Error error, string message)
