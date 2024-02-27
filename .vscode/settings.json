@@ -1,0 +1,17 @@
+{
+    "cmake.allowUnsupportedPresetsVersions": true,
+    "cmake.buildDirectory": "${workspaceFolder}/_build_win_${buildKitTargetArch}",
+    "cmake.configureSettings": {
+        "MARKETING_VERSION_DIGITS": 2,
+        "MARKETING_VERSION_POSTFIX": "",
+        "BUILD_AVDECC_USE_COMMON_OUTPUT_DIRECTORY": true,
+        "BUILD_AVDECC_EXAMPLES": false,
+        "BUILD_AVDECC_BINDINGS_SWIG": true,
+        "CMAKE_VERBOSE_MAKEFILE": false,
+        "BUILD_AVDECC_BINDINGS_CSHARP": true,
+        "AVDECC_SWIG_LANGUAGES": "python"
+    },
+    "cmake.buildEnvironment": {
+        "PATH": "%PATH%"
+    }
+}
