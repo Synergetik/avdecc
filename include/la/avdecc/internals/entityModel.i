@@ -260,6 +260,17 @@ DEFINE_AEM_TYPES_CLASS_BASE(ControlValues);
 %template(UniqueIdentifierVector) std::vector<la::avdecc::UniqueIdentifier>;
 %template(DescriptorCounterArray) std::array<la::avdecc::entity::model::DescriptorCounter, 32>;
 
+#if defined(SWIGPYTHON)
+%typemap(directorin) std::array< unsigned int,32 > const& (PyObject* inter = 0, Py_ssize_t index = 0) %{
+	inter = PyTuple_New($1.size());
+    for (const auto& n : $1) {
+        auto val = SWIG_From_unsigned_SS_int(n);
+        PyTuple_SetItem(inter, index++, val);
+    }
+	$input = inter;
+  %}
+#endif
+
 
 ////////////////////////////////////////
 // Entity Enums
