@@ -17,6 +17,7 @@
 // Generated wrapper file needs to include our header file
 %{
 		#include <la/avdecc/internals/entityModel.hpp>
+		#include <la/avdecc/internals/streamFormatInfoPublic.hpp>
 %}
 
 // C# Specifics
@@ -489,3 +490,12 @@ SWIG_STD_VECTOR_ENHANCED(la::avdecc::entity::model::DescriptorIndex); // Swig is
 %template(SamplingRateSet) std::set<la::avdecc::entity::model::SamplingRate>;
 %template(StreamFormatSet) std::set<la::avdecc::entity::model::StreamFormat>;
 %template(RedundantStreamIndexSet) std::set<la::avdecc::entity::model::StreamIndex>;
+
+
+////////////////////////////////////////
+// Stream Format Info Public Interface
+////////////////////////////////////////
+
+// Include c++ declaration file
+%rename("StreamFormatInfo") la::avdecc::entity::model::StreamFormatInfoPublic;
+%include "la/avdecc/internals/streamFormatInfoPublic.hpp"
