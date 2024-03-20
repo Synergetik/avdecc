@@ -22,10 +22,15 @@ namespace facility
         using namespace std::literals;
         constexpr auto klass = "class "sv;
 
+        // strip prefix if any
         auto name = type_name(self);
         name.remove_prefix(klass.size());
 
-        return name;
+        // strip namespace if any
+        auto pos = name.rfind("::");
+        auto nsp = (pos == std::string::npos) ? 0 : pos + 2;
+
+        return name.substr(nsp);
     }
 } // namespace syn
 %}

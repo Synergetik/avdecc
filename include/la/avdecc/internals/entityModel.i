@@ -241,6 +241,17 @@ SWIG_PY_REPR(la::avdecc::entity::model::AvdeccFixedString, {
 DEFINE_AEM_TYPES_CLASS(SamplingRate);
 DEFINE_AEM_TYPES_CLASS(StreamFormat);
 DEFINE_AEM_TYPES_CLASS(LocalizedStringReference);
+SWIG_PY_REPR(la::avdecc::entity::model::LocalizedStringReference, {
+			if ($self->isValid())
+			{
+				auto offsetIndex = $self->getOffsetIndex();
+				oss << fmt::format("@{},{}", offsetIndex.first, offsetIndex.second);
+			} else
+			{
+				oss << "invalid";
+			}
+});
+
 DEFINE_AEM_TYPES_CLASS(ControlValueUnit);
 %typemap(csbase) la::avdecc::entity::model::ControlValueUnit::Unit "byte"
 DEFINE_AEM_TYPES_CLASS(ControlValueType);
