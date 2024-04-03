@@ -273,6 +273,7 @@ DEFINE_AEM_TYPES_CLASS_BASE(ControlValues);
 %template(DescriptorCounterArray) std::array<la::avdecc::entity::model::DescriptorCounter, 32>;
 
 #if defined(SWIGPYTHON)
+// Custom python map for DescriptorCounterArray
 %typemap(directorin) std::array< unsigned int,32 > const& (PyObject* inter = 0, Py_ssize_t index = 0) %{
 	inter = PyTuple_New($1.size());
     for (const auto& n : $1) {
@@ -488,6 +489,18 @@ DEFINE_AEM_STRUCT(MilanInfo);
 // Some ignores
 %ignore la::avdecc::entity::model::makeEntityModelID; // Ignore, not needed
 %ignore la::avdecc::entity::model::splitEntityModelID; // Ignore, not needed
+
+
+#if defined(SWIGPYTHON)
+// Custom python map for RedundantStreamIndexSet
+%typemap(out) std::set<la::avdecc::entity::model::StreamIndex>* %{
+    $result = PySet_New(NULL);
+    for (auto n : *$1) {
+        auto val = SWIG_From_unsigned_SS_int(n);
+        PySet_Add($result, val);
+    }
+  %}
+#endif
 
 // Include c++ declaration file
 %include "la/avdecc/internals/entityModel.hpp"
