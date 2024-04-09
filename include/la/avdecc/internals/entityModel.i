@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 %module(directors="1", threads="1") avdeccEntityModel
+%feature("nothreadallow");
 
 %include <stdint.i>
 %include <std_string.i>

@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 %module(directors="1", threads="1") avdecc
+%feature("nothreadallow");
 
 %include <stl.i>
 %include <std_string.i>

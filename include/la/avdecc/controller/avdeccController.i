@@ -3,6 +3,7 @@
 ////////////////////////////////////////
 
 %module(directors="1", threads="1") avdeccController
+%feature("nothreadallow");
 
 #define SWIG_STD_PAIR_ASVAL
 
