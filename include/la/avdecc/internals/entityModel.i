@@ -289,6 +289,9 @@ DEFINE_AEM_TYPES_CLASS_BASE(ControlValues);
 ////////////////////////////////////////
 // Entity Enums
 ////////////////////////////////////////
+
+%typemap(constcode) int %{SWIG_Python_SetConstant(d, "$symname",PyLong_FromLongLong(static_cast< long long >($1)));%}
+
 // Bind enums
 DEFINE_ENUM_CLASS(la::avdecc::entity, EntityCapability, "uint")
 DEFINE_ENUM_CLASS(la::avdecc::entity, TalkerCapability, "ushort")
