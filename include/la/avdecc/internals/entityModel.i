@@ -285,6 +285,16 @@ DEFINE_AEM_TYPES_CLASS_BASE(ControlValues);
   %}
 #endif
 
+#if defined(SWIGPYTHON)
+// Custom python map for std::vector<la::avdecc::entity::model::ClockSourceIndex>
+%typemap(out) std::vector<la::avdecc::entity::model::ClockSourceIndex>* %{
+    $result = PyList_New(NULL);
+    for (auto n : *$1) {
+        auto val = SWIG_From_unsigned_SS_int(n);
+        PyList_Append($result, val);
+    }
+  %}
+#endif
 
 ////////////////////////////////////////
 // Entity Enums
