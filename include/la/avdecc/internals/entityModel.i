@@ -18,6 +18,7 @@
 // Generated wrapper file needs to include our header file
 %{
 		#include <la/avdecc/internals/entityModel.hpp>
+		#include <la/avdecc/internals/entityAddressAccessTypes.hpp>
 		#include <la/avdecc/internals/streamFormatInfoPublic.hpp>
 %}
 
@@ -528,6 +529,14 @@ SWIG_STD_VECTOR_ENHANCED(la::avdecc::entity::model::DescriptorIndex); // Swig is
 %template(SamplingRateSet) std::set<la::avdecc::entity::model::SamplingRate>;
 %template(StreamFormatSet) std::set<la::avdecc::entity::model::StreamFormat>;
 %template(RedundantStreamIndexSet) std::set<la::avdecc::entity::model::StreamIndex>;
+
+////////////////////////////////////////
+// Tlv Interface
+////////////////////////////////////////
+
+// Include c++ declaration file
+%template(Tlvs) std::vector<la::avdecc::entity::addressAccess::Tlv>;
+%include "la/avdecc/internals/entityAddressAccessTypes.hpp"
 
 
 ////////////////////////////////////////
