@@ -64,8 +64,8 @@ endif()
 
 project(LA_avdecc)
 
-# Using c++17 standard for all targets
-set(CMAKE_CXX_STANDARD 17)
+# Using c++20 standard for all targets
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 # Define some product/company specific values

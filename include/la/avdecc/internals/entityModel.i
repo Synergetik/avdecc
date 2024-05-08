@@ -17,6 +17,7 @@
 
 // Generated wrapper file needs to include our header file
 %{
+		#include <span>
 		#include <la/avdecc/internals/entityModel.hpp>
 		#include <la/avdecc/internals/entityAddressAccessTypes.hpp>
 		#include <la/avdecc/internals/streamFormatInfoPublic.hpp>
@@ -533,6 +534,53 @@ SWIG_STD_VECTOR_ENHANCED(la::avdecc::entity::model::DescriptorIndex); // Swig is
 ////////////////////////////////////////
 // Tlv Interface
 ////////////////////////////////////////
+
+
+#if defined(SWIGPYTHON)
+	%typemap(in) std::span<uint8_t const> const& {
+		char *data = 0;
+		Py_ssize_t size = 0;
+		int res$argnum;
+
+		res$argnum = PyBytes_AsStringAndSize($input, &data, &size);
+		if (!SWIG_IsOK(res$argnum)) {
+		%argument_fail(res$argnum, $1_type, $symname, $argnum);
+		}
+
+		$1 = new $*1_ltype  { reinterpret_cast<uint8_t const*>(data), static_cast<size_t>(size) };
+	}
+	%typemap(freearg) std::span<uint8_t const> const& {
+		delete $1;
+	}
+
+	%typemap(out) std::span<uint8_t const> {
+		$result = PyBytes_FromStringAndSize(reinterpret_cast<const char*>($1.data()), $1.size());
+	}
+
+	// Some ignores
+	%ignore la::avdecc::entity::addressAccess::Tlv::getMemoryData;      // Ignore, not needed
+	%ignore la::avdecc::entity::addressAccess::Tlv::data;    		    // Ignore, not needed
+
+	// Extend the class
+	%extend la::avdecc::entity::addressAccess::Tlv
+	{
+		// Provide a more native data() method
+		std::span<uint8_t const> raw() const noexcept
+		{
+			return {reinterpret_cast<uint8_t const*>($self->data()), $self->size()}; // Da Kotzt DER
+		}
+	}
+#endif
+
+SWIG_PY_REPR(la::avdecc::entity::addressAccess::Tlv, {
+			if ($self->isValid())
+			{
+				oss << fmt::format("address: 0x{:08x}, size: {}", $self->getAddress(), $self->size());
+			} else
+			{
+				oss << "invalid";
+			}
+});
 
 // Include c++ declaration file
 %template(Tlvs) std::vector<la::avdecc::entity::addressAccess::Tlv>;
