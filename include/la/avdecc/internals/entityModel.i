@@ -553,6 +553,10 @@ SWIG_STD_VECTOR_ENHANCED(la::avdecc::entity::model::DescriptorIndex); // Swig is
 		delete $1;
 	}
 
+	%typemap(typecheck) std::span<uint8_t const> const& {
+		$1 = PyBytes_Check($input);
+	}
+
 	%typemap(out) std::span<uint8_t const> {
 		$result = PyBytes_FromStringAndSize(reinterpret_cast<const char*>($1.data()), $1.size());
 	}
@@ -569,6 +573,11 @@ SWIG_STD_VECTOR_ENHANCED(la::avdecc::entity::model::DescriptorIndex); // Swig is
 		{
 			return {reinterpret_cast<uint8_t const*>($self->data()), $self->size()}; // Da Kotzt DER
 		}
+
+		// Provide a native constructor from bytearray
+		Tlv(std::uint64_t const address, std::span<uint8_t const> const& data) {
+			return new la::avdecc::entity::addressAccess::Tlv(address, la::avdecc::protocol::AaMode::Write, reinterpret_cast<void const*>(data.data()), data.size());
+    	}
 	}
 #endif
 
