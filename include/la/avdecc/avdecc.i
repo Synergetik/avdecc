@@ -23,6 +23,7 @@
 %include "la/avdecc/internals/optional.i"
 %include "la/avdecc/internals/std_function.i"
 %include "la/avdecc/internals/std_tuple.i"
+%include "la/avdecc/internals/swig_facility.i"
 
 // Generated wrapper file needs to include our header file (include as soon as possible using 'insert(runtime)' as target language exceptions are defined early in the generated wrapper file)
 %insert(runtime) %{
@@ -114,6 +115,9 @@ extern std::function<void(std::string const&)> OnSetCurrentThreadName;
 //%rename("constData") la::avdecc::MemoryBuffer::data() const; // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
 %ignore la::avdecc::MemoryBuffer::data(); // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
 %ignore la::avdecc::MemoryBuffer::data() const; // RIGHT NOW IGNORE IT AS WE NEED TO FIND A WAY TO MARSHALL THE RETURNED POINTER
+
+%ignore la::avdecc::MemoryBuffer::assign;
+%ignore la::avdecc::MemoryBuffer::append;
 // Extend the class
 %extend la::avdecc::MemoryBuffer
 {
@@ -124,7 +128,34 @@ extern std::function<void(std::string const&)> OnSetCurrentThreadName;
 		return *$self == other;
 	}
 #endif
+#if defined(SWIGPYTHON)
+		// Provide a more native data() method
+		std::span<uint8_t const> raw() const noexcept
+		{
+			return {reinterpret_cast<uint8_t const*>($self->data()), $self->size()};
+		}
+
+		// Provide a native constructor from bytearray
+		MemoryBuffer(std::span<uint8_t const> const& data) {
+			return new la::avdecc::MemoryBuffer(reinterpret_cast<void const*>(data.data()), data.size());
+    	}
+
+		%rename("%s") assign(std::span<uint8_t const> const& data);
+		void assign(std::span<uint8_t const> const& data) {
+			return $self->assign(reinterpret_cast<void const*>(data.data()), data.size());
+    	}
+#endif
 }
+
+SWIG_PY_REPR(la::avdecc::MemoryBuffer, {
+			if ($self->isValid())
+			{
+				oss << fmt::format("size: {}",  $self->size());
+			} else
+			{
+				oss << "invalid";
+			}
+});
 
 #ifdef SWIGCSHARP
 // Marshalling for void pointers
