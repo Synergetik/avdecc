@@ -351,7 +351,7 @@
     %rename("__destroy_iterator") std::unordered_map::destroy_iterator;
 
     %extend std::unordered_map {
-        int __len__() { return $self->size(); }
+        size_t __len__() { return $self->size(); }
 
         %pythoncode %{
             def keys(self):
