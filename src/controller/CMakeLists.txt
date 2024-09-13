@@ -160,8 +160,7 @@ if(BUILD_AVDECC_BINDINGS_CSHARP)
 	# Prepare dependencies
 	foreach(SWIG_LANG ${AVDECC_SWIG_LANGUAGES})
 		if(${SWIG_LANG} STREQUAL "python")
-			find_package(Python 3.8 REQUIRED COMPONENTS Development Development.Module)
-
+			find_package(Python 3.11 REQUIRED COMPONENTS Development Development.Module)
 			message(STATUS "Using python ${Python_VERSION} from ${Python_RUNTIME_LIBRARY_DIRS}/ for SWIG bindings")
 		endif()
 	endforeach()
