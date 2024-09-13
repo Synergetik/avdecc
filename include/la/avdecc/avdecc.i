@@ -894,6 +894,7 @@ DEFINE_ENUM_BITFIELD_CLASS(la::avdecc::entity::model::jsonSerializer, Flags, Fla
 %ignore la::avdecc::EndStation::deserializeEntityModelFromJson;
 %ignore la::avdecc::EndStation::getProtocolInterface; // Ignore at the moment, we didn't bind ProtocolInterface yet
 %unique_ptr(la::avdecc::EndStation) // Define unique_ptr for EndStation
+%threadallow la::avdecc::EndStation::~EndStation; // Python workaround, release GIL, during destruction
 // Extend the class
 %extend la::avdecc::EndStation
 {
