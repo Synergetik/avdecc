@@ -20,6 +20,7 @@
 		#include <la/avdecc/internals/entityModel.hpp>
 		#include <la/avdecc/internals/entityAddressAccessTypes.hpp>
 		#include <la/avdecc/internals/streamFormatInfoPublic.hpp>
+		#include <la/avdecc/internals/entityModelControlValues.hpp>
 %}
 
 // C# Specifics
@@ -295,6 +296,20 @@ DEFINE_AEM_TYPES_CLASS_BASE(ControlValues);
         PyList_Append($result, val);
     }
   %}
+#endif
+
+#if defined(SWIGPYTHON)
+	// Extend the class
+	%extend la::avdecc::entity::model::ControlValues
+	{
+		// Provide a native constructor from bytearray
+		ControlValues(std::span<uint8_t const> const& data, ControlValueType::Type const valueType, std::uint16_t const numberOfValues) {
+			auto buffer = la::avdecc::MemoryBuffer(data.data(), data.size());
+			auto values = la::avdecc::entity::model::unpackDynamicControlValues(buffer, valueType, numberOfValues);
+
+			return values.has_value() ? new la::avdecc::entity::model::ControlValues { values.value() } : new la::avdecc::entity::model::ControlValues {};
+    	}
+	}
 #endif
 
 ////////////////////////////////////////
