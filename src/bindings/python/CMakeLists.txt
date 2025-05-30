@@ -28,6 +28,7 @@ configure_file(
 # Public header files
 set (PUBLIC_HEADER_FILES
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_python.hpp
+	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_model_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_utils_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/utils.hpp
   ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
@@ -36,6 +37,7 @@ set (PUBLIC_HEADER_FILES
 # Common files
 set (SOURCE_FILES_COMMON
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_python.cpp
+	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_model_python.cpp
 )
 
 # Group sources
