@@ -24,6 +24,7 @@ option(BUILD_AVDECC_LIB_STATIC_RT_SHARED "Build static library (runtime shared).
 option(BUILD_AVDECC_DOC "Build documentation." FALSE)
 option(BUILD_AVDECC_BINDINGS_C "Build avdecc C bindings library." FALSE)
 option(BUILD_AVDECC_BINDINGS_CSHARP "Build avdecc C# bindings library." FALSE)
+option(BUILD_AVDECC_BINDINGS_PYTHON "Build avdecc python bindings library." FALSE)
 option(BUILD_AVDECC_CONTROLLER "Build avdecc controller library." TRUE)
 option(BUILD_AVDECC_INTERFACE_PCAP "Build the pcap protocol interface." TRUE)
 option(BUILD_AVDECC_INTERFACE_PCAP_DYNAMIC_LINKING "Pcap protocol interface uses dynamic shared library linking (instead of static linking)." TRUE)
@@ -117,6 +118,11 @@ if(BUILD_AVDECC_EXAMPLES)
 	set(BUILD_AVDECC_LIB_STATIC_RT_SHARED TRUE CACHE BOOL "Build avdecc static library (runtime shared)." FORCE)
 endif()
 
+# avdecc-python needs avdecc.lib
+if(BUILD_AVDECC_BINDINGS_PYTHON)
+	set(BUILD_AVDECC_LIB_STATIC_RT_SHARED TRUE CACHE BOOL "Build avdecc static library (runtime shared)." FORCE)
+endif()
+
 # Cannot build 'macOS native protocol interface' from non-macOS host
 if(NOT CMAKE_HOST_APPLE AND BUILD_AVDECC_INTERFACE_MAC)
 	set(BUILD_AVDECC_INTERFACE_MAC FALSE)
@@ -171,6 +177,7 @@ set(BUILD_NIH_EXAMPLES OFF CACHE BOOL "Build examples." FORCE)
 set(BUILD_NIH_TESTS OFF CACHE BOOL "Build unit tests." FORCE)
 set(BUILD_C_BINDINGS OFF CACHE BOOL "Build C Bindings." FORCE)
 set(BUILD_NIH_SWIG ${BUILD_AVDECC_BINDINGS_CSHARP} CACHE BOOL "Build SWIG Wrapper." FORCE)
+set(BUILD_NIH_PYTHON_BINDINGS ${BUILD_AVDECC_BINDINGS_PYTHON} CACHE BOOL "Build python bindings." FORCE)
 set(NIH_SWIG_LANGUAGES ${AVDECC_SWIG_LANGUAGES} CACHE STRING "Set the languages to compile as SWIG wrappers." FORCE)
 # Install options
 set(INSTALL_NIH_EXAMPLES OFF CACHE BOOL "Install examples." FORCE)
