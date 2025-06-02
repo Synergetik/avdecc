@@ -23,7 +23,7 @@
  */
 
 #include "avdecc_python.hpp"
-#include "avdecc_entity_model_python.hpp"
+#include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
 
 #include "config.hpp"
@@ -55,7 +55,9 @@ PYBIND11_MODULE(la_avdecc, m)
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
 
     bindCompileOptions(m);
-    bindEntityModels(m);
+    bindEntity(m);
+    bindEntityModelTypes(m);
+    bindEntityModel(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/

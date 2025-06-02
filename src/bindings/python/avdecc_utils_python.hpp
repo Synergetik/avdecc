@@ -18,7 +18,7 @@
 */
 
 /**
- * @file avdecc_python.cpp
+ * @file avdecc_utils_python.cpp
  * @author Vitalij Mast
  */
 

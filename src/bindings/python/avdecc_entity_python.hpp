@@ -18,7 +18,7 @@
 */
 
 /**
- * @file avdecc_entity_model_python.hpp
+ * @file avdecc_entity_python.hpp
  * @author Vitalij Mast
  */
 
@@ -28,11 +28,22 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
+#include <optional>
+
 #include <la/avdecc/internals/entityModel.hpp>
 
 namespace py = pybind11;
 
 /*-------------------------------------------------------------------------------------------------------------------*/
+/*-- Globals --------------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------*/
+
+extern std::optional<py::class_<la::avdecc::UniqueIdentifier>> UniqueIdentifierBinding;
+
+/*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
-void bindEntityModels(py::module_& m);
+
+void bindEntity(py::module_& m);
+void bindEntityModelTypes(py::module_& m);
+void bindEntityModel(py::module_& m);
