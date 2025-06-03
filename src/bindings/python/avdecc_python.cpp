@@ -57,6 +57,7 @@ PYBIND11_MODULE(la_avdecc, m)
     bindCompileOptions(m);
     bindEntity(m);
     bindEntityModelTypes(m);
+    bindEntityModelProtocol(m);
     bindEntityModel(m);
 }
 

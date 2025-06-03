@@ -46,4 +46,5 @@ extern std::optional<py::class_<la::avdecc::UniqueIdentifier>> UniqueIdentifierB
 
 void bindEntity(py::module_& m);
 void bindEntityModelTypes(py::module_& m);
+void bindEntityModelProtocol(py::module_& m);
 void bindEntityModel(py::module_& m);
