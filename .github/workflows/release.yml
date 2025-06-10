@@ -26,7 +26,7 @@ env:
   NUGET_FEED_URL: https://nuget.pkg.github.com/${{github.repository_owner}}/index.json 
   lib_name: la_avdecc
   build_dir: _build
-  GITHUB_TOKEN: ${{secrets.NUGET_GITHUB_PAT}}
+  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 jobs:
   release-linux:
