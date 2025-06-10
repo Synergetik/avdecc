@@ -71,9 +71,9 @@ jobs:
       working-directory: ${{github.workspace}}/${{env.build_dir}}/tests/src
       shell: bash
       run: |
-        test_cmd="./Tests --gtest_filter=-MANUAL*"
+        test_cmd="./Tests --gtest_filter=-INTEGRATION*"
         if [ "${{matrix.config}}" = "debug" ]; then
-          test_cmd="./Tests-d --gtest_filter=-MANUAL*"
+          test_cmd="./Tests-d --gtest_filter=-INTEGRATION*"
         fi
         eval $test_cmd 
 
@@ -126,9 +126,9 @@ jobs:
       working-directory: ${{github.workspace}}/${{env.build_dir}}/tests/src
       shell: bash
       run: |
-        test_cmd="./Tests --gtest_filter=-MANUAL*"
+        test_cmd="./Tests --gtest_filter=-INTEGRATION*"
         if [ "${{matrix.config}}" = "debug" ]; then
-          test_cmd="./Tests-d --gtest_filter=-MANUAL*"
+          test_cmd="./Tests-d --gtest_filter=-INTEGRATION*"
         fi
         eval $test_cmd 
 
@@ -158,7 +158,7 @@ jobs:
     - name: Configure runner
       uses: L-Acoustics/la-mw-gh-action/.github/actions/la-configure-runner@v0
       with:
-        os: windows
+        os: macos
 
     - name: Configure CMake
       shell: bash
@@ -177,9 +177,9 @@ jobs:
       working-directory: ${{github.workspace}}/${{env.build_dir}}/tests/src
       shell: bash
       run: |
-        test_cmd="./Tests --gtest_filter=-MANUAL*"
+        test_cmd="./Tests --gtest_filter=-INTEGRATION*"
         if [ "${{matrix.config}}" = "debug" ]; then
-          test_cmd="./Tests-d --gtest_filter=-MANUAL*"
+          test_cmd="./Tests-d --gtest_filter=-INTEGRATION*"
         fi
         eval $test_cmd 
 
