@@ -34,6 +34,7 @@
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindCompileOptions(py::module_& m);
+void bindBaseException(py::module_& m);
 void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
 void bindLogger(py::module_& m);
@@ -53,6 +54,7 @@ PYBIND11_MODULE(la_avdecc, m)
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
 
     bindCompileOptions(m);
+    bindBaseException(m);
     bindMemoryBuffer(m);
     bindMemoryBufferView(m);
     bindLogger(m);
@@ -98,6 +100,12 @@ void bindCompileOptions(py::module_& m)
 
     m.def("getCompileOptions", &getCompileOptions, "Gets the the library compile options.");
     m.def("getCompileOptionsInfo", &getCompileOptionsInfo, "Gets the the library compile option informations.");
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindBaseException(py::module_& m)
+{
+    py::register_exception<la::avdecc::Exception>(m, "BaseException", PyExc_RuntimeError);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -313,7 +321,7 @@ void bindLogger(py::module_& m)
         .def("registerObserver", &Logger::registerObserver, py::arg("observer"), "Registers a logger observer.")
         .def("unregisterObserver", &Logger::unregisterObserver, py::arg("observer"), "Unregisters a logger observer.")
         .def("logItem", &Logger::logItem, py::arg("level"), py::arg("item"), "Logs a given LogItem at the specified log level.")
-        .def_property("level", &Logger::getLevel, &Logger::setLevel, py::arg("level"), "Minimum log level.")
+        .def_property("level", &Logger::getLevel, &Logger::setLevel, "Minimum log level.")
         .def("layerToString", &Logger::layerToString, py::arg("layer"), "Converts a log layer to its string representation.")
         .def("levelToString", &Logger::levelToString, py::arg("level"), "Converts a log level to its string representation.")
         .def(
