@@ -28,6 +28,7 @@
 
 #include "config.hpp"
 #include <la/avdecc/avdecc.hpp>
+#include <la/avdecc/logger.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
@@ -35,6 +36,7 @@
 void bindCompileOptions(py::module_& m);
 void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
+void bindLogger(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Module entry definition ----------------------------------------------------------------------------------------*/
@@ -53,6 +55,7 @@ PYBIND11_MODULE(la_avdecc, m)
     bindCompileOptions(m);
     bindMemoryBuffer(m);
     bindMemoryBufferView(m);
+    bindLogger(m);
 
     bindEntity(m);
     bindEntityModelTypes(m);
@@ -249,4 +252,76 @@ void bindMemoryBufferView(py::module_& m)
                 return oss.str();
             },
             "Returns a string representation of the view with size and hex preview.");
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+/*-- Logger bindings ------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+class PyLoggerObserver : public la::avdecc::logger::Logger::Observer
+{
+public:
+    using la::avdecc::logger::Logger::Observer::Observer;
+    using Level    = la::avdecc::logger::Level;
+    using LogItem  = la::avdecc::logger::LogItem;
+    using Observer = la::avdecc::logger::Logger::Observer;
+
+    void onLogItem(Level level, const LogItem* item) noexcept override
+    {
+        PYBIND11_OVERRIDE_PURE(void, Observer, onLogItem, level, item);
+    }
+};
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindLogger(py::module_& m)
+{
+    using namespace la::avdecc::logger;
+
+    py::enum_<Layer>(m, "LogLayer", "Enumeration of logging layers used throughout the system.")
+        .value("Generic", Layer::Generic, "General-purpose logging layer.")
+        .value("Serialization", Layer::Serialization, "Serialization and deserialization operations.")
+        .value("ProtocolInterface", Layer::ProtocolInterface, "Protocol interface (transport, low-level).")
+        .value("AemPayload", Layer::AemPayload, "AVDECC AEM payload-specific logic.")
+        .value("Entity", Layer::Entity, "Entity-related logic.")
+        .value("ControllerEntity", Layer::ControllerEntity, "Entity controller logic.")
+        .value("ControllerStateMachine", Layer::ControllerStateMachine, "State machine logic for controllers.")
+        .value("Controller", Layer::Controller, "Top-level controller behavior.")
+        .value("JsonSerializer", Layer::JsonSerializer, "JSON serialization and introspection layer.")
+        .value("FirstUserLayer", Layer::FirstUserLayer, "Starting point for user-defined logging layers.")
+        .export_values();
+
+    py::enum_<Level>(m, "LogLevel", "Enumeration of log severity levels.")
+        .value("Trace", Level::Trace, "Very verbose debug information (typically disabled in release builds).")
+        .value("Debug", Level::Debug, "Verbose debugging information (typically disabled in release builds).")
+        .value("Info", Level::Info, "General informational messages.")
+        .value("Warn", Level::Warn, "Indicates potential issues or non-critical problems.")
+        .value("Error", Level::Error, "Indicates serious issues or failures.")
+        .value("None", Level::None, "Disables all logging output.")
+        .export_values();
+
+    py::class_<LogItem, std::shared_ptr<LogItem>>(m, "LogItem", "Base class for a log entry. Not constructible or subclassable in Python.")
+        .def_property_readonly("layer", &LogItem::getLayer, "Returns the log layer associated with this log item.")
+        .def_property_readonly("message", &LogItem::getMessage, "Returns the log message. Must be implemented by concrete subclasses.");
+
+    py::class_<Logger::Observer, PyLoggerObserver>(m, "LogObserver", "Interface for receiving log items.")
+        .def(py::init<>())
+        .def("onLogItem", &Logger::Observer::onLogItem, py::arg("level"), py::arg("item"), "Called when a new log item is emitted.");
+
+    py::class_<Logger, std::unique_ptr<Logger, py::nodelete>>(m, "Logger", "Logger singleton class.")
+        .def_static("getInstance", &Logger::getInstance, py::return_value_policy::reference, "Returns the global logger instance.")
+        .def("registerObserver", &Logger::registerObserver, py::arg("observer"), "Registers a logger observer.")
+        .def("unregisterObserver", &Logger::unregisterObserver, py::arg("observer"), "Unregisters a logger observer.")
+        .def("logItem", &Logger::logItem, py::arg("level"), py::arg("item"), "Logs a given LogItem at the specified log level.")
+        .def_property("level", &Logger::getLevel, &Logger::setLevel, py::arg("level"), "Minimum log level.")
+        .def("layerToString", &Logger::layerToString, py::arg("layer"), "Converts a log layer to its string representation.")
+        .def("levelToString", &Logger::levelToString, py::arg("level"), "Converts a log level to its string representation.")
+        .def(
+            "__repr__",
+            [](const Logger& self) {
+                std::ostringstream oss;
+                oss << "<AvdeccLogger level=" << self.levelToString(self.getLevel()) << ">";
+                return oss.str();
+            },
+            "Returns a string representation of the Logger.");
 }
