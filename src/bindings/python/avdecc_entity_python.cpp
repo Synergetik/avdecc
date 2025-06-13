@@ -25,6 +25,8 @@
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
 
+#include <la/avdecc/internals/entity.hpp>
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Globals --------------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -58,6 +60,8 @@ void bindStreamOutputCounterValidFlag(py::module_& m);
 void bindStreamOutputCounterValidFlag17221(py::module_& m);
 void bindMilanInfoFeaturesFlag(py::module_& m);
 void bindMediaClockReferenceInfoFlag(py::module_& m);
+void bindBaseEntity(py::module_& m);
+void bindLocalEntity(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntity(py::module_& m)
@@ -65,7 +69,7 @@ void bindEntity(py::module_& m)
     // la\avdecc\internals\uniqueIdentifier.hpp
     bindUniqueIdentifier(m);
 
-    // \la\avdecc\internals\entityEnums.hpp
+    // la\avdecc\internals\entityEnums.hpp
     bindEntityCapability(m);
     bindTalkerCapability(m);
     bindListenerCapability(m);
@@ -89,6 +93,10 @@ void bindEntity(py::module_& m)
     bindStreamOutputCounterValidFlag17221(m);
     bindMilanInfoFeaturesFlag(m);
     bindMediaClockReferenceInfoFlag(m);
+
+    // la/avdecc/internals/entity.hpp
+    bindBaseEntity(m);
+    bindLocalEntity(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -686,3 +694,240 @@ void bindMediaClockReferenceInfoFlag(py::module_& m)
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
+void bindBaseEntity(py::module_& m)
+{
+    using namespace la::avdecc::entity;
+
+    auto cls = py::class_<Entity>(m, "BaseEntity", "Represents an AVDECC Entity with common and interface-specific information.");
+
+    py::class_<Entity::CommonInformation>(cls, "CommonInformation", "Common information shared by an entity across all network interfaces.")
+        .def(py::init<>())
+        .def_readwrite("entityID", &Entity::CommonInformation::entityID, "The entity's unique identifier.")
+        .def_readwrite("entityModelID", &Entity::CommonInformation::entityModelID, "The entity model unique identifier.")
+        .def_readwrite("entityCapabilities", &Entity::CommonInformation::entityCapabilities, "The entity's current capabilities (can change over time).")
+        .def_readwrite("talkerStreamSources", &Entity::CommonInformation::talkerStreamSources,
+                       "The maximum number of streams the entity is capable of sourcing simultaneously.")
+        .def_readwrite("talkerCapabilities", &Entity::CommonInformation::talkerCapabilities, "The entity's capabilities as a talker.")
+        .def_readwrite("listenerStreamSinks", &Entity::CommonInformation::listenerStreamSinks,
+                       "The maximum number of streams the entity is capable of sinking simultaneously.")
+        .def_readwrite("listenerCapabilities", &Entity::CommonInformation::listenerCapabilities, "The entity's capabilities as a listener.")
+        .def_readwrite("controllerCapabilities", &Entity::CommonInformation::controllerCapabilities, "The entity's capabilities as a controller.")
+        .def_readwrite("identifyControlIndex", &Entity::CommonInformation::identifyControlIndex,
+                       "The ControlIndex for the primary IDENTIFY control, if set. Only valid if EntityCapabilities::AemIdentifyControlIndexValid is defined.")
+        .def_readwrite("associationID", &Entity::CommonInformation::associationID,
+                       "he unique identifier of the associated entity, if set. Only valid if EntityCapabilities::AssociationIDValid is defined.")
+        .def(
+            "__repr__",
+            [](const Entity::CommonInformation& info) {
+                std::ostringstream oss;
+                oss << "<BaseEntity.CommonInformation>";
+                return oss.str();
+            },
+            "Returns a string representation of the common entity information.");
+
+    py::class_<Entity::InterfaceInformation>(cls, "InterfaceInformation")
+        .def(py::init<>())
+        .def_readwrite("macAddress", &Entity::InterfaceInformation::macAddress, "The mac address this interface is attached to.")
+        .def_readwrite("validTime", &Entity::InterfaceInformation::validTime,
+                       "The number of 2-seconds periods the entity's announcement is valid on this interface.")
+        .def_readwrite("availableIndex", &Entity::InterfaceInformation::availableIndex, "The current available index for the entity on this interface.")
+        .def_readwrite("gptpGrandmasterID", &Entity::InterfaceInformation::gptpGrandmasterID,
+                       "The current gPTP grandmaster unique identifier on this interface. Only valid if EntityCapabilities::GptpSupported is defined.")
+        .def_readwrite("gptpDomainNumber", &Entity::InterfaceInformation::gptpDomainNumber,
+                       "The current gPTP domain number on this interface. Only valid if EntityCapabilities::GptpSupported is defined.")
+        .def(
+            "__repr__",
+            [](const Entity::InterfaceInformation& info) {
+                std::ostringstream oss;
+                oss << "<BaseEntity.InterfaceInformation>";
+                return oss.str();
+            },
+            "Returns a string representation of the entity interface information.");
+
+    cls.def_property_readonly_static("GlobalAvbInterfaceIndex", [](const py::object&) { return Entity::GlobalAvbInterfaceIndex; });
+
+    cls.def(py::init<Entity::CommonInformation const&, Entity::InterfacesInformation const&>(), py::arg("commonInformation"), py::arg("interfacesInformation"),
+            "Constructs an Entity from common and interface information.\n\n"
+            ":param commonInformation: Common information shared by all interfaces.\n"
+            ":param interfacesInformation: Map of interface index to interface-specific information.")
+        // Getters
+        .def("getCommonInformation", py::overload_cast<>(&Entity::getCommonInformation), py::return_value_policy::reference_internal,
+             "Returns a reference to the modifiable CommonInformation.")
+        .def("getInterfacesInformation", py::overload_cast<>(&Entity::getInterfacesInformation), py::return_value_policy::reference_internal,
+             "Returns a reference to the modifiable InterfacesInformation map.")
+        .def("getInterfaceInformation", py::overload_cast<model::AvbInterfaceIndex const>(&Entity::getInterfaceInformation), py::arg("interfaceIndex"),
+             py::return_value_policy::reference_internal,
+             "Returns a modifiable reference to InterfaceInformation for the given interface index.\n"
+             ":raises Exception: if the interface index is invalid.")
+        .def("hasInterfaceIndex", &Entity::hasInterfaceIndex, py::arg("interfaceIndex"), "Checks whether a given interface index exists in the entity.")
+        .def("getEntityID", &Entity::getEntityID, "Returns the entity's unique identifier.")
+        .def("getEntityModelID", &Entity::getEntityModelID, "Returns the entity's model identifier.")
+        .def("getEntityCapabilities", &Entity::getEntityCapabilities, "Returns the current entity capabilities.")
+        .def("getTalkerStreamSources", &Entity::getTalkerStreamSources, "Returns the maximum number of streams the entity can source.")
+        .def("getTalkerCapabilities", &Entity::getTalkerCapabilities, "Returns the talker capabilities of the entity.")
+        .def("getListenerStreamSinks", &Entity::getListenerStreamSinks, "Returns the maximum number of streams the entity can sink.")
+        .def("getListenerCapabilities", &Entity::getListenerCapabilities, "Returns the listener capabilities of the entity.")
+        .def("getControllerCapabilities", &Entity::getControllerCapabilities, "Returns the controller capabilities of the entity.")
+        .def("getIdentifyControlIndex", &Entity::getIdentifyControlIndex, "Returns the optional identify control index if valid.")
+        .def("getAssociationID", &Entity::getAssociationID, "Returns the optional association ID of the entity.")
+        .def("getMacAddress", &Entity::getMacAddress, py::arg("interfaceIndex"),
+             "Returns the MAC address associated with the given interface index. Returns an invalid MAC if not found.")
+        .def("getAnyMacAddress", &Entity::getAnyMacAddress, "Returns any available MAC address from the entity.")
+
+        // Setters
+        .def("removeInterfaceInformation", &Entity::removeInterfaceInformation, py::arg("interfaceIndex"),
+             "Removes the InterfaceInformation for the specified interface index.")
+        .def("setEntityCapabilities", &Entity::setEntityCapabilities, py::arg("entityCapabilities"), "Sets the entity's capabilities.")
+        .def("setAssociationID", &Entity::setAssociationID, py::arg("associationID"), "Sets the optional association ID of the entity.")
+        .def("setValidTime", &Entity::setValidTime, py::arg("validTime"), py::arg("interfaceIndex") = std::nullopt,
+             "Sets the valid time in 2-second periods.\n"
+             "If interfaceIndex is given, only applies to that interface; otherwise, applies to all.")
+        .def("setGptpGrandmasterID", &Entity::setGptpGrandmasterID, py::arg("gptpGrandmasterID"), py::arg("interfaceIndex"),
+             "Sets the gPTP grandmaster ID for the given interface.")
+        .def("setGptpDomainNumber", &Entity::setGptpDomainNumber, py::arg("gptpDomainNumber"), py::arg("interfaceIndex"),
+             "Sets the gPTP domain number for the given interface.")
+
+        // Static
+        .def_static("generateEID", &Entity::generateEID, py::arg("macAddress"), py::arg("progID"), py::arg("useDeprecatedAlgorithm"),
+                    "Generates an Entity ID (EID) from a MAC address and a program ID.\n"
+                    "This method is provided for backward compatibility, use ProtocolInterface::getDynamicEID instead.");
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindLocalEntity(py::module_& m)
+{
+    using namespace la::avdecc::entity;
+
+    auto cls = py::class_<LocalEntity, Entity, std::unique_ptr<LocalEntity, py::nodelete>>(m, "LocalEntity",
+                                                                                           "Represents a local AVDECC Entity that extends BaseEntity.");
+
+    py::enum_<LocalEntity::AemCommandStatus>(cls, "AemCommandStatus", "Status code returned by all AEM (AECP) command methods.")
+        // AVDECC Protocol Error Codes
+        .value("Success", LocalEntity::AemCommandStatus::Success, "The AVDECC Entity successfully performed the command and has valid results.")
+        .value("NotImplemented", LocalEntity::AemCommandStatus::NotImplemented, "The AVDECC Entity does not support the command type.")
+        .value("NoSuchDescriptor", LocalEntity::AemCommandStatus::NoSuchDescriptor, "A descriptor with the specified type and index does not exist.")
+        .value("LockedByOther", LocalEntity::AemCommandStatus::LockedByOther, "The AVDECC Entity has been locked by another controller.")
+        .value("AcquiredByOther", LocalEntity::AemCommandStatus::AcquiredByOther, "The AVDECC Entity has been acquired by another controller.")
+        .value("NotAuthenticated", LocalEntity::AemCommandStatus::NotAuthenticated, "The controller is not authenticated with the entity.")
+        .value("AuthenticationDisabled", LocalEntity::AemCommandStatus::AuthenticationDisabled, "Authentication is not enabled on the AVDECC Entity.")
+        .value("BadArguments", LocalEntity::AemCommandStatus::BadArguments, "One or more arguments in the command were invalid or unsupported.")
+        .value("NoResources", LocalEntity::AemCommandStatus::NoResources, "The entity does not have sufficient resources to complete the command.")
+        .value("InProgress", LocalEntity::AemCommandStatus::InProgress, "The command is still being processed; results will follow.")
+        .value("EntityMisbehaving", LocalEntity::AemCommandStatus::EntityMisbehaving, "The entity encountered an internal error while processing the command.")
+        .value("NotSupported", LocalEntity::AemCommandStatus::NotSupported,
+               "The command is valid but not supported for the specified target (e.g. read-only control).")
+        .value("StreamIsRunning", LocalEntity::AemCommandStatus::StreamIsRunning, "The stream is active and cannot accept this command while running.")
+        // Library-specific error codes
+        .value("BaseProtocolViolation", LocalEntity::AemCommandStatus::BaseProtocolViolation, "The entity sent a message that violates the base protocol.")
+        .value("PartialImplementation", LocalEntity::AemCommandStatus::PartialImplementation, "This command is only partially implemented by the library.")
+        .value("Busy", LocalEntity::AemCommandStatus::Busy, "The library is currently busy; try again later.")
+        .value("NetworkError", LocalEntity::AemCommandStatus::NetworkError, "A network error occurred during command transmission.")
+        .value("ProtocolError", LocalEntity::AemCommandStatus::ProtocolError, "The message could not be unpacked due to a protocol violation.")
+        .value("TimedOut", LocalEntity::AemCommandStatus::TimedOut, "The command did not receive a response and timed out.")
+        .value("UnknownEntity", LocalEntity::AemCommandStatus::UnknownEntity, "The target entity has not been detected on the network.")
+        .value("InternalError", LocalEntity::AemCommandStatus::InternalError, "An internal library error occurred. Please report this issue.")
+        .export_values()
+        .def("asString", [](LocalEntity::AemCommandStatus self) { return LocalEntity::statusToString(self); });
+
+    py::enum_<LocalEntity::AaCommandStatus>(cls, "AaCommandStatus", "Status code returned by all AA (AECP) command methods.")
+        // AVDECC Protocol Error Codes
+        .value("Success", LocalEntity::AaCommandStatus::Success, "The AVDECC Entity successfully performed the command and has valid results.")
+        .value("NotImplemented", LocalEntity::AaCommandStatus::NotImplemented, "The AVDECC Entity does not support the command type.")
+        .value("AddressTooLow", LocalEntity::AaCommandStatus::AddressTooLow, "The address is below the start of the memory map.")
+        .value("AddressTooHigh", LocalEntity::AaCommandStatus::AddressTooHigh, "The address is above the end of the memory map.")
+        .value("AddressInvalid", LocalEntity::AaCommandStatus::AddressInvalid, "The address is within the memory map but lies in an invalid region.")
+        .value("TlvInvalid", LocalEntity::AaCommandStatus::TlvInvalid, "One or more TLVs were invalid. No TLVs have been processed.")
+        .value("DataInvalid", LocalEntity::AaCommandStatus::DataInvalid, "The data provided for writing is invalid.")
+        .value("Unsupported", LocalEntity::AaCommandStatus::Unsupported,
+               "The requested action is unsupported, typically due to unknown EXECUTE or unsupported EXECUTE.")
+        // Library-specific error codes
+        .value("BaseProtocolViolation", LocalEntity::AaCommandStatus::BaseProtocolViolation, "The entity sent a message that violates the base protocol.")
+        .value("PartialImplementation", LocalEntity::AaCommandStatus::PartialImplementation,
+               "The command is only partially implemented by the library. Please report this.")
+        .value("Busy", LocalEntity::AaCommandStatus::Busy, "The library is currently busy; try again later.")
+        .value("Aborted", LocalEntity::AaCommandStatus::Aborted, "The request was aborted before completion.")
+        .value("NetworkError", LocalEntity::AaCommandStatus::NetworkError, "A network error occurred while transmitting or receiving the command.")
+        .value("ProtocolError", LocalEntity::AaCommandStatus::ProtocolError, "Failed to parse the message due to a protocol violation.")
+        .value("TimedOut", LocalEntity::AaCommandStatus::TimedOut, "The command did not receive a timely response.")
+        .value("UnknownEntity", LocalEntity::AaCommandStatus::UnknownEntity, "The entity has not been detected on the network.")
+        .value("InternalError", LocalEntity::AaCommandStatus::InternalError, "An internal library error occurred. Please report this.")
+        .export_values()
+        .def("asString", [](LocalEntity::AaCommandStatus self) { return LocalEntity::statusToString(self); });
+
+    py::enum_<LocalEntity::MvuCommandStatus>(m, "MvuCommandStatus", "Status code returned by all MVU (Milan Vendor Unique AECP) command methods.")
+        // Milan Vendor Unique Protocol Error Codes
+        .value("Success", LocalEntity::MvuCommandStatus::Success, "The command completed successfully with valid results.")
+        .value("NotImplemented", LocalEntity::MvuCommandStatus::NotImplemented, "The command type is not implemented by the entity.")
+        // Library-specific error codes
+        .value("BaseProtocolViolation", LocalEntity::MvuCommandStatus::BaseProtocolViolation, "The entity sent a message that violates the base protocol.")
+        .value("PartialImplementation", LocalEntity::MvuCommandStatus::PartialImplementation,
+               "This command is only partially implemented by the library. Please report this.")
+        .value("Busy", LocalEntity::MvuCommandStatus::Busy, "The library is busy. Try again later.")
+        .value("NetworkError", LocalEntity::MvuCommandStatus::NetworkError, "A network error occurred during command transmission.")
+        .value("ProtocolError", LocalEntity::MvuCommandStatus::ProtocolError, "Failed to parse the message due to a protocol violation.")
+        .value("TimedOut", LocalEntity::MvuCommandStatus::TimedOut, "The command did not receive a response within the timeout period.")
+        .value("UnknownEntity", LocalEntity::MvuCommandStatus::UnknownEntity, "The target entity is unknown or not currently detected on the network.")
+        .value("InternalError", LocalEntity::MvuCommandStatus::InternalError, "An internal library error occurred. Please report this issue.")
+        .export_values()
+        .def("asString", [](LocalEntity::MvuCommandStatus self) { return LocalEntity::statusToString(self); });
+
+    py::enum_<LocalEntity::ControlStatus>(cls, "ControlStatus", "Status code returned by all ACMP (AVDECC Connection Management Protocol) control methods.")
+        // AVDECC Protocol Error Codes
+        .value("Success", LocalEntity::ControlStatus::Success, "The command was successful and returned valid results.")
+        .value("ListenerUnknownID", LocalEntity::ControlStatus::ListenerUnknownID, "The Listener does not have the specified unique identifier.")
+        .value("TalkerUnknownID", LocalEntity::ControlStatus::TalkerUnknownID, "The Talker does not have the specified unique identifier.")
+        .value("TalkerDestMacFail", LocalEntity::ControlStatus::TalkerDestMacFail, "The Talker could not allocate a destination MAC for the Stream.")
+        .value("TalkerNoStreamIndex", LocalEntity::ControlStatus::TalkerNoStreamIndex, "The Talker has no available Stream index.")
+        .value("TalkerNoBandwidth", LocalEntity::ControlStatus::TalkerNoBandwidth, "The Talker could not allocate bandwidth for the Stream.")
+        .value("TalkerExclusive", LocalEntity::ControlStatus::TalkerExclusive, "The Talker already has an established Stream and supports only one Listener.")
+        .value("ListenerTalkerTimeout", LocalEntity::ControlStatus::ListenerTalkerTimeout, "The Listener timed out after all retries to contact the Talker.")
+        .value("ListenerExclusive", LocalEntity::ControlStatus::ListenerExclusive, "The Listener already has an established connection.")
+        .value("StateUnavailable", LocalEntity::ControlStatus::StateUnavailable, "Could not retrieve the state from the AVDECC Entity.")
+        .value("NotConnected", LocalEntity::ControlStatus::NotConnected,
+               "Attempting to disconnect while not connected or not connected to the specified Talker.")
+        .value("NoSuchConnection", LocalEntity::ControlStatus::NoSuchConnection, "No connection exists for the specified Talker.")
+        .value("CouldNotSendMessage", LocalEntity::ControlStatus::CouldNotSendMessage, "The Listener failed to send the message to the Talker.")
+        .value("TalkerMisbehaving", LocalEntity::ControlStatus::TalkerMisbehaving, "Talker failed due to an internal error.")
+        .value("ListenerMisbehaving", LocalEntity::ControlStatus::ListenerMisbehaving, "Listener failed due to an internal error.")
+        .value("ControllerNotAuthorized", LocalEntity::ControlStatus::ControllerNotAuthorized, "The Controller is not authorized to modify stream connections.")
+        .value("IncompatibleRequest", LocalEntity::ControlStatus::IncompatibleRequest,
+               "Listener is trying to connect to a Talker with incompatible traffic class or parameters.")
+        .value("NotSupported", LocalEntity::ControlStatus::NotSupported, "The command is not supported.")
+        // Library Error Codes
+        .value("BaseProtocolViolation", LocalEntity::ControlStatus::BaseProtocolViolation, "The entity sent a message that violates the base protocol.")
+        .value("NetworkError", LocalEntity::ControlStatus::NetworkError, "A network error occurred.")
+        .value("ProtocolError", LocalEntity::ControlStatus::ProtocolError, "A protocol parsing or validation error occurred.")
+        .value("TimedOut", LocalEntity::ControlStatus::TimedOut, "The command timed out with no response.")
+        .value("UnknownEntity", LocalEntity::ControlStatus::UnknownEntity, "The specified entity is unknown or not present on the network.")
+        .value("InternalError", LocalEntity::ControlStatus::InternalError, "An internal library error occurred. Please report this.")
+        .export_values()
+        .def("asString", [](LocalEntity::ControlStatus self) { return LocalEntity::statusToString(self); });
+
+    py::enum_<LocalEntity::AdvertiseFlag>(cls, "AdvertiseFlag", py::arithmetic(), "EntityAdvertise dirty flags indicating which fields have changed.")
+        .value("None", LocalEntity::AdvertiseFlag::None, "No changes have occurred.")
+        .value("EntityCapabilities", LocalEntity::AdvertiseFlag::EntityCapabilities, "The EntityCapabilities field has changed.")
+        .value("AssociationID", LocalEntity::AdvertiseFlag::AssociationID, "The AssociationID field has changed.")
+        .value("ValidTime", LocalEntity::AdvertiseFlag::ValidTime, "The ValidTime field has changed.")
+        .value("GptpGrandmasterID", LocalEntity::AdvertiseFlag::GptpGrandmasterID, "The gPTP GrandmasterID field has changed.")
+        .value("GptpDomainNumber", LocalEntity::AdvertiseFlag::GptpDomainNumber, "The gPTP DomainNumber field has changed.")
+        .export_values();
+    bindEnumBitfield<LocalEntity::AdvertiseFlag>(cls, "AdvertiseFlags");
+
+    cls.def("enableEntityAdvertising", &LocalEntity::enableEntityAdvertising, py::arg("availableDuration"), py::arg("interfaceIndex") = std::nullopt,
+            "Enables entity advertising with a duration between 2–62 seconds on the specified interface index or all interfaces. "
+            "Returns false if parameters are invalid.")
+        .def("disableEntityAdvertising", &LocalEntity::disableEntityAdvertising, py::arg("interfaceIndex") = std::nullopt,
+             "Disables entity advertising on the specified interface index or all interfaces.")
+        .def("discoverRemoteEntities", &LocalEntity::discoverRemoteEntities, "Requests discovery of all remote entities. Returns true if successful.")
+        .def("discoverRemoteEntity", &LocalEntity::discoverRemoteEntity, py::arg("entityID"),
+             "Requests discovery of a specific remote entity by its unique identifier. Returns true if successful.")
+        .def("forgetRemoteEntity", &LocalEntity::forgetRemoteEntity, py::arg("entityID"),
+             "Removes knowledge of a previously discovered remote entity. Returns true if successful.")
+        .def(
+            "setAutomaticDiscoveryDelay",
+            [](LocalEntity& self, std::uint64_t delay_ms) { self.setAutomaticDiscoveryDelay(std::chrono::milliseconds{delay_ms}); }, py::arg("delay_ms"),
+            "Sets the delay between automatic discovery cycles. 0 disables auto-discovery.")
+        .def("lock", &LocalEntity::lock, "Locks the entity for thread-safe access. Part of BasicLockable.")
+        .def("unlock", &LocalEntity::unlock, "Unlocks the entity. Part of BasicLockable.")
+        .def("isSelfLocked", &LocalEntity::isSelfLocked, "Returns true if the calling thread already holds the entity lock.");
+}

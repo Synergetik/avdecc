@@ -34,12 +34,12 @@ namespace py = pybind11;
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 template <typename EnumType>
-void bindEnumBitfield(py::module_& m, const std::string& py_class_name)
+void bindEnumBitfield(py::handle scope, const std::string& py_class_name)
 {
     using namespace la::avdecc::utils;
     using Bitfield = EnumBitfield<EnumType>;
 
-    py::class_<Bitfield> cls(m, py_class_name.c_str());
+    py::class_<Bitfield> cls(scope, py_class_name.c_str());
 
     cls.def(py::init<>())
         .def(py::init<EnumType>())
