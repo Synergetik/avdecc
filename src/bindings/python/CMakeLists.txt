@@ -29,6 +29,7 @@ configure_file(
 set (PUBLIC_HEADER_FILES
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_python.hpp
+	${CU_ROOT_DIR}/src/bindings/python/avdecc_controller_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_utils_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/utils.hpp
   ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
@@ -41,6 +42,7 @@ set (SOURCE_FILES_COMMON
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_model_types_python.cpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_protocol_python.cpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_model_python.cpp
+	${CU_ROOT_DIR}/src/bindings/python/avdecc_controller_python.cpp
 )
 
 # Group sources

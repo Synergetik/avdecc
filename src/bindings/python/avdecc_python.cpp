@@ -23,6 +23,7 @@
  */
 
 #include "avdecc_python.hpp"
+#include "avdecc_controller_python.hpp"
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
 
@@ -63,6 +64,7 @@ PYBIND11_MODULE(la_avdecc, m)
     bindEntityModelTypes(m);
     bindEntityModelProtocol(m);
     bindEntityModel(m);
+    bindControllerEntity(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
