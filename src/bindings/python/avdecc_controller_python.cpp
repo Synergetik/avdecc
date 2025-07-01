@@ -26,7 +26,8 @@
 
 
 #include <la/avdecc/avdecc.hpp>
-
+#include <pybind11/chrono.h>
+#include <pybind11/functional.h>
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -34,10 +35,11 @@ void bindDynamicInfoParameter(py::module_& m);
 void bindControllerInterface(py::module_& m);
 void bindControllerDelegate(py::module_& m);
 void bindControllerDefaultedDelegate(py::module_& m);
-
+void bindAddressAccessTlV(py::module_& m);
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindControllerEntity(py::module_& m)
 {
+    bindAddressAccessTlV(m);
     bindDynamicInfoParameter(m);
     bindControllerInterface(m);
     bindControllerDelegate(m);
@@ -834,9 +836,218 @@ void bindControllerInterface(py::module_& m)
 {
     using namespace la::avdecc::entity::controller;
 
-    auto cls = py::class_<Interface, PyInterface>(m, "ControllerInterface").def(py::init<>());
-
-    // TODO: Bind methods for Interface here.
+    auto cls =
+        py::class_<Interface, PyInterface>(m, "ControllerInterface")
+            .def(py::init<>())
+            .def("acquireEntity", &Interface::acquireEntity, py::arg("target_entity_id"), py::arg("is_persistent"), py::arg("descriptor_type"),
+                 py::arg("descriptor_index"), py::arg("handler"))
+            .def("releaseEntity", &Interface::releaseEntity, py::arg("target_entity_id"), py::arg("descriptor_type"), py::arg("descriptor_index"),
+                 py::arg("handler"))
+            .def("lockEntity", &Interface::lockEntity, py::arg("target_entity_id"), py::arg("descriptor_type"), py::arg("descriptor_index"), py::arg("handler"))
+            .def("unlockEntity", &Interface::unlockEntity, py::arg("target_entity_id"), py::arg("descriptor_type"), py::arg("descriptor_index"),
+                 py::arg("handler"))
+            .def("queryEntityAvailable", &Interface::queryEntityAvailable, py::arg("target_entity_id"), py::arg("handler"))
+            .def("queryControllerAvailable", &Interface::queryControllerAvailable, py::arg("target_entity_id"), py::arg("handler"))
+            .def("registerUnsolicitedNotifications", &Interface::registerUnsolicitedNotifications, py::arg("target_entity_id"), py::arg("handler"))
+            .def("unregisterUnsolicitedNotifications", &Interface::unregisterUnsolicitedNotifications, py::arg("target_entity_id"), py::arg("handler"))
+            .def("readEntityDescriptor", &Interface::readEntityDescriptor, py::arg("target_entity_id"), py::arg("handler"))
+            .def("readConfigurationDescriptor", &Interface::readConfigurationDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("handler"))
+            .def("readAudioUnitDescriptor", &Interface::readAudioUnitDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_unit_index"), py::arg("handler"))
+            .def("readStreamInputDescriptor", &Interface::readStreamInputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("handler"))
+            .def("readStreamOutputDescriptor", &Interface::readStreamOutputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("handler"))
+            .def("readJackInputDescriptor", &Interface::readJackInputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("handler"))
+            .def("readJackOutputDescriptor", &Interface::readJackOutputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("handler"))
+            .def("readAvbInterfaceDescriptor", &Interface::readAvbInterfaceDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("avb_interface_index"), py::arg("handler"))
+            .def("readClockSourceDescriptor", &Interface::readClockSourceDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_source_index"), py::arg("handler"))
+            .def("readMemoryObjectDescriptor", &Interface::readMemoryObjectDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("handler"))
+            .def("readLocaleDescriptor", &Interface::readLocaleDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("locale_index"),
+                 py::arg("handler"))
+            .def("readStringsDescriptor", &Interface::readStringsDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("strings_index"), py::arg("handler"))
+            .def("readStreamPortInputDescriptor", &Interface::readStreamPortInputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_port_index"), py::arg("handler"))
+            .def("readStreamPortOutputDescriptor", &Interface::readStreamPortOutputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_port_index"), py::arg("handler"))
+            .def("readExternalPortInputDescriptor", &Interface::readExternalPortInputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("external_port_index"), py::arg("handler"))
+            .def("readExternalPortOutputDescriptor", &Interface::readExternalPortOutputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("external_port_index"), py::arg("handler"))
+            .def("readInternalPortInputDescriptor", &Interface::readInternalPortInputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("internal_port_index"), py::arg("handler"))
+            .def("readInternalPortOutputDescriptor", &Interface::readInternalPortOutputDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("internal_port_index"), py::arg("handler"))
+            .def("readAudioClusterDescriptor", &Interface::readAudioClusterDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("cluster_index"), py::arg("handler"))
+            .def("readAudioMapDescriptor", &Interface::readAudioMapDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("map_index"), py::arg("handler"))
+            .def("readControlDescriptor", &Interface::readControlDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("control_index"), py::arg("handler"))
+            .def("readClockDomainDescriptor", &Interface::readClockDomainDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_domain_index"), py::arg("handler"))
+            .def("readTimingDescriptor", &Interface::readTimingDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("timing_index"),
+                 py::arg("handler"))
+            .def("readPtpInstanceDescriptor", &Interface::readPtpInstanceDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_instance_index"), py::arg("handler"))
+            .def("readPtpPortDescriptor", &Interface::readPtpPortDescriptor, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_port_index"), py::arg("handler"))
+            .def("setConfiguration", &Interface::setConfiguration, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("handler"))
+            .def("getConfiguration", &Interface::getConfiguration, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setStreamInputFormat", &Interface::setStreamInputFormat, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("stream_format"),
+                 py::arg("handler"))
+            .def("getStreamInputFormat", &Interface::getStreamInputFormat, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("setStreamOutputFormat", &Interface::setStreamOutputFormat, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("stream_format"),
+                 py::arg("handler"))
+            .def("getStreamOutputFormat", &Interface::getStreamOutputFormat, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("getStreamPortInputAudioMap", &Interface::getStreamPortInputAudioMap, py::arg("target_entity_id"), py::arg("stream_port_index"),
+                 py::arg("map_index"), py::arg("handler"))
+            .def("getStreamPortOutputAudioMap", &Interface::getStreamPortOutputAudioMap, py::arg("target_entity_id"), py::arg("stream_port_index"),
+                 py::arg("map_index"), py::arg("handler"))
+            .def("addStreamPortInputAudioMappings", &Interface::addStreamPortInputAudioMappings, py::arg("target_entity_id"), py::arg("stream_port_index"),
+                 py::arg("mappings"), py::arg("handler"))
+            .def("addStreamPortOutputAudioMappings", &Interface::addStreamPortOutputAudioMappings, py::arg("target_entity_id"), py::arg("stream_port_index"),
+                 py::arg("mappings"), py::arg("handler"))
+            .def("removeStreamPortInputAudioMappings", &Interface::removeStreamPortInputAudioMappings, py::arg("target_entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"), py::arg("handler"))
+            .def("removeStreamPortOutputAudioMappings", &Interface::removeStreamPortOutputAudioMappings, py::arg("target_entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"), py::arg("handler"))
+            .def("setStreamInputInfo", &Interface::setStreamInputInfo, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("info"),
+                 py::arg("handler"))
+            .def("setStreamOutputInfo", &Interface::setStreamOutputInfo, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("info"),
+                 py::arg("handler"))
+            .def("getStreamInputInfo", &Interface::getStreamInputInfo, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("getStreamOutputInfo", &Interface::getStreamOutputInfo, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("setEntityName", &Interface::setEntityName, py::arg("target_entity_id"), py::arg("entity_name"), py::arg("handler"))
+            .def("getEntityName", &Interface::getEntityName, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setEntityGroupName", &Interface::setEntityGroupName, py::arg("target_entity_id"), py::arg("entity_group_name"), py::arg("handler"))
+            .def("getEntityGroupName", &Interface::getEntityGroupName, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setConfigurationName", &Interface::setConfigurationName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("configuration_name"), py::arg("handler"))
+            .def("getConfigurationName", &Interface::getConfigurationName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("handler"))
+            .def("setAudioUnitName", &Interface::setAudioUnitName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("audio_unit_index"),
+                 py::arg("audio_unit_name"), py::arg("handler"))
+            .def("getAudioUnitName", &Interface::getAudioUnitName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("audio_unit_index"),
+                 py::arg("handler"))
+            .def("setStreamInputName", &Interface::setStreamInputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("stream_index"),
+                 py::arg("stream_input_name"), py::arg("handler"))
+            .def("getStreamInputName", &Interface::getStreamInputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("stream_index"),
+                 py::arg("handler"))
+            .def("setStreamOutputName", &Interface::setStreamOutputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("stream_index"),
+                 py::arg("stream_output_name"), py::arg("handler"))
+            .def("getStreamOutputName", &Interface::getStreamOutputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("stream_index"),
+                 py::arg("handler"))
+            .def("setJackInputName", &Interface::setJackInputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("jack_index"),
+                 py::arg("jack_input_name"), py::arg("handler"))
+            .def("getJackInputName", &Interface::getJackInputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("jack_index"),
+                 py::arg("handler"))
+            .def("setJackOutputName", &Interface::setJackOutputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("jack_index"),
+                 py::arg("jack_output_name"), py::arg("handler"))
+            .def("getJackOutputName", &Interface::getJackOutputName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("jack_index"),
+                 py::arg("handler"))
+            .def("setAvbInterfaceName", &Interface::setAvbInterfaceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("avb_interface_index"), py::arg("avb_interface_name"), py::arg("handler"))
+            .def("getAvbInterfaceName", &Interface::getAvbInterfaceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("avb_interface_index"), py::arg("handler"))
+            .def("setClockSourceName", &Interface::setClockSourceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_source_index"), py::arg("clock_source_name"), py::arg("handler"))
+            .def("getClockSourceName", &Interface::getClockSourceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_source_index"), py::arg("handler"))
+            .def("setMemoryObjectName", &Interface::setMemoryObjectName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("memory_object_name"), py::arg("handler"))
+            .def("getMemoryObjectName", &Interface::getMemoryObjectName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("handler"))
+            .def("setAudioClusterName", &Interface::setAudioClusterName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_cluster_index"), py::arg("audio_cluster_name"), py::arg("handler"))
+            .def("getAudioClusterName", &Interface::getAudioClusterName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_cluster_index"), py::arg("handler"))
+            .def("setControlName", &Interface::setControlName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("control_index"),
+                 py::arg("control_name"), py::arg("handler"))
+            .def("getControlName", &Interface::getControlName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("control_index"),
+                 py::arg("handler"))
+            .def("setClockDomainName", &Interface::setClockDomainName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_domain_index"), py::arg("clock_domain_name"), py::arg("handler"))
+            .def("getClockDomainName", &Interface::getClockDomainName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_domain_index"), py::arg("handler"))
+            .def("setTimingName", &Interface::setTimingName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("timing_index"),
+                 py::arg("timing_name"), py::arg("handler"))
+            .def("getTimingName", &Interface::getTimingName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("timing_index"),
+                 py::arg("handler"))
+            .def("setPtpInstanceName", &Interface::setPtpInstanceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_instance_index"), py::arg("ptp_instance_name"), py::arg("handler"))
+            .def("getPtpInstanceName", &Interface::getPtpInstanceName, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_instance_index"), py::arg("handler"))
+            .def("setPtpPortName", &Interface::setPtpPortName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("ptp_port_index"),
+                 py::arg("ptp_port_name"), py::arg("handler"))
+            .def("getPtpPortName", &Interface::getPtpPortName, py::arg("target_entity_id"), py::arg("configuration_index"), py::arg("ptp_port_index"),
+                 py::arg("handler"))
+            .def("setAssociation", &Interface::setAssociation, py::arg("target_entity_id"), py::arg("association_id"), py::arg("handler"))
+            .def("getAssociation", &Interface::getAssociation, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setAudioUnitSamplingRate", &Interface::setAudioUnitSamplingRate, py::arg("target_entity_id"), py::arg("audio_unit_index"),
+                 py::arg("sampling_rate"), py::arg("handler"))
+            .def("getAudioUnitSamplingRate", &Interface::getAudioUnitSamplingRate, py::arg("target_entity_id"), py::arg("audio_unit_index"), py::arg("handler"))
+            .def("setVideoClusterSamplingRate", &Interface::setVideoClusterSamplingRate, py::arg("target_entity_id"), py::arg("video_cluster_index"),
+                 py::arg("sampling_rate"), py::arg("handler"))
+            .def("getVideoClusterSamplingRate", &Interface::getVideoClusterSamplingRate, py::arg("target_entity_id"), py::arg("video_cluster_index"),
+                 py::arg("handler"))
+            .def("setSensorClusterSamplingRate", &Interface::setSensorClusterSamplingRate, py::arg("target_entity_id"), py::arg("sensor_cluster_index"),
+                 py::arg("sampling_rate"), py::arg("handler"))
+            .def("getSensorClusterSamplingRate", &Interface::getSensorClusterSamplingRate, py::arg("target_entity_id"), py::arg("sensor_cluster_index"),
+                 py::arg("handler"))
+            .def("setClockSource", &Interface::setClockSource, py::arg("target_entity_id"), py::arg("clock_domain_index"), py::arg("clock_source_index"),
+                 py::arg("handler"))
+            .def("getClockSource", &Interface::getClockSource, py::arg("target_entity_id"), py::arg("clock_domain_index"), py::arg("handler"))
+            .def("setControlValues", &Interface::setControlValues, py::arg("target_entity_id"), py::arg("control_index"), py::arg("control_values"),
+                 py::arg("handler"))
+            .def("getControlValues", &Interface::getControlValues, py::arg("target_entity_id"), py::arg("control_index"), py::arg("handler"))
+            .def("startStreamInput", &Interface::startStreamInput, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("startStreamOutput", &Interface::startStreamOutput, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("stopStreamInput", &Interface::stopStreamInput, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("stopStreamOutput", &Interface::stopStreamOutput, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("getAvbInfo", &Interface::getAvbInfo, py::arg("target_entity_id"), py::arg("avb_interface_index"), py::arg("handler"))
+            .def("getAsPath", &Interface::getAsPath, py::arg("target_entity_id"), py::arg("avb_interface_index"), py::arg("handler"))
+            .def("getEntityCounters", &Interface::getEntityCounters, py::arg("target_entity_id"), py::arg("handler"))
+            .def("getAvbInterfaceCounters", &Interface::getAvbInterfaceCounters, py::arg("target_entity_id"), py::arg("avb_interface_index"),
+                 py::arg("handler"))
+            .def("getClockDomainCounters", &Interface::getClockDomainCounters, py::arg("target_entity_id"), py::arg("clock_domain_index"), py::arg("handler"))
+            .def("getStreamInputCounters", &Interface::getStreamInputCounters, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("getStreamOutputCounters", &Interface::getStreamOutputCounters, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("reboot", &Interface::reboot, py::arg("target_entity_id"), py::arg("handler"))
+            .def("rebootToFirmware", &Interface::rebootToFirmware, py::arg("target_entity_id"), py::arg("memory_object_index"), py::arg("handler"))
+            .def("startOperation", &Interface::startOperation, py::arg("target_entity_id"), py::arg("descriptor_type"), py::arg("descriptor_index"),
+                 py::arg("operation_type"), py::arg("memory_buffer"), py::arg("handler"))
+            .def("abortOperation", &Interface::abortOperation, py::arg("target_entity_id"), py::arg("descriptor_type"), py::arg("descriptor_index"),
+                 py::arg("operation_id"), py::arg("handler"))
+            .def("setMemoryObjectLength", &Interface::setMemoryObjectLength, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("length"), py::arg("handler"))
+            .def("getMemoryObjectLength", &Interface::getMemoryObjectLength, py::arg("target_entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("handler"))
+            .def("getDynamicInfo", &Interface::getDynamicInfo, py::arg("target_entity_id"), py::arg("parameters"), py::arg("handler"))
+            .def("setMaxTransitTime", &Interface::setMaxTransitTime, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("max_transit_time"),
+                 py::arg("handler"))
+            .def("getMaxTransitTime", &Interface::getMaxTransitTime, py::arg("target_entity_id"), py::arg("stream_index"), py::arg("handler"))
+            .def("addressAccess", &Interface::addressAccess, py::arg("target_entity_id"), py::arg("tlvs"), py::arg("handler"))
+            .def("getMilanInfo", &Interface::getMilanInfo, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setSystemUniqueID", &Interface::setSystemUniqueID, py::arg("target_entity_id"), py::arg("system_unique_id"), py::arg("handler"))
+            .def("getSystemUniqueID", &Interface::getSystemUniqueID, py::arg("target_entity_id"), py::arg("handler"))
+            .def("setMediaClockReferenceInfo", &Interface::setMediaClockReferenceInfo, py::arg("target_entity_id"), py::arg("clock_domain_index"),
+                 py::arg("user_priority"), py::arg("domain_name"), py::arg("handler"))
+            .def("getMediaClockReferenceInfo", &Interface::getMediaClockReferenceInfo, py::arg("target_entity_id"), py::arg("clock_domain_index"),
+                 py::arg("handler"))
+            .def("connectStream", &Interface::connectStream, py::arg("talker_stream"), py::arg("listener_stream"), py::arg("handler"))
+            .def("disconnectStream", &Interface::disconnectStream, py::arg("talker_stream"), py::arg("listener_stream"), py::arg("handler"))
+            .def("disconnectTalkerStream", &Interface::disconnectTalkerStream, py::arg("talker_stream"), py::arg("listener_stream"), py::arg("handler"))
+            .def("getTalkerStreamState", &Interface::getTalkerStreamState, py::arg("talker_stream"), py::arg("handler"))
+            .def("getListenerStreamState", &Interface::getListenerStreamState, py::arg("listener_stream"), py::arg("handler"))
+            .def("getTalkerStreamConnection", &Interface::getTalkerStreamConnection, py::arg("talker_stream"), py::arg("connection_index"), py::arg("handler"));
+    // TODO: Add binding for Tlv for addressAccess
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -1211,13 +1422,136 @@ namespace la::avdecc::entity::controller
     };
 } // namespace la::avdecc::entity::controller
 
-
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindControllerDelegate(py::module_& m)
 {
     using namespace la::avdecc::entity::controller;
 
-    auto cls = py::class_<Delegate, PyDelegate>(m, "ControllerDelegate").def(py::init<>());
+    auto cls =
+        py::class_<Delegate, PyDelegate>(m, "ControllerDelegate")
+            .def(py::init<>())
+            .def("onTransportError", &Delegate::onTransportError, py::arg("controller"))
+            .def("onEntityOnline", &Delegate::onEntityOnline, py::arg("controller"), py::arg("entity_id"), py::arg("entity"))
+            .def("onEntityUpdate", &Delegate::onEntityUpdate, py::arg("controller"), py::arg("entity_id"), py::arg("entity"))
+            .def("onEntityOffline", &Delegate::onEntityOffline, py::arg("controller"), py::arg("entity_id"))
+            .def("onControllerConnectResponseSniffed", &Delegate::onControllerConnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onControllerDisconnectResponseSniffed", &Delegate::onControllerDisconnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onListenerConnectResponseSniffed", &Delegate::onListenerConnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onListenerDisconnectResponseSniffed", &Delegate::onListenerDisconnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onGetTalkerStreamStateResponseSniffed", &Delegate::onGetTalkerStreamStateResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onGetListenerStreamStateResponseSniffed", &Delegate::onGetListenerStreamStateResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onDeregisteredFromUnsolicitedNotifications", &Delegate::onDeregisteredFromUnsolicitedNotifications, py::arg("controller"),
+                 py::arg("entity_id"))
+            .def("onEntityAcquired", &Delegate::onEntityAcquired, py::arg("controller"), py::arg("entity_id"), py::arg("owning_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityReleased", &Delegate::onEntityReleased, py::arg("controller"), py::arg("entity_id"), py::arg("owning_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityLocked", &Delegate::onEntityLocked, py::arg("controller"), py::arg("entity_id"), py::arg("locking_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityUnlocked", &Delegate::onEntityUnlocked, py::arg("controller"), py::arg("entity_id"), py::arg("locking_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onConfigurationChanged", &Delegate::onConfigurationChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"))
+            .def("onStreamInputFormatChanged", &Delegate::onStreamInputFormatChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("stream_format"))
+            .def("onStreamOutputFormatChanged", &Delegate::onStreamOutputFormatChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("stream_format"))
+            .def("onStreamPortInputAudioMappingsChanged", &Delegate::onStreamPortInputAudioMappingsChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("number_of_maps"), py::arg("map_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsChanged", &Delegate::onStreamPortOutputAudioMappingsChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("number_of_maps"), py::arg("map_index"), py::arg("mappings"))
+            .def("onStreamInputInfoChanged", &Delegate::onStreamInputInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("info"), py::arg("from_get_stream_info_response"))
+            .def("onStreamOutputInfoChanged", &Delegate::onStreamOutputInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("info"), py::arg("from_get_stream_info_response"))
+            .def("onEntityNameChanged", &Delegate::onEntityNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("entity_name"))
+            .def("onEntityGroupNameChanged", &Delegate::onEntityGroupNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("entity_group_name"))
+            .def("onConfigurationNameChanged", &Delegate::onConfigurationNameChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("configuration_index"), py::arg("configuration_name"))
+            .def("onAudioUnitNameChanged", &Delegate::onAudioUnitNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_unit_index"), py::arg("audio_unit_name"))
+            .def("onStreamInputNameChanged", &Delegate::onStreamInputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("stream_name"))
+            .def("onStreamOutputNameChanged", &Delegate::onStreamOutputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("stream_name"))
+            .def("onJackInputNameChanged", &Delegate::onJackInputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("jack_name"))
+            .def("onJackOutputNameChanged", &Delegate::onJackOutputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("jack_name"))
+            .def("onAvbInterfaceNameChanged", &Delegate::onAvbInterfaceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("avb_interface_index"), py::arg("avb_interface_name"))
+            .def("onClockSourceNameChanged", &Delegate::onClockSourceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_source_index"), py::arg("clock_source_name"))
+            .def("onMemoryObjectNameChanged", &Delegate::onMemoryObjectNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("memory_object_name"))
+            .def("onAudioClusterNameChanged", &Delegate::onAudioClusterNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_cluster_index"), py::arg("audio_cluster_name"))
+            .def("onControlNameChanged", &Delegate::onControlNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("control_index"), py::arg("control_name"))
+            .def("onClockDomainNameChanged", &Delegate::onClockDomainNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_domain_index"), py::arg("clock_domain_name"))
+            .def("onTimingNameChanged", &Delegate::onTimingNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("timing_index"), py::arg("timing_name"))
+            .def("onPtpInstanceNameChanged", &Delegate::onPtpInstanceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_instance_index"), py::arg("ptp_instance_name"))
+            .def("onPtpPortNameChanged", &Delegate::onPtpPortNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_port_index"), py::arg("ptp_port_name"))
+            .def("onAssociationIDChanged", &Delegate::onAssociationIDChanged, py::arg("controller"), py::arg("entity_id"), py::arg("association_id"))
+            .def("onAudioUnitSamplingRateChanged", &Delegate::onAudioUnitSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("audio_unit_index"), py::arg("sampling_rate"))
+            .def("onVideoClusterSamplingRateChanged", &Delegate::onVideoClusterSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("video_cluster_index"), py::arg("sampling_rate"))
+            .def("onSensorClusterSamplingRateChanged", &Delegate::onSensorClusterSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("sensor_cluster_index"), py::arg("sampling_rate"))
+            .def("onClockSourceChanged", &Delegate::onClockSourceChanged, py::arg("controller"), py::arg("entity_id"), py::arg("clock_domain_index"),
+                 py::arg("clock_source_index"))
+            .def("onControlValuesChanged", &Delegate::onControlValuesChanged, py::arg("controller"), py::arg("entity_id"), py::arg("control_index"),
+                 py::arg("packed_control_values"))
+            .def("onStreamInputStarted", &Delegate::onStreamInputStarted, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamOutputStarted", &Delegate::onStreamOutputStarted, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamInputStopped", &Delegate::onStreamInputStopped, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamOutputStopped", &Delegate::onStreamOutputStopped, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onAvbInfoChanged", &Delegate::onAvbInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("avb_interface_index"), py::arg("info"))
+            .def("onAsPathChanged", &Delegate::onAsPathChanged, py::arg("controller"), py::arg("entity_id"), py::arg("avb_interface_index"), py::arg("as_path"))
+            .def("onEntityCountersChanged", &Delegate::onEntityCountersChanged, py::arg("controller"), py::arg("entity_id"), py::arg("valid_counters"),
+                 py::arg("counters"))
+            .def("onAvbInterfaceCountersChanged", &Delegate::onAvbInterfaceCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("avb_interface_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onClockDomainCountersChanged", &Delegate::onClockDomainCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("clock_domain_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamInputCountersChanged", &Delegate::onStreamInputCountersChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamOutputCountersChanged", &Delegate::onStreamOutputCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamPortInputAudioMappingsAdded", &Delegate::onStreamPortInputAudioMappingsAdded, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsAdded", &Delegate::onStreamPortOutputAudioMappingsAdded, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortInputAudioMappingsRemoved", &Delegate::onStreamPortInputAudioMappingsRemoved, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsRemoved", &Delegate::onStreamPortOutputAudioMappingsRemoved, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onMemoryObjectLengthChanged", &Delegate::onMemoryObjectLengthChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("configuration_index"), py::arg("memory_object_index"), py::arg("length"))
+            .def("onOperationStatus", &Delegate::onOperationStatus, py::arg("controller"), py::arg("entity_id"), py::arg("descriptor_type"),
+                 py::arg("descriptor_index"), py::arg("operation_id"), py::arg("percent_complete"))
+            .def("onMaxTransitTimeChanged", &Delegate::onMaxTransitTimeChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("max_transit_time"))
+            .def("onSystemUniqueIDChanged", &Delegate::onSystemUniqueIDChanged, py::arg("controller"), py::arg("entity_id"), py::arg("system_unique_id"))
+            .def("onMediaClockReferenceInfoChanged", &Delegate::onMediaClockReferenceInfoChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("clock_domain_index"), py::arg("mcr_info"))
+            .def("onEntityIdentifyNotification", &Delegate::onEntityIdentifyNotification, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpRetry", &Delegate::onAecpRetry, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpTimeout", &Delegate::onAecpTimeout, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpUnexpectedResponse", &Delegate::onAecpUnexpectedResponse, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpResponseTime", &Delegate::onAecpResponseTime, py::arg("controller"), py::arg("entity_id"), py::arg("response_time"))
+            .def("onAemAecpUnsolicitedReceived", &Delegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
+            .def("onMvuAecpUnsolicitedReceived", &Delegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"));
 
     // TODO: Bind methods for Delegate here.
 }
@@ -1600,9 +1934,148 @@ void bindControllerDefaultedDelegate(py::module_& m)
 {
     using namespace la::avdecc::entity::controller;
 
-    auto cls = py::class_<DefaultedDelegate, PyDefaultedDelegate>(m, "ControllerDefaultedDelegate").def(py::init<>());
+    auto cls =
+        py::class_<DefaultedDelegate, PyDefaultedDelegate>(m, "ControllerDefaultedDelegate")
+            .def(py::init<>())
+           .def("onTransportError", &DefaultedDelegate::onTransportError, py::arg("controller"))
+            .def("onEntityOnline", &DefaultedDelegate::onEntityOnline, py::arg("controller"), py::arg("entity_id"), py::arg("entity"))
+            .def("onEntityUpdate", &DefaultedDelegate::onEntityUpdate, py::arg("controller"), py::arg("entity_id"), py::arg("entity"))
+            .def("onEntityOffline", &DefaultedDelegate::onEntityOffline, py::arg("controller"), py::arg("entity_id"))
+            .def("onControllerConnectResponseSniffed", &DefaultedDelegate::onControllerConnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onControllerDisconnectResponseSniffed", &DefaultedDelegate::onControllerDisconnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onListenerConnectResponseSniffed", &DefaultedDelegate::onListenerConnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onListenerDisconnectResponseSniffed", &DefaultedDelegate::onListenerDisconnectResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onGetTalkerStreamStateResponseSniffed", &DefaultedDelegate::onGetTalkerStreamStateResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onGetListenerStreamStateResponseSniffed", &DefaultedDelegate::onGetListenerStreamStateResponseSniffed, py::arg("controller"), py::arg("talker_stream"),
+                 py::arg("listener_stream"), py::arg("connection_count"), py::arg("flags"), py::arg("status"))
+            .def("onDeregisteredFromUnsolicitedNotifications", &DefaultedDelegate::onDeregisteredFromUnsolicitedNotifications, py::arg("controller"),
+                 py::arg("entity_id"))
+            .def("onEntityAcquired", &DefaultedDelegate::onEntityAcquired, py::arg("controller"), py::arg("entity_id"), py::arg("owning_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityReleased", &DefaultedDelegate::onEntityReleased, py::arg("controller"), py::arg("entity_id"), py::arg("owning_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityLocked", &DefaultedDelegate::onEntityLocked, py::arg("controller"), py::arg("entity_id"), py::arg("locking_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onEntityUnlocked", &DefaultedDelegate::onEntityUnlocked, py::arg("controller"), py::arg("entity_id"), py::arg("locking_entity"),
+                 py::arg("descriptor_type"), py::arg("descriptor_index"))
+            .def("onConfigurationChanged", &DefaultedDelegate::onConfigurationChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"))
+            .def("onStreamInputFormatChanged", &DefaultedDelegate::onStreamInputFormatChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("stream_format"))
+            .def("onStreamOutputFormatChanged", &DefaultedDelegate::onStreamOutputFormatChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("stream_format"))
+            .def("onStreamPortInputAudioMappingsChanged", &DefaultedDelegate::onStreamPortInputAudioMappingsChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("number_of_maps"), py::arg("map_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsChanged", &DefaultedDelegate::onStreamPortOutputAudioMappingsChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("number_of_maps"), py::arg("map_index"), py::arg("mappings"))
+            .def("onStreamInputInfoChanged", &DefaultedDelegate::onStreamInputInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("info"), py::arg("from_get_stream_info_response"))
+            .def("onStreamOutputInfoChanged", &DefaultedDelegate::onStreamOutputInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("info"), py::arg("from_get_stream_info_response"))
+            .def("onEntityNameChanged", &DefaultedDelegate::onEntityNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("entity_name"))
+            .def("onEntityGroupNameChanged", &DefaultedDelegate::onEntityGroupNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("entity_group_name"))
+            .def("onConfigurationNameChanged", &DefaultedDelegate::onConfigurationNameChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("configuration_index"), py::arg("configuration_name"))
+            .def("onAudioUnitNameChanged", &DefaultedDelegate::onAudioUnitNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_unit_index"), py::arg("audio_unit_name"))
+            .def("onStreamInputNameChanged", &DefaultedDelegate::onStreamInputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("stream_name"))
+            .def("onStreamOutputNameChanged", &DefaultedDelegate::onStreamOutputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("stream_index"), py::arg("stream_name"))
+            .def("onJackInputNameChanged", &DefaultedDelegate::onJackInputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("jack_name"))
+            .def("onJackOutputNameChanged", &DefaultedDelegate::onJackOutputNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("jack_index"), py::arg("jack_name"))
+            .def("onAvbInterfaceNameChanged", &DefaultedDelegate::onAvbInterfaceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("avb_interface_index"), py::arg("avb_interface_name"))
+            .def("onClockSourceNameChanged", &DefaultedDelegate::onClockSourceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_source_index"), py::arg("clock_source_name"))
+            .def("onMemoryObjectNameChanged", &DefaultedDelegate::onMemoryObjectNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("memory_object_index"), py::arg("memory_object_name"))
+            .def("onAudioClusterNameChanged", &DefaultedDelegate::onAudioClusterNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("audio_cluster_index"), py::arg("audio_cluster_name"))
+            .def("onControlNameChanged", &DefaultedDelegate::onControlNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("control_index"), py::arg("control_name"))
+            .def("onClockDomainNameChanged", &DefaultedDelegate::onClockDomainNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("clock_domain_index"), py::arg("clock_domain_name"))
+            .def("onTimingNameChanged", &DefaultedDelegate::onTimingNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("timing_index"), py::arg("timing_name"))
+            .def("onPtpInstanceNameChanged", &DefaultedDelegate::onPtpInstanceNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_instance_index"), py::arg("ptp_instance_name"))
+            .def("onPtpPortNameChanged", &DefaultedDelegate::onPtpPortNameChanged, py::arg("controller"), py::arg("entity_id"), py::arg("configuration_index"),
+                 py::arg("ptp_port_index"), py::arg("ptp_port_name"))
+            .def("onAssociationIDChanged", &DefaultedDelegate::onAssociationIDChanged, py::arg("controller"), py::arg("entity_id"), py::arg("association_id"))
+            .def("onAudioUnitSamplingRateChanged", &DefaultedDelegate::onAudioUnitSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("audio_unit_index"), py::arg("sampling_rate"))
+            .def("onVideoClusterSamplingRateChanged", &DefaultedDelegate::onVideoClusterSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("video_cluster_index"), py::arg("sampling_rate"))
+            .def("onSensorClusterSamplingRateChanged", &DefaultedDelegate::onSensorClusterSamplingRateChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("sensor_cluster_index"), py::arg("sampling_rate"))
+            .def("onClockSourceChanged", &DefaultedDelegate::onClockSourceChanged, py::arg("controller"), py::arg("entity_id"), py::arg("clock_domain_index"),
+                 py::arg("clock_source_index"))
+            .def("onControlValuesChanged", &DefaultedDelegate::onControlValuesChanged, py::arg("controller"), py::arg("entity_id"), py::arg("control_index"),
+                 py::arg("packed_control_values"))
+            .def("onStreamInputStarted", &DefaultedDelegate::onStreamInputStarted, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamOutputStarted", &DefaultedDelegate::onStreamOutputStarted, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamInputStopped", &DefaultedDelegate::onStreamInputStopped, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onStreamOutputStopped", &DefaultedDelegate::onStreamOutputStopped, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"))
+            .def("onAvbInfoChanged", &DefaultedDelegate::onAvbInfoChanged, py::arg("controller"), py::arg("entity_id"), py::arg("avb_interface_index"), py::arg("info"))
+            .def("onAsPathChanged", &DefaultedDelegate::onAsPathChanged, py::arg("controller"), py::arg("entity_id"), py::arg("avb_interface_index"), py::arg("as_path"))
+            .def("onEntityCountersChanged", &DefaultedDelegate::onEntityCountersChanged, py::arg("controller"), py::arg("entity_id"), py::arg("valid_counters"),
+                 py::arg("counters"))
+            .def("onAvbInterfaceCountersChanged", &DefaultedDelegate::onAvbInterfaceCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("avb_interface_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onClockDomainCountersChanged", &DefaultedDelegate::onClockDomainCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("clock_domain_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamInputCountersChanged", &DefaultedDelegate::onStreamInputCountersChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamOutputCountersChanged", &DefaultedDelegate::onStreamOutputCountersChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_index"), py::arg("valid_counters"), py::arg("counters"))
+            .def("onStreamPortInputAudioMappingsAdded", &DefaultedDelegate::onStreamPortInputAudioMappingsAdded, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsAdded", &DefaultedDelegate::onStreamPortOutputAudioMappingsAdded, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortInputAudioMappingsRemoved", &DefaultedDelegate::onStreamPortInputAudioMappingsRemoved, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onStreamPortOutputAudioMappingsRemoved", &DefaultedDelegate::onStreamPortOutputAudioMappingsRemoved, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("stream_port_index"), py::arg("mappings"))
+            .def("onMemoryObjectLengthChanged", &DefaultedDelegate::onMemoryObjectLengthChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("configuration_index"), py::arg("memory_object_index"), py::arg("length"))
+            .def("onOperationStatus", &DefaultedDelegate::onOperationStatus, py::arg("controller"), py::arg("entity_id"), py::arg("descriptor_type"),
+                 py::arg("descriptor_index"), py::arg("operation_id"), py::arg("percent_complete"))
+            .def("onMaxTransitTimeChanged", &DefaultedDelegate::onMaxTransitTimeChanged, py::arg("controller"), py::arg("entity_id"), py::arg("stream_index"),
+                 py::arg("max_transit_time"))
+            .def("onSystemUniqueIDChanged", &DefaultedDelegate::onSystemUniqueIDChanged, py::arg("controller"), py::arg("entity_id"), py::arg("system_unique_id"))
+            .def("onMediaClockReferenceInfoChanged", &DefaultedDelegate::onMediaClockReferenceInfoChanged, py::arg("controller"), py::arg("entity_id"),
+                 py::arg("clock_domain_index"), py::arg("mcr_info"))
+            .def("onEntityIdentifyNotification", &DefaultedDelegate::onEntityIdentifyNotification, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpRetry", &DefaultedDelegate::onAecpRetry, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpTimeout", &DefaultedDelegate::onAecpTimeout, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpUnexpectedResponse", &DefaultedDelegate::onAecpUnexpectedResponse, py::arg("controller"), py::arg("entity_id"))
+            .def("onAecpResponseTime", &DefaultedDelegate::onAecpResponseTime, py::arg("controller"), py::arg("entity_id"), py::arg("response_time"))
+            .def("onAemAecpUnsolicitedReceived", &DefaultedDelegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
+            .def("onMvuAecpUnsolicitedReceived", &DefaultedDelegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"));
 
-    // TODO: Bind methods for DefaultedDelegate here.
+}
+
+
+void bindAddressAccessTlV(py::module_& m)
+{
+    using namespace la::avdecc::entity::addressAccess;
+    using namespace la::avdecc::protocol;
+    auto cls = py::class_<Tlv>(m, "Tlv", py::is_final())
+                   .def(py::init<>())
+                   .def(py::init<std::uint64_t const, size_t const>())
+                   .def(py::init<AaMode const, std::uint64_t const, size_t const>())
+                   .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type const&>())
+                   .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type&&>())
+                   .def(py::init<Tlv>())
+                   .def(py::init<Tlv const>());
+    // TODO:I omitted the constructor from a raw buffer as this uses a void pointer.
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
