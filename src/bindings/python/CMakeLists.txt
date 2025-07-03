@@ -1,6 +1,6 @@
 # Python Bindings CMake file
 
-find_package(Python 3.11 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python 3.11 EXACT COMPONENTS Interpreter Development REQUIRED)
 
 string(TOLOWER "${PROJECT_NAME}_python" PYTHON_PROJECT_TARGET)
 string(TOLOWER "${PROJECT_NAME}" PYTHON_OUTPUT)
