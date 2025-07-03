@@ -130,7 +130,6 @@ void bindDescriptorType(py::module_& m)
         .value("PtpInstance", DescriptorType::PtpInstance)
         .value("PtpPort", DescriptorType::PtpPort)
         .value("Invalid", DescriptorType::Invalid)
-        .export_values()
         .def("asString", [](DescriptorType self) { return descriptorTypeToString(self); });
 }
 
@@ -179,7 +178,6 @@ void bindJackType(py::module_& m)
         .value("GnssClock", JackType::GnssClock)
         .value("Pps", JackType::Pps)
         .value("Expansion", JackType::Expansion)
-        .export_values()
         .def("asString", [](JackType self) { return jackTypeToString(self); });
 }
 
@@ -193,7 +191,6 @@ void bindClockSourceType(py::module_& m)
         .value("External", ClockSourceType::External)
         .value("InputStream", ClockSourceType::InputStream)
         .value("Expansion", ClockSourceType::Expansion)
-        .export_values()
         .def("asString", [](ClockSourceType self) { return clockSourceTypeToString(self); });
 }
 
@@ -218,7 +215,6 @@ void bindMemoryObjectType(py::module_& m)
         .value("DaeManufacturer", MemoryObjectType::DaeManufacturer)
         .value("DaeEntity", MemoryObjectType::DaeEntity)
         .value("DaeGeneric", MemoryObjectType::DaeGeneric)
-        .export_values()
         .def("asString", [](MemoryObjectType self) { return memoryObjectTypeToString(self); });
 }
 
@@ -233,7 +229,6 @@ void bindMemoryObjectOperationType(py::module_& m)
         .value("Read", MemoryObjectOperationType::Read)
         .value("Erase", MemoryObjectOperationType::Erase)
         .value("Upload", MemoryObjectOperationType::Upload)
-        .export_values()
         .def("asString", [](MemoryObjectOperationType self) { return memoryObjectOperationTypeToString(self); });
 }
 
@@ -247,7 +242,6 @@ void bindAudioClusterFormat(py::module_& m)
         .value("Mbla", AudioClusterFormat::Mbla)
         .value("Midi", AudioClusterFormat::Midi)
         .value("Smpte", AudioClusterFormat::Smpte)
-        .export_values()
         .def("asString", [](AudioClusterFormat self) { return audioClusterFormatToString(self); });
 }
 
@@ -269,8 +263,8 @@ void bindAudioMapping(py::module_& m)
         .def("__repr__",
              [](const AudioMapping& am) {
                  std::ostringstream oss;
-                 oss << "AudioMapping(streamIndex=" << am.streamIndex << ", streamChannel=" << am.streamChannel
-                     << ", clusterOffset=" << am.clusterOffset << ", clusterChannel=" << am.clusterChannel << ")";
+                 oss << "AudioMapping(streamIndex=" << am.streamIndex << ", streamChannel=" << am.streamChannel << ", clusterOffset=" << am.clusterOffset
+                     << ", clusterChannel=" << am.clusterChannel << ")";
                  return oss.str();
              })
 
@@ -287,7 +281,6 @@ void bindTimingAlgorithm(py::module_& m)
         .value("Single", TimingAlgorithm::Single)
         .value("Fallback", TimingAlgorithm::Fallback)
         .value("Combined", TimingAlgorithm::Combined)
-        .export_values()
         .def("asString", [](TimingAlgorithm self) { return timingAlgorithmToString(self); });
 }
 
@@ -309,7 +302,6 @@ void bindPtpPortType(py::module_& m)
         .value("P2PUnicastUdpV6", PtpPortType::P2PUnicastUdpV6)
         .value("E2EUnicastUdpV4", PtpPortType::E2EUnicastUdpV4)
         .value("E2EUnicastUdpV6", PtpPortType::E2EUnicastUdpV6)
-        .export_values()
         .def("asString", [](PtpPortType self) { return ptpPortTypeToString(self); });
 }
 
@@ -319,8 +311,7 @@ void bindStandardControlTypeVendorID(py::module_& m)
     using namespace la::avdecc;
     assert(UniqueIdentifierBinding.has_value());
 
-    UniqueIdentifierBinding->def_property_readonly_static(
-        "StandardControlTypeVendorID", [](py::object) { return entity::model::StandardControlTypeVendorID; });
+    UniqueIdentifierBinding->def_property_readonly_static("StandardControlTypeVendorID", [](py::object) { return entity::model::StandardControlTypeVendorID; });
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -388,7 +379,6 @@ void bindStandardControlType(py::module_& m)
         .value("Frequency", StandardControlType::Frequency)
         .value("Modulation", StandardControlType::Modulation)
         .value("Polarization", StandardControlType::Polarization)
-        .export_values()
         .def("asString", [](StandardControlType self) { return standardControlTypeToString(self); });
 }
 
@@ -410,8 +400,8 @@ void bindMsrpMapping(py::module_& m)
         .def("__repr__",
              [](const MsrpMapping& m) {
                  std::ostringstream oss;
-                 oss << "MsrpMapping(trafficClass=" << static_cast<int>(m.trafficClass)
-                     << ", priority=" << static_cast<int>(m.priority) << ", vlanID=" << m.vlanID << ")";
+                 oss << "MsrpMapping(trafficClass=" << static_cast<int>(m.trafficClass) << ", priority=" << static_cast<int>(m.priority)
+                     << ", vlanID=" << m.vlanID << ")";
                  return oss.str();
              })
 
@@ -432,8 +422,7 @@ void bindAvdeccFixedString(py::module_& m)
              }),
              py::arg("data"), py::arg("size"))
 
-        .def("assign", static_cast<void (AvdeccFixedString::*)(std::string const&)>(&AvdeccFixedString::assign),
-             py::arg("string"))
+        .def("assign", static_cast<void (AvdeccFixedString::*)(std::string const&)>(&AvdeccFixedString::assign), py::arg("string"))
         .def(
             "assignRaw",
             [](AvdeccFixedString& self, py::bytes raw, size_t size) {
@@ -444,8 +433,7 @@ void bindAvdeccFixedString(py::module_& m)
 
         .def_property_readonly("size", &AvdeccFixedString::size)
         .def_property_readonly("empty", &AvdeccFixedString::empty)
-        .def_property_readonly("data",
-                               [](const AvdeccFixedString& self) { return py::bytes(self.data(), self.size()); })
+        .def_property_readonly("data", [](const AvdeccFixedString& self) { return py::bytes(self.data(), self.size()); })
 
         .def("__getitem__",
              [](const AvdeccFixedString& self, size_t i) {
@@ -546,14 +534,10 @@ void bindLocalizedStringReference(py::module_& m)
 
         .def_static("getNullLocalizedStringReference", &LocalizedStringReference::getNullLocalizedStringReference)
 
-        .def("__eq__",
-             [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self == other; })
-        .def("__ne__",
-             [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self != other; })
-        .def("__lt__",
-             [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self < other; })
-        .def("__int__",
-             [](const LocalizedStringReference& r) { return static_cast<LocalizedStringReference::value_type>(r); })
+        .def("__eq__", [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self == other; })
+        .def("__ne__", [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self != other; })
+        .def("__lt__", [](const LocalizedStringReference& self, const LocalizedStringReference& other) { return self < other; })
+        .def("__int__", [](const LocalizedStringReference& r) { return static_cast<LocalizedStringReference::value_type>(r); })
 
         .def("__repr__", [](const LocalizedStringReference& r) {
             std::ostringstream oss;
@@ -647,7 +631,6 @@ void bindControlValueUnit(py::module_& m)
         .value("Lu", ControlValueUnit::Unit::Lu)
         .value("Lufs", ControlValueUnit::Unit::Lufs)
         .value("DbA", ControlValueUnit::Unit::DbA)
-        .export_values()
         .def("asString", [](ControlValueUnit::Unit self) { return controlValueUnitToString(self); });
 
     cls.def(py::init<>())
@@ -669,8 +652,7 @@ void bindControlValueUnit(py::module_& m)
         .def("__repr__", [](const ControlValueUnit& u) {
             std::ostringstream oss;
             auto [mult, unit] = u.getMultiplierUnit();
-            oss << "ControlValueUnit(multiplier=" << static_cast<int>(mult)
-                << ", unit=" << static_cast<std::uint16_t>(unit) << ")";
+            oss << "ControlValueUnit(multiplier=" << static_cast<int>(mult) << ", unit=" << static_cast<std::uint16_t>(unit) << ")";
             return oss.str();
         });
 }
@@ -721,13 +703,11 @@ void bindControlValueType(py::module_& m)
         .value("ControlGptpTime", ControlValueType::Type::ControlGptpTime)
         .value("ControlVendor", ControlValueType::Type::ControlVendor)
         .value("Expansion", ControlValueType::Type::Expansion)
-        .export_values()
         .def("asString", [](ControlValueType::Type self) { return controlValueTypeToString(self); });
 
     cls.def(py::init<>())
         .def(py::init<ControlValueType::value_type>(), py::arg("value"))
-        .def(py::init<bool, bool, ControlValueType::Type>(), py::arg("isReadOnly"), py::arg("isUnknown"),
-             py::arg("type"))
+        .def(py::init<bool, bool, ControlValueType::Type>(), py::arg("isReadOnly"), py::arg("isUnknown"), py::arg("type"))
 
         .def("setValue", &ControlValueType::setValue)
         .def("getValue", &ControlValueType::getValue)
@@ -743,8 +723,7 @@ void bindControlValueType(py::module_& m)
 
         .def("__repr__", [](const ControlValueType& v) {
             std::ostringstream oss;
-            oss << "ControlValueType(readOnly=" << v.isReadOnly() << ", unknown=" << v.isUnknown()
-                << ", type=" << controlValueTypeToString(v.getType()) << ")";
+            oss << "ControlValueType(readOnly=" << v.isReadOnly() << ", unknown=" << v.isUnknown() << ", type=" << controlValueTypeToString(v.getType()) << ")";
             return oss.str();
         });
 }
@@ -765,8 +744,7 @@ void bindBaseControlValues(py::module_& m)
         .def_property_readonly("isValid", &ControlValues::isValid)
         .def("__repr__", [](const ControlValues& c) {
             std::ostringstream oss;
-            oss << "ControlValues(valid=" << c.isValid() << ", type=" << static_cast<int>(c.getType())
-                << ", size=" << c.size() << ")";
+            oss << "ControlValues(valid=" << c.isValid() << ", type=" << static_cast<int>(c.getType()) << ", size=" << c.size() << ")";
             return oss.str();
         });
 }
@@ -781,17 +759,13 @@ void bindStreamIdentification(py::module_& m)
         .def_readwrite("entityID", &entity::model::StreamIdentification::entityID)
         .def_readwrite("streamIndex", &entity::model::StreamIdentification::streamIndex)
 
-        .def("__eq__", [](const entity::model::StreamIdentification& self,
-                          const entity::model::StreamIdentification& other) { return self == other; })
-        .def("__ne__", [](const entity::model::StreamIdentification& self,
-                          const entity::model::StreamIdentification& other) { return self != other; })
-        .def("__lt__", [](const entity::model::StreamIdentification& self,
-                          const entity::model::StreamIdentification& other) { return self < other; })
+        .def("__eq__", [](const entity::model::StreamIdentification& self, const entity::model::StreamIdentification& other) { return self == other; })
+        .def("__ne__", [](const entity::model::StreamIdentification& self, const entity::model::StreamIdentification& other) { return self != other; })
+        .def("__lt__", [](const entity::model::StreamIdentification& self, const entity::model::StreamIdentification& other) { return self < other; })
 
         .def("__repr__", [](const entity::model::StreamIdentification& id) {
             std::ostringstream oss;
-            oss << "StreamIdentification(entityID=" << id.entityID.getValue() << ", streamIndex=" << id.streamIndex
-                << ")";
+            oss << "StreamIdentification(entityID=" << id.entityID.getValue() << ", streamIndex=" << id.streamIndex << ")";
             return oss.str();
         });
 }
@@ -804,9 +778,8 @@ void bindMilanVersion(py::module_& m)
     py::class_<MilanVersion>(m, "MilanVersion")
         .def(py::init<>())
         .def(py::init<MilanVersion::value_type>(), py::arg("value"))
-        .def(py::init<MilanVersion::digit_type, MilanVersion::digit_type, MilanVersion::digit_type,
-                      MilanVersion::digit_type>(),
-             py::arg("majorVersion"), py::arg("minorVersion"), py::arg("patchVersion") = 0, py::arg("buildVersion") = 0)
+        .def(py::init<MilanVersion::digit_type, MilanVersion::digit_type, MilanVersion::digit_type, MilanVersion::digit_type>(), py::arg("majorVersion"),
+             py::arg("minorVersion"), py::arg("patchVersion") = 0, py::arg("buildVersion") = 0)
         .def(py::init<const std::string&>(), py::arg("version"))
 
         .def("setValue", &MilanVersion::setValue)
@@ -843,8 +816,7 @@ void bindProbingStatus(py::module_& m)
         .value("Disabled", ProbingStatus::Disabled, "The sink is not probing because it is not bound.")
         .value("Passive", ProbingStatus::Passive, "The sink is probing passively.")
         .value("Active", ProbingStatus::Active, "The sink is probing actively.")
-        .value("Completed", ProbingStatus::Completed, "The sink is not probing because it is settled.")
-        .export_values();
+        .value("Completed", ProbingStatus::Completed, "The sink is not probing because it is settled.");
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -873,7 +845,6 @@ void bindMsrpFailureCode(py::module_& m)
         .value("VlanBlockedOnEgress", MsrpFailureCode::VlanBlockedOnEgress)
         .value("VlanTaggingDisabledOnEgress", MsrpFailureCode::VlanTaggingDisabledOnEgress)
         .value("SrClassPriorityMismatch", MsrpFailureCode::SrClassPriorityMismatch)
-        .export_values()
         .def("asString", [](MsrpFailureCode self) { return msrpFailureCodeToString(self); });
 }
 
@@ -884,25 +855,19 @@ void bindDefaultMediaClockReferencePriority(py::module_& m)
 
     py::enum_<DefaultMediaClockReferencePriority>(m, "DefaultMediaClockReferencePriority")
         .value("Highest", DefaultMediaClockReferencePriority::Highest, "Highest priority")
-        .value("DedicatedGenerators", DefaultMediaClockReferencePriority::DedicatedGenerators,
-               "Dedicated media clock reference generators")
+        .value("DedicatedGenerators", DefaultMediaClockReferencePriority::DedicatedGenerators, "Dedicated media clock reference generators")
         .value("MatrixMixingDevices", DefaultMediaClockReferencePriority::MatrixMixingDevices,
                "Matrix mixing devices, signal routers, network switches with central audio processing capability")
         .value("MixingConsoles", DefaultMediaClockReferencePriority::MixingConsoles, "Mixing consoles")
         .value("Stageboxes", DefaultMediaClockReferencePriority::Stageboxes, "Stageboxes, audio interfaces")
         .value("Processors", DefaultMediaClockReferencePriority::Processors, "Loudspeaker processors")
-        .value("Amplifiers", DefaultMediaClockReferencePriority::Amplifiers,
-               "Amplifiers, powered loudspeakers, in-ear transmitters")
+        .value("Amplifiers", DefaultMediaClockReferencePriority::Amplifiers, "Amplifiers, powered loudspeakers, in-ear transmitters")
         .value("RecordingDevices", DefaultMediaClockReferencePriority::RecordingDevices, "Recording devices")
-        .value("Default", DefaultMediaClockReferencePriority::Default,
-               "Default (if the device provides no data, this is taken as its priority)")
-        .value("EffectProcessingDevices", DefaultMediaClockReferencePriority::EffectProcessingDevices,
-               "Effect processing devices")
+        .value("Default", DefaultMediaClockReferencePriority::Default, "Default (if the device provides no data, this is taken as its priority)")
+        .value("EffectProcessingDevices", DefaultMediaClockReferencePriority::EffectProcessingDevices, "Effect processing devices")
         .value("WirelessReceivers", DefaultMediaClockReferencePriority::WirelessReceivers, "Wireless receivers")
         .value("Microphones", DefaultMediaClockReferencePriority::Microphones, "Microphones")
         .value("Instruments", DefaultMediaClockReferencePriority::Instruments, "Instruments")
         .value("Lowest", DefaultMediaClockReferencePriority::Lowest, "Lowest priority")
-        .export_values()
-        .def("asString",
-             [](DefaultMediaClockReferencePriority self) { return defaultMediaClockReferencePriorityToString(self); });
+        .def("asString", [](DefaultMediaClockReferencePriority self) { return defaultMediaClockReferencePriorityToString(self); });
 }

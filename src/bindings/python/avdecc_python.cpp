@@ -54,10 +54,17 @@ PYBIND11_MODULE(la_avdecc, m)
     m.def("getLibraryCopyright", []() -> std::string { return internals::readableCopyright; }, "Gets the copyright string of the library.");
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
 
+    // la/avdecc/avdecc.hpp
     bindCompileOptions(m);
+
+    // la/avdecc/internals/exception.hpp
     bindBaseException(m);
+
+    // la/avdecc/memoryBuffer.hpp
     bindMemoryBuffer(m);
     bindMemoryBufferView(m);
+
+    // la/avdecc/logger.hpp
     bindLogger(m);
 
     bindEntity(m);
@@ -80,8 +87,7 @@ void bindCompileOptions(py::module_& m)
         .value("AllowSendBigAecpPayloads", CompileOption::AllowSendBigAecpPayloads)
         .value("AllowRecvBigAecpPayloads", CompileOption::AllowRecvBigAecpPayloads)
         .value("EnableRedundancy", CompileOption::EnableRedundancy)
-        .value("EnableJsonSupport", CompileOption::EnableJsonSupport)
-        .export_values();
+        .value("EnableJsonSupport", CompileOption::EnableJsonSupport);
 
     bindEnumBitfield<CompileOption>(m, "CompileOptions");
 
@@ -298,8 +304,7 @@ void bindLogger(py::module_& m)
         .value("ControllerStateMachine", Layer::ControllerStateMachine, "State machine logic for controllers.")
         .value("Controller", Layer::Controller, "Top-level controller behavior.")
         .value("JsonSerializer", Layer::JsonSerializer, "JSON serialization and introspection layer.")
-        .value("FirstUserLayer", Layer::FirstUserLayer, "Starting point for user-defined logging layers.")
-        .export_values();
+        .value("FirstUserLayer", Layer::FirstUserLayer, "Starting point for user-defined logging layers.");
 
     py::enum_<Level>(m, "LogLevel", "Enumeration of log severity levels.")
         .value("Trace", Level::Trace, "Very verbose debug information (typically disabled in release builds).")
@@ -307,8 +312,7 @@ void bindLogger(py::module_& m)
         .value("Info", Level::Info, "General informational messages.")
         .value("Warn", Level::Warn, "Indicates potential issues or non-critical problems.")
         .value("Error", Level::Error, "Indicates serious issues or failures.")
-        .value("None", Level::None, "Disables all logging output.")
-        .export_values();
+        .value("None", Level::None, "Disables all logging output.");
 
     py::class_<LogItem, std::shared_ptr<LogItem>>(m, "LogItem", "Base class for a log entry. Not constructible or subclassable in Python.")
         .def_property_readonly("layer", &LogItem::getLayer, "Returns the log layer associated with this log item.")
