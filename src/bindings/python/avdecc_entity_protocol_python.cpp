@@ -25,6 +25,8 @@
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
 
+#include <la/avdecc/internals/entityAddressAccessTypes.hpp>
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -41,11 +43,12 @@ void bindMvuAecpStatus(py::module_& m);
 void bindMvuCommandType(py::module_& m);
 void bindAcmpMessageType(py::module_& m);
 void bindAcmpStatus(py::module_& m);
+void bindAddressAccessTlV(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntityModelProtocol(py::module_& m)
 {
-    // la\avdecc\internals\protocolDefines.hpp
+    // la/avdecc/internals/protocolDefines.hpp
     m.attr("EthernetMaxFrameSize")               = py::int_(la::avdecc::protocol::EthernetMaxFrameSize);
     m.attr("AvtpEtherType")                      = py::int_(la::avdecc::protocol::AvtpEtherType);
     m.attr("AvtpMaxPayloadLength")               = py::int_(la::avdecc::protocol::AvtpMaxPayloadLength);
@@ -70,6 +73,9 @@ void bindEntityModelProtocol(py::module_& m)
     bindMvuCommandType(m);
     bindAcmpMessageType(m);
     bindAcmpStatus(m);
+
+    // la/avdecc/internals/entityAddressAccessTypes.hpp
+    bindAddressAccessTlV(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -360,4 +366,51 @@ void bindAcmpStatus(py::module_& m)
         .def_property_readonly_static("IncompatibleRequest",     [](const py::object&) { return AcmpStatus::IncompatibleRequest; })
         .def_property_readonly_static("NotSupported",            [](const py::object&) { return AcmpStatus::NotSupported; });
     // clang-format on
+}
+
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindAddressAccessTlV(py::module_& m)
+{
+    using namespace la::avdecc::entity::addressAccess;
+    using namespace la::avdecc::protocol;
+
+    auto cls = py::class_<Tlv>(m, "Tlv", py::is_final());
+
+    cls.def(py::init<>())
+        .def(py::init<std::uint64_t const, size_t const>())
+        .def(py::init<AaMode const, std::uint64_t const, size_t const>())
+        .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type const&>())
+        .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type&&>())
+        .def(py::init<Tlv>())
+        .def(py::init<Tlv const>())
+        .def_property_readonly("mode", &Tlv::getMode)
+        .def_property_readonly("address", &Tlv::getAddress)
+        .def_property(
+            "memory_data", [](Tlv& self) -> Tlv::memory_data_type& { return self.getMemoryData(); },
+            [](Tlv& self, py::bytes pyData) {
+                std::string buffer = static_cast<std::string>(pyData);
+                if (buffer.empty())
+                {
+                    throw std::invalid_argument("Length is 0");
+                }
+                if (buffer.size() > Tlv::MaxLength)
+                {
+                    throw std::invalid_argument("Length too big");
+                }
+                self.getMemoryData() = Tlv::memory_data_type(buffer.begin(), buffer.end()); // setter
+            },
+            py::return_value_policy::reference_internal)
+        .def_property_readonly("size", &Tlv::size)
+        .def_property_readonly("isValid", &Tlv::isValid)
+        .def("__eq__", &Tlv::operator==)
+        .def("__ne__", &Tlv::operator!=)
+        .def("__bool__", [](const Tlv& self) { return static_cast<bool>(self); })
+        .def("__len__", &Tlv::size)
+        .def("__repr__", [](const Tlv& self) {
+            std::ostringstream oss;
+            oss << "<Tlv mode=" << static_cast<std::string>(self.getMode()) << " address=0x" << std::hex << self.getAddress() << " size=" << std::dec
+                << self.size() << " valid=" << (self.isValid() ? "True" : "False") << ">";
+            return oss.str();
+        });
 }

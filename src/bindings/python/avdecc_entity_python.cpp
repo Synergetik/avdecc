@@ -66,10 +66,10 @@ void bindLocalEntity(py::module_& m);
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntity(py::module_& m)
 {
-    // la\avdecc\internals\uniqueIdentifier.hpp
+    // la/avdecc/internals/uniqueIdentifier.hpp
     bindUniqueIdentifier(m);
 
-    // la\avdecc\internals\entityEnums.hpp
+    // la/avdecc/internals/entityEnums.hpp
     bindEntityCapability(m);
     bindTalkerCapability(m);
     bindListenerCapability(m);

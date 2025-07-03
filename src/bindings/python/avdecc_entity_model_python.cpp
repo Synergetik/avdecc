@@ -58,7 +58,7 @@ void bindEntityModelUniqueIdentifierExtensions(py::module_& m);
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntityModel(py::module_& m)
 {
-    // la\avdecc\internals\entityModel.hpp
+    // la/avdecc/internals/entityModel.hpp
     bindEntityDescriptor(m);
     bindConfigurationDescriptor(m);
     bindAudioUnitDescriptor(m);

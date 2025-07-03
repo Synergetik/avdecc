@@ -24,10 +24,10 @@
 
 #include "avdecc_controller_python.hpp"
 
-
 #include <la/avdecc/avdecc.hpp>
 #include <pybind11/chrono.h>
 #include <pybind11/functional.h>
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -35,11 +35,10 @@ void bindDynamicInfoParameter(py::module_& m);
 void bindControllerInterface(py::module_& m);
 void bindControllerDelegate(py::module_& m);
 void bindControllerDefaultedDelegate(py::module_& m);
-void bindAddressAccessTlV(py::module_& m);
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindControllerEntity(py::module_& m)
 {
-    bindAddressAccessTlV(m);
     bindDynamicInfoParameter(m);
     bindControllerInterface(m);
     bindControllerDelegate(m);
@@ -1047,7 +1046,6 @@ void bindControllerInterface(py::module_& m)
             .def("getTalkerStreamState", &Interface::getTalkerStreamState, py::arg("talker_stream"), py::arg("handler"))
             .def("getListenerStreamState", &Interface::getListenerStreamState, py::arg("listener_stream"), py::arg("handler"))
             .def("getTalkerStreamConnection", &Interface::getTalkerStreamConnection, py::arg("talker_stream"), py::arg("connection_index"), py::arg("handler"));
-    // TODO: Add binding for Tlv for addressAccess
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -1552,8 +1550,6 @@ void bindControllerDelegate(py::module_& m)
             .def("onAecpResponseTime", &Delegate::onAecpResponseTime, py::arg("controller"), py::arg("entity_id"), py::arg("response_time"))
             .def("onAemAecpUnsolicitedReceived", &Delegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
             .def("onMvuAecpUnsolicitedReceived", &Delegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"));
-
-    // TODO: Bind methods for Delegate here.
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -2059,23 +2055,6 @@ void bindControllerDefaultedDelegate(py::module_& m)
             .def("onAecpResponseTime", &DefaultedDelegate::onAecpResponseTime, py::arg("controller"), py::arg("entity_id"), py::arg("response_time"))
             .def("onAemAecpUnsolicitedReceived", &DefaultedDelegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
             .def("onMvuAecpUnsolicitedReceived", &DefaultedDelegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"));
-
-}
-
-
-void bindAddressAccessTlV(py::module_& m)
-{
-    using namespace la::avdecc::entity::addressAccess;
-    using namespace la::avdecc::protocol;
-    auto cls = py::class_<Tlv>(m, "Tlv", py::is_final())
-                   .def(py::init<>())
-                   .def(py::init<std::uint64_t const, size_t const>())
-                   .def(py::init<AaMode const, std::uint64_t const, size_t const>())
-                   .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type const&>())
-                   .def(py::init<std::uint64_t const, AaMode const, Tlv::memory_data_type&&>())
-                   .def(py::init<Tlv>())
-                   .def(py::init<Tlv const>());
-    // TODO:I omitted the constructor from a raw buffer as this uses a void pointer.
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/

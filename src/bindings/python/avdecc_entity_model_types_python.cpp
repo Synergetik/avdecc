@@ -55,7 +55,7 @@ void bindDefaultMediaClockReferencePriority(py::module_& m);
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntityModelTypes(py::module_& m)
 {
-    // la\avdecc\internals\entityModelTypes.hpp
+    // la/avdecc/internals/entityModelTypes.hpp
     bindDescriptorType(m);
     bindJackType(m);
     bindClockSourceType(m);
