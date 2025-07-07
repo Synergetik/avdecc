@@ -32,6 +32,12 @@
 #include <la/avdecc/logger.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
+/*-- Globals --------------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------*/
+
+std::optional<py::exception<la::avdecc::Exception>> AvdeccExceptionBinding{std::nullopt};
+
+/*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindCompileOptions(py::module_& m);
@@ -39,6 +45,7 @@ void bindBaseException(py::module_& m);
 void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
 void bindLogger(py::module_& m);
+void bindEndStation(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Module entry definition ----------------------------------------------------------------------------------------*/
@@ -72,6 +79,9 @@ PYBIND11_MODULE(la_avdecc, m)
     bindEntityModelProtocol(m);
     bindEntityModel(m);
     bindControllerEntity(m);
+
+    // la/avdecc/internals/endStation.hpp
+    bindEndStation(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -87,7 +97,8 @@ void bindCompileOptions(py::module_& m)
         .value("AllowSendBigAecpPayloads", CompileOption::AllowSendBigAecpPayloads)
         .value("AllowRecvBigAecpPayloads", CompileOption::AllowRecvBigAecpPayloads)
         .value("EnableRedundancy", CompileOption::EnableRedundancy)
-        .value("EnableJsonSupport", CompileOption::EnableJsonSupport);
+        .value("EnableJsonSupport", CompileOption::EnableJsonSupport)
+        .export_values();
 
     bindEnumBitfield<CompileOption>(m, "CompileOptions");
 
@@ -113,7 +124,7 @@ void bindCompileOptions(py::module_& m)
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindBaseException(py::module_& m)
 {
-    py::register_exception<la::avdecc::Exception>(m, "BaseException", PyExc_RuntimeError);
+    AvdeccExceptionBinding = py::register_exception<la::avdecc::Exception>(m, "AvdeccException", PyExc_RuntimeError);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -338,4 +349,54 @@ void bindLogger(py::module_& m)
                 return oss.str();
             },
             "Returns a string representation of the Logger.");
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindEndStation(py::module_& m)
+{
+    using namespace la::avdecc;
+    using namespace la::avdecc::protocol;
+
+    auto endStation = py::class_<EndStation, std::shared_ptr<EndStation>>(m, "EndStation");
+
+    py::enum_<EndStation::Error>(endStation, "Error")
+        .value("NoError", EndStation::Error::NoError)
+        .value("InvalidProtocolInterfaceType", EndStation::Error::InvalidProtocolInterfaceType)
+        .value("InterfaceOpenError", EndStation::Error::InterfaceOpenError)
+        .value("InterfaceNotFound", EndStation::Error::InterfaceNotFound)
+        .value("InterfaceInvalid", EndStation::Error::InterfaceInvalid)
+        .value("DuplicateEntityID", EndStation::Error::DuplicateEntityID)
+        .value("InvalidEntityModel", EndStation::Error::InvalidEntityModel)
+        .value("DuplicateExecutorName", EndStation::Error::DuplicateExecutorName)
+        .value("UnknownExecutorName", EndStation::Error::UnknownExecutorName)
+        .value("InternalError", EndStation::Error::InternalError);
+
+    auto endStationException = py::register_exception<EndStation::Exception>(m, "EndStationException", AvdeccExceptionBinding->ptr());
+    py::class_<EndStation::Exception>(static_cast<py::handle>(endStationException), "EndStationException")
+        .def_property_readonly("error", &EndStation::Exception::getError);
+
+    endStation
+        .def(
+            "addControllerEntity",
+            [](EndStation& self, std::uint16_t progID, const UniqueIdentifier& entityModelID, entity::controller::Delegate* delegate) {
+                return self.addControllerEntity(progID, entityModelID, nullptr, delegate);
+            },
+            py::arg("progID"), py::arg("entityModelID"), py::arg("delegate"), py::return_value_policy::reference,
+            "Adds a ControllerEntity without an empty EntityModelTree.")
+        .def_static(
+            "create",
+            [](const std::string& interfaceID, const std::optional<std::string>& executorName) -> std::shared_ptr<EndStation> {
+                auto instance = la::avdecc::EndStation::create(ProtocolInterface::Type::PCap, interfaceID, executorName);
+                return {instance.release(), instance.get_deleter()};
+            },
+            py::arg("interfaceID"), py::arg("executorName") = std::nullopt,
+            "Creates a new EndStation instance with the specified network interface ID and optional executor name.\n"
+            "The protocol interface type is set to PCap (PCAP-based protocol interface).")
+        .def("__repr__", [](const EndStation& self) {
+            std::ostringstream oss;
+            oss << "<EndStation at 0x" << &self << ">";
+            return oss.str();
+        });
+
+    // TODO VM: add more methods to EndStation as needed
 }

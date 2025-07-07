@@ -35,6 +35,7 @@ void bindDynamicInfoParameter(py::module_& m);
 void bindControllerInterface(py::module_& m);
 void bindControllerDelegate(py::module_& m);
 void bindControllerDefaultedDelegate(py::module_& m);
+void bindControllerEntityClass(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindControllerEntity(py::module_& m)
@@ -43,6 +44,7 @@ void bindControllerEntity(py::module_& m)
     bindControllerInterface(m);
     bindControllerDelegate(m);
     bindControllerDefaultedDelegate(m);
+    bindControllerEntityClass(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -2062,6 +2064,19 @@ void bindControllerDefaultedDelegate(py::module_& m)
                  py::arg("sequence_id"))
             .def("onMvuAecpUnsolicitedReceived", &DefaultedDelegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"),
                  py::arg("sequence_id"));
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindControllerEntityClass(py::module_& m)
+{
+    using namespace la::avdecc::entity::controller;
+    using namespace la::avdecc::entity;
+    using namespace la::avdecc::protocol;
+
+    py::class_<ControllerEntity, LocalEntity, std::unique_ptr<ControllerEntity, py::nodelete>>(m, "ControllerEntity")
+        .def("setControllerDelegate", &ControllerEntity::setControllerDelegate, py::arg("delegate"));
+
+    // TODO VM: add more methods to ControllerEntity as needed
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
