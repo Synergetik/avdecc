@@ -1047,7 +1047,12 @@ void bindControllerInterface(py::module_& m)
             .def("disconnectTalkerStream", &Interface::disconnectTalkerStream, py::arg("talker_stream"), py::arg("listener_stream"), py::arg("handler"))
             .def("getTalkerStreamState", &Interface::getTalkerStreamState, py::arg("talker_stream"), py::arg("handler"))
             .def("getListenerStreamState", &Interface::getListenerStreamState, py::arg("listener_stream"), py::arg("handler"))
-            .def("getTalkerStreamConnection", &Interface::getTalkerStreamConnection, py::arg("talker_stream"), py::arg("connection_index"), py::arg("handler"));
+            .def("getTalkerStreamConnection", &Interface::getTalkerStreamConnection, py::arg("talker_stream"), py::arg("connection_index"), py::arg("handler"))
+            .def("__repr__", [](const Interface& self) {
+                std::ostringstream oss;
+                oss << "<ControllerInterface at 0x" << &self << ">";
+                return oss.str();
+            });
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -1551,7 +1556,12 @@ void bindControllerDelegate(py::module_& m)
             .def("onAecpUnexpectedResponse", &Delegate::onAecpUnexpectedResponse, py::arg("controller"), py::arg("entity_id"))
             .def("onAecpResponseTime", &Delegate::onAecpResponseTime, py::arg("controller"), py::arg("entity_id"), py::arg("response_time"))
             .def("onAemAecpUnsolicitedReceived", &Delegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
-            .def("onMvuAecpUnsolicitedReceived", &Delegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"));
+            .def("onMvuAecpUnsolicitedReceived", &Delegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"), py::arg("sequence_id"))
+            .def("__repr__", [](const Delegate& self) {
+                std::ostringstream oss;
+                oss << "<ControllerDelegate at 0x" << &self << ">";
+                return oss.str();
+            });
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -1933,7 +1943,7 @@ void bindControllerDefaultedDelegate(py::module_& m)
     using namespace la::avdecc::entity::controller;
 
     auto cls =
-        py::class_<DefaultedDelegate, PyDefaultedDelegate>(m, "ControllerDefaultedDelegate")
+        py::class_<DefaultedDelegate, Delegate, PyDefaultedDelegate>(m, "ControllerDefaultedDelegate")
             .def(py::init<>())
             .def("onTransportError", &DefaultedDelegate::onTransportError, py::arg("controller"))
             .def("onEntityOnline", &DefaultedDelegate::onEntityOnline, py::arg("controller"), py::arg("entity_id"), py::arg("entity"))
@@ -2063,7 +2073,12 @@ void bindControllerDefaultedDelegate(py::module_& m)
             .def("onAemAecpUnsolicitedReceived", &DefaultedDelegate::onAemAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"),
                  py::arg("sequence_id"))
             .def("onMvuAecpUnsolicitedReceived", &DefaultedDelegate::onMvuAecpUnsolicitedReceived, py::arg("controller"), py::arg("entity_id"),
-                 py::arg("sequence_id"));
+                 py::arg("sequence_id"))
+            .def("__repr__", [](const DefaultedDelegate& self) {
+                std::ostringstream oss;
+                oss << "<ControllerDefaultedDelegate at 0x" << &self << ">";
+                return oss.str();
+            });
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -2074,7 +2089,12 @@ void bindControllerEntityClass(py::module_& m)
     using namespace la::avdecc::protocol;
 
     py::class_<ControllerEntity, LocalEntity, std::unique_ptr<ControllerEntity, py::nodelete>>(m, "ControllerEntity")
-        .def("setControllerDelegate", &ControllerEntity::setControllerDelegate, py::arg("delegate"));
+        .def("setControllerDelegate", &ControllerEntity::setControllerDelegate, py::arg("delegate"))
+        .def("__repr__", [](const ControllerEntity& self) {
+            std::ostringstream oss;
+            oss << "<ControllerEntity at 0x" << &self << ">";
+            return oss.str();
+        });
 
     // TODO VM: add more methods to ControllerEntity as needed
 }

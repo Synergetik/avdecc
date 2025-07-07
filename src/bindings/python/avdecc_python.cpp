@@ -90,7 +90,7 @@ void bindCompileOptions(py::module_& m)
     using namespace la::avdecc;
 
     py::enum_<CompileOption>(m, "CompileOption", py::arithmetic())
-        .value("Unset", CompileOption::None)
+        .value("Nothing", CompileOption::None)
         .value("IgnoreInvalidControlDataLength", CompileOption::IgnoreInvalidControlDataLength)
         .value("IgnoreInvalidNonSuccessAemResponses", CompileOption::IgnoreInvalidNonSuccessAemResponses)
         .value("AllowGetAudioMapUnsol", CompileOption::AllowGetAudioMapUnsol)
@@ -323,7 +323,7 @@ void bindLogger(py::module_& m)
         .value("Info", Level::Info, "General informational messages.")
         .value("Warn", Level::Warn, "Indicates potential issues or non-critical problems.")
         .value("Error", Level::Error, "Indicates serious issues or failures.")
-        .value("None", Level::None, "Disables all logging output.");
+        .value("Nothing", Level::None, "Disables all logging output.");
 
     py::class_<LogItem, std::shared_ptr<LogItem>>(m, "LogItem", "Base class for a log entry. Not constructible or subclassable in Python.")
         .def_property_readonly("layer", &LogItem::getLayer, "Returns the log layer associated with this log item.")
@@ -382,7 +382,7 @@ void bindEndStation(py::module_& m)
                 return self.addControllerEntity(progID, entityModelID, nullptr, delegate);
             },
             py::arg("progID"), py::arg("entityModelID"), py::arg("delegate"), py::return_value_policy::reference,
-            "Adds a ControllerEntity without an empty EntityModelTree.")
+            "Adds a ControllerEntity with an empty EntityModelTree.")
         .def_static(
             "create",
             [](const std::string& interfaceID, const std::optional<std::string>& executorName) -> std::shared_ptr<EndStation> {

@@ -836,7 +836,7 @@ void bindLocalEntity(py::module_& m)
         .def("asString", [](LocalEntity::ControlStatus self) { return LocalEntity::statusToString(self); });
 
     py::enum_<LocalEntity::AdvertiseFlag>(cls, "AdvertiseFlag", py::arithmetic(), "EntityAdvertise dirty flags indicating which fields have changed.")
-        .value("None", LocalEntity::AdvertiseFlag::None, "No changes have occurred.")
+        .value("Unspecified", LocalEntity::AdvertiseFlag::None, "No changes have occurred.")
         .value("EntityCapabilities", LocalEntity::AdvertiseFlag::EntityCapabilities, "The EntityCapabilities field has changed.")
         .value("AssociationID", LocalEntity::AdvertiseFlag::AssociationID, "The AssociationID field has changed.")
         .value("ValidTime", LocalEntity::AdvertiseFlag::ValidTime, "The ValidTime field has changed.")
