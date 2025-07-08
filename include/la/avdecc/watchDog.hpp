@@ -32,6 +32,7 @@
 #include <mutex>
 #include <string>
 #include <chrono>
+#include <functional>
 
 namespace la
 {
@@ -39,6 +40,9 @@ namespace avdecc
 {
 namespace watchDog
 {
+/* Global watchdog control */
+extern LA_AVDECC_API std::function<bool()> IsCustomDebuggerPresent;
+
 /**
 * @details Class to detect (dead)locked threads, or operations that took longer than expected.
 *          Used as debugging purpose.

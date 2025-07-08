@@ -30,8 +30,8 @@
 #include "config.hpp"
 #include <la/avdecc/avdecc.hpp>
 #include <la/avdecc/logger.hpp>
-#include <la/avdecc/executor.hpp>
 #include <la/avdecc/utils.hpp>
+#include <la/avdecc/watchDog.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Globals --------------------------------------------------------------------------------------------------------*/
@@ -48,14 +48,30 @@ void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
 void bindLogger(py::module_& m);
 void bindEndStation(py::module_& m);
-void bindExecutor(py::module_& m);
-
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Module entry definition ----------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
+
+
+
 PYBIND11_MODULE(la_avdecc, m)
 {
     using namespace la::avdecc;
+    // Lambda for warchDog to heck if Python debugger is attached 
+    la::avdecc::watchDog::IsCustomDebuggerPresent = []() -> bool {
+            bool attached = false;
+            auto sys = py::module_::import("sys");
+            auto gettrace = sys.attr("gettrace");
+            if (gettrace)
+            {
+                auto trace = gettrace();
+                if (!trace.is(py::none()))
+                {
+                    attached = true;
+                }
+            }
+            return attached;
+        }; 
 
     m.doc() = "Python bindings for la::avdecc";
     m.def("set_thread_handler", [](std::function<void(std::string const&)> handler) -> void {
@@ -86,9 +102,6 @@ PYBIND11_MODULE(la_avdecc, m)
 
     // la/avdecc/internals/endStation.hpp
     bindEndStation(m);
-
-    // la/avdecc/executor.hpp
-    bindExecutor(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
