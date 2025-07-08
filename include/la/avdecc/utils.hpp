@@ -76,6 +76,7 @@ enum class ThreadPriority
 	TimeCritical = 10,
 };
 
+extern LA_AVDECC_API std::function<void(std::string const&)> OnSetCurrentThreadName;
 LA_AVDECC_API bool LA_AVDECC_CALL_CONVENTION setCurrentThreadName(std::string const& name);
 LA_AVDECC_API bool LA_AVDECC_CALL_CONVENTION setCurrentThreadPriority(ThreadPriority const prio);
 LA_AVDECC_API void LA_AVDECC_CALL_CONVENTION enableAssert() noexcept;

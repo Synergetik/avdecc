@@ -30,6 +30,8 @@
 #include "config.hpp"
 #include <la/avdecc/avdecc.hpp>
 #include <la/avdecc/logger.hpp>
+#include <la/avdecc/executor.hpp>
+#include <la/avdecc/utils.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Globals --------------------------------------------------------------------------------------------------------*/
@@ -46,6 +48,7 @@ void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
 void bindLogger(py::module_& m);
 void bindEndStation(py::module_& m);
+void bindExecutor(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Module entry definition ----------------------------------------------------------------------------------------*/
@@ -55,12 +58,13 @@ PYBIND11_MODULE(la_avdecc, m)
     using namespace la::avdecc;
 
     m.doc() = "Python bindings for la::avdecc";
-
+    m.def("set_thread_handler", [](std::function<void(std::string const&)> handler) -> void {
+        utils::OnSetCurrentThreadName = std::move(handler);
+    }, "Sets the thread name handler function. This function will be called whenever a thread name is set.");
     m.def("getLibraryVersion", []() -> std::string { return internals::versionString; }, "Gets the library version string.");
     m.def("getLibraryName", []() -> std::string { return internals::applicationLongName; }, "Gets the full name of the library.");
     m.def("getLibraryCopyright", []() -> std::string { return internals::readableCopyright; }, "Gets the copyright string of the library.");
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
-
     // la/avdecc/avdecc.hpp
     bindCompileOptions(m);
 
@@ -82,6 +86,9 @@ PYBIND11_MODULE(la_avdecc, m)
 
     // la/avdecc/internals/endStation.hpp
     bindEndStation(m);
+
+    // la/avdecc/executor.hpp
+    bindExecutor(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -386,6 +393,7 @@ void bindEndStation(py::module_& m)
         .def_static(
             "create",
             [](const std::string& interfaceID, const std::optional<std::string>& executorName) -> std::shared_ptr<EndStation> {
+                py::gil_scoped_release nogil{}; // Release GIL for potentially blocking operation
                 auto instance = la::avdecc::EndStation::create(ProtocolInterface::Type::PCap, interfaceID, executorName);
                 return {instance.release(), instance.get_deleter()};
             },

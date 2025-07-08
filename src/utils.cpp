@@ -129,8 +129,15 @@ bool isDebuggerPresent()
 }
 #endif // __APPLE__
 
+LA_AVDECC_API std::function<void(std::string const&)> OnSetCurrentThreadName = nullptr;
+
 bool LA_AVDECC_CALL_CONVENTION setCurrentThreadName(std::string const& name)
 {
+	if (OnSetCurrentThreadName)
+	{
+		OnSetCurrentThreadName(name);
+	}
+	// Set thread name using platform-specific APIs
 #if defined(_WIN32)
 	struct
 	{
@@ -144,7 +151,6 @@ bool LA_AVDECC_CALL_CONVENTION setCurrentThreadName(std::string const& name)
 	info.szName = name.c_str();
 	info.dwThreadID = GetCurrentThreadId();
 	info.dwFlags = 0;
-
 	__try
 	{
 		RaiseException(0x406d1388 /*MS_VC_EXCEPTION*/, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
