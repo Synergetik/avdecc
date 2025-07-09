@@ -48,35 +48,32 @@ void bindMemoryBuffer(py::module_& m);
 void bindMemoryBufferView(py::module_& m);
 void bindLogger(py::module_& m);
 void bindEndStation(py::module_& m);
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Module entry definition ----------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
-
-
-
 PYBIND11_MODULE(la_avdecc, m)
 {
     using namespace la::avdecc;
-    // Lambda for warchDog to heck if Python debugger is attached 
+
+    // WatchDog intercept hook to check if Python debugger is attached
     la::avdecc::watchDog::IsCustomDebuggerPresent = []() -> bool {
-            bool attached = false;
-            auto sys = py::module_::import("sys");
-            auto gettrace = sys.attr("gettrace");
-            if (gettrace)
-            {
-                auto trace = gettrace();
-                if (!trace.is(py::none()))
-                {
-                    attached = true;
-                }
-            }
-            return attached;
-        }; 
+        py::gil_scoped_acquire gil;
+
+        static auto gettrace = py::module_::import("sys").attr("gettrace");
+        if (gettrace)
+        {
+            return gettrace().is_none();
+        }
+
+        return false;
+    };
+
+    m.def(
+        "setThreadNameChangeCallback", [](std::function<void(std::string const&)> handler) { utils::OnSetCurrentThreadName = std::move(handler); },
+        py::arg("handler"), "Registers a callback that is triggered whenever a thread's name is set.");
 
     m.doc() = "Python bindings for la::avdecc";
-    m.def("set_thread_handler", [](std::function<void(std::string const&)> handler) -> void {
-        utils::OnSetCurrentThreadName = std::move(handler);
-    }, "Sets the thread name handler function. This function will be called whenever a thread name is set.");
     m.def("getLibraryVersion", []() -> std::string { return internals::versionString; }, "Gets the library version string.");
     m.def("getLibraryName", []() -> std::string { return internals::applicationLongName; }, "Gets the full name of the library.");
     m.def("getLibraryCopyright", []() -> std::string { return internals::readableCopyright; }, "Gets the copyright string of the library.");
@@ -406,7 +403,8 @@ void bindEndStation(py::module_& m)
         .def_static(
             "create",
             [](const std::string& interfaceID, const std::optional<std::string>& executorName) -> std::shared_ptr<EndStation> {
-                py::gil_scoped_release nogil{}; // Release GIL for potentially blocking operation
+                py::gil_scoped_release nogil{};
+
                 auto instance = la::avdecc::EndStation::create(ProtocolInterface::Type::PCap, interfaceID, executorName);
                 return {instance.release(), instance.get_deleter()};
             },
