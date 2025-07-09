@@ -406,7 +406,12 @@ void bindEndStation(py::module_& m)
                 py::gil_scoped_release nogil{};
 
                 auto instance = la::avdecc::EndStation::create(ProtocolInterface::Type::PCap, interfaceID, executorName);
-                return {instance.release(), instance.get_deleter()};
+                auto deleter  = instance.get_deleter();
+
+                return {instance.release(), [deleter](EndStation* self) mutable {
+                            py::gil_scoped_release nogil{};
+                            deleter(self);
+                        }};
             },
             py::arg("interfaceID"), py::arg("executorName") = std::nullopt,
             "Creates a new EndStation instance with the specified network interface ID and optional executor name.\n"
