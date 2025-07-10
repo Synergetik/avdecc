@@ -40,9 +40,6 @@ namespace avdecc
 {
 namespace watchDog
 {
-/* Global watchdog control */
-extern LA_AVDECC_API std::function<bool()> IsCustomDebuggerPresent;
-
 /**
 * @details Class to detect (dead)locked threads, or operations that took longer than expected.
 *          Used as debugging purpose.
@@ -55,6 +52,15 @@ protected:
 	using Subject = utils::TypedSubject<struct SubjectTag, std::mutex>;
 
 public:
+	/**
+	 * Optional user-defined callback to detect the presence of a custom debugger.
+	 * If set, this will be called by the WatchDog to determine whether a debugger is active.
+	 * Can be used to define a custom debugger detection logic.
+	 */
+	using DebuggerPresenceCallback = std::function<bool()>;
+	using SharedDebuggerPresenceCallback = std::shared_ptr<DebuggerPresenceCallback>;
+	static SharedDebuggerPresenceCallback IsCustomDebuggerPresent;
+
 	/** Observer interface for the WatchDog */
 	class Observer : public la::avdecc::utils::Observer<Subject>
 	{

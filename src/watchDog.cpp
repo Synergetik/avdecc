@@ -40,8 +40,8 @@ namespace avdecc
 {
 namespace watchDog
 {
-/* Global watchdog control */
-std::function<bool()> IsCustomDebuggerPresent { nullptr };
+/* Optional user-defined callback to detect the presence of a custom debugger. */
+WatchDog::SharedDebuggerPresenceCallback WatchDog::IsCustomDebuggerPresent { nullptr };
 
 class WatchDogImpl final : public WatchDog
 {
@@ -67,6 +67,12 @@ public:
 					// Check all watch
 					{
 						auto const lg = std::lock_guard{ _lock };
+						auto const customDebuggerPresent = [] {
+							if (auto isCustomDebuggerPresent = WatchDog::IsCustomDebuggerPresent; isCustomDebuggerPresent) {
+								return (*isCustomDebuggerPresent)();
+							}
+							return false;
+						}();
 
 						auto const currentTime = std::chrono::system_clock::now();
 						for (auto& [threadId, watchedMap] : _watched)
@@ -74,11 +80,7 @@ public:
 							for (auto& [name, watchInfo] : watchedMap)
 							{
 								// If debugger is present, update the last alive time and don't check the timeout
-								if (utils::isDebuggerPresent())
-								{
-									watchInfo.lastAlive = currentTime;
-								}
-								if (IsCustomDebuggerPresent && IsCustomDebuggerPresent())
+								if (utils::isDebuggerPresent() || customDebuggerPresent)
 								{
 									watchInfo.lastAlive = currentTime;
 								}

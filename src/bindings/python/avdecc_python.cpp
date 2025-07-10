@@ -33,15 +33,22 @@
 #include <la/avdecc/utils.hpp>
 #include <la/avdecc/watchDog.hpp>
 
+#include <atomic>
+#include <shared_mutex>
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Globals --------------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
+
+static std::shared_mutex PythonShutdownAccessMutex;
+static std::atomic<bool> PythonRuntimeAvailable{false};
 
 std::optional<py::exception<la::avdecc::Exception>> AvdeccExceptionBinding{std::nullopt};
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
+void configureLibraryEnvironment(py::module_& m);
 void bindCompileOptions(py::module_& m);
 void bindBaseException(py::module_& m);
 void bindMemoryBuffer(py::module_& m);
@@ -56,28 +63,14 @@ PYBIND11_MODULE(la_avdecc, m)
 {
     using namespace la::avdecc;
 
-    // WatchDog intercept hook to check if Python debugger is attached
-    la::avdecc::watchDog::IsCustomDebuggerPresent = []() -> bool {
-        py::gil_scoped_acquire gil;
-
-        static auto gettrace = py::module_::import("sys").attr("gettrace");
-        if (gettrace)
-        {
-            return gettrace().is_none();
-        }
-
-        return false;
-    };
-
-    m.def(
-        "setThreadNameChangeCallback", [](std::function<void(std::string const&)> handler) { utils::OnSetCurrentThreadName = std::move(handler); },
-        py::arg("handler"), "Registers a callback that is triggered whenever a thread's name is set.");
+    configureLibraryEnvironment(m);
 
     m.doc() = "Python bindings for la::avdecc";
     m.def("getLibraryVersion", []() -> std::string { return internals::versionString; }, "Gets the library version string.");
     m.def("getLibraryName", []() -> std::string { return internals::applicationLongName; }, "Gets the full name of the library.");
     m.def("getLibraryCopyright", []() -> std::string { return internals::readableCopyright; }, "Gets the copyright string of the library.");
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
+
     // la/avdecc/avdecc.hpp
     bindCompileOptions(m);
 
@@ -99,6 +92,75 @@ PYBIND11_MODULE(la_avdecc, m)
 
     // la/avdecc/internals/endStation.hpp
     bindEndStation(m);
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void configureLibraryEnvironment(py::module_& m)
+{
+    // Configure WatchDog intercept hook to check if python debugger is attached.
+    using WatchDog = la::avdecc::watchDog::WatchDog;
+
+    WatchDog::IsCustomDebuggerPresent = std::make_shared<WatchDog::DebuggerPresenceCallback>([]() -> bool {
+        // Acquire an exclusive lock to ensure thread-safe access
+        // to the Python interpreter state. This prevents Python shutdown from
+        // proceeding while this callback is potentially using Python APIs.
+        std::unique_lock lock(PythonShutdownAccessMutex);
+
+        // Check whether the Python runtime is still available. This flag is updated
+        // just before the interpreter shuts down (via the atexit handler). If it's no
+        // longer safe to use Python APIs, exit early to avoid undefined behavior.
+        if (!PythonRuntimeAvailable.load(std::memory_order_acquire))
+        {
+            return false;
+        }
+
+        try
+        {
+            // Acquire the Global Interpreter Lock (GIL) to safely interact with Python code.
+            // This ensures that any Python API calls in this block are thread-safe.
+            py::gil_scoped_acquire gil;
+
+            // Attempt to detect if a Python debugger is attached by inspecting sys.gettrace().
+            // If gettrace is not None, a debugger (like pdb or PyCharm) is typically active.
+            auto gettrace = py::module_::import("sys").attr("gettrace");
+            return gettrace && !gettrace().is_none();
+        } catch (...)
+        {
+            // Catch any exception that might occur during Python operations and
+            // return false to fail safely without crashing the native thread.
+            return false;
+        }
+    });
+
+    // Bind the thread name change callback
+    using namespace la::avdecc;
+
+    m.def(
+        "setThreadNameChangeCallback", [](std::function<void(std::string const&)> handler) { utils::OnSetCurrentThreadName = std::move(handler); },
+        py::arg("handler"), "Registers a callback that is triggered whenever a thread's name is set.");
+
+    // Register a Python cleanup function using the atexit module.
+    // This ensures all Python-aware callbacks are deactivated before interpreter finalization.
+    // It prevents native threads from attempting to interact with Python while it's shutting down.
+    py::module_::import("atexit").attr("register")(py::cpp_function([]() {
+        // Acquire an exclusive lock before starting the Python shutdown sequence.
+        // This blocks until all other threads using Python (e.g., the watchdog thread)
+        // have released their shared locks, ensuring no Python code is being executed concurrently.
+        std::unique_lock lock(PythonShutdownAccessMutex);
+
+        // Mark the Python runtime as unavailable. This prevents any further Python API
+        // usage from native threads (such as the watchdog thread) once shutdown has started.
+        PythonRuntimeAvailable.store(false, std::memory_order_release);
+
+        // Clear any callback that may reference Python objects. This is critical
+        // to avoid use-after-free or interpreter crashes once Python is finalized.
+        WatchDog::IsCustomDebuggerPresent = nullptr;
+        utils::OnSetCurrentThreadName     = nullptr;
+    }));
+
+    // Mark Python runtime as initialized and available for native threads.
+    // This flag must be set after the atexit hook is registered and all callbacks are in place.
+    PythonRuntimeAvailable.store(true, std::memory_order_release);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
