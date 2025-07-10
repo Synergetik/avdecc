@@ -24,6 +24,7 @@
 
 #include "avdecc_controller_python.hpp"
 #include "avdecc_utils_python.hpp"
+#include "utils.hpp"
 
 #include <la/avdecc/avdecc.hpp>
 #include <pybind11/chrono.h>

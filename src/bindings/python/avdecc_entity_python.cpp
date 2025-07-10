@@ -24,6 +24,7 @@
 
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
+#include "utils.hpp"
 
 #include <la/avdecc/internals/entity.hpp>
 

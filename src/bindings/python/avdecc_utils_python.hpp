@@ -33,33 +33,6 @@
 namespace py = pybind11;
 
 /*-------------------------------------------------------------------------------------------------------------------*/
-/*-- pybind helpers -------------------------------------------------------------------------------------------------*/
-/*-------------------------------------------------------------------------------------------------------------------*/
-namespace py = pybind11;
-
-// For non-const member functions
-template<typename Ret, typename Class, typename... Args>
-auto with_released_gil(Ret (Class::*method)(Args...))
-{
-	return [method](Class* self, Args... args) -> Ret
-	{
-		py::gil_scoped_release release;
-		return (self->*method)(std::forward<Args>(args)...);
-	};
-}
-
-// For const member functions
-template<typename Ret, typename Class, typename... Args>
-auto with_released_gil(Ret (Class::*method)(Args...) const)
-{
-	return [method](const Class* self, Args... args) -> Ret
-	{
-		py::gil_scoped_release release;
-		return (self->*method)(std::forward<Args>(args)...);
-	};
-}
-
-/*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Special lbirary binding helpers --------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
 
