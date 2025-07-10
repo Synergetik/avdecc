@@ -821,10 +821,11 @@ void bindLocalEntity(py::module_& m)
         .value("GptpDomainNumber", LocalEntity::AdvertiseFlag::GptpDomainNumber, "The gPTP DomainNumber field has changed.");
     bindEnumBitfield<LocalEntity::AdvertiseFlag>(cls, "AdvertiseFlags");
 
-    cls.def("enableEntityAdvertising", &LocalEntity::enableEntityAdvertising, py::arg("availableDuration"), py::arg("interfaceIndex") = std::nullopt,
+    cls.def("enableEntityAdvertising", with_released_gil(&LocalEntity::enableEntityAdvertising), py::arg("availableDuration"),
+            py::arg("interfaceIndex") = std::nullopt,
             "Enables entity advertising with a duration between 2–62 seconds on the specified interface index or all interfaces. "
             "Returns false if parameters are invalid.")
-        .def("disableEntityAdvertising", &LocalEntity::disableEntityAdvertising, py::arg("interfaceIndex") = std::nullopt,
+        .def("disableEntityAdvertising", with_released_gil(&LocalEntity::disableEntityAdvertising), py::arg("interfaceIndex") = std::nullopt,
              "Disables entity advertising on the specified interface index or all interfaces.")
         .def("discoverRemoteEntities", &LocalEntity::discoverRemoteEntities, "Requests discovery of all remote entities. Returns true if successful.")
         .def("discoverRemoteEntity", &LocalEntity::discoverRemoteEntity, py::arg("entityID"),
