@@ -49,16 +49,21 @@ void bindAddressAccessTlV(py::module_& m);
 void bindEntityModelProtocol(py::module_& m)
 {
     // la/avdecc/internals/protocolDefines.hpp
-    m.attr("EthernetMaxFrameSize")               = py::int_(la::avdecc::protocol::EthernetMaxFrameSize);
-    m.attr("AvtpEtherType")                      = py::int_(la::avdecc::protocol::AvtpEtherType);
-    m.attr("AvtpMaxPayloadLength")               = py::int_(la::avdecc::protocol::AvtpMaxPayloadLength);
-    m.attr("AvtpVersion")                        = py::int_(la::avdecc::protocol::AvtpVersion);
-    m.attr("AvtpSubType_Adp")                    = py::int_(la::avdecc::protocol::AvtpSubType_Adp);
-    m.attr("AvtpSubType_Aecp")                   = py::int_(la::avdecc::protocol::AvtpSubType_Aecp);
-    m.attr("AvtpSubType_Acmp")                   = py::int_(la::avdecc::protocol::AvtpSubType_Acmp);
-    m.attr("AvtpSubType_Maap")                   = py::int_(la::avdecc::protocol::AvtpSubType_Maap);
-    m.attr("AvtpSubType_Experimental")           = py::int_(la::avdecc::protocol::AvtpSubType_Experimental);
-    m.attr("AaAecpMaxSingleTlvMemoryDataLength") = py::int_(la::avdecc::protocol::AaAecpMaxSingleTlvMemoryDataLength);
+    struct ProtocolDefines
+    {};
+    // clang-format off
+    py::class_<ProtocolDefines>(m, "ProtocolDefines")
+        .def_property_readonly_static("EthernetMaxFrameSize", [](py::object) { return la::avdecc::protocol::EthernetMaxFrameSize; })
+        .def_property_readonly_static("AvtpEtherType", [](py::object) { return la::avdecc::protocol::AvtpEtherType; })
+        .def_property_readonly_static("AvtpMaxPayloadLength", [](py::object) { return la::avdecc::protocol::AvtpMaxPayloadLength; })
+        .def_property_readonly_static("AvtpVersion", [](py::object) { return la::avdecc::protocol::AvtpVersion; })
+        .def_property_readonly_static("AvtpSubType_Adp", [](py::object) { return la::avdecc::protocol::AvtpSubType_Adp; })
+        .def_property_readonly_static("AvtpSubType_Aecp", [](py::object) { return la::avdecc::protocol::AvtpSubType_Aecp; })
+        .def_property_readonly_static("AvtpSubType_Acmp", [](py::object) { return la::avdecc::protocol::AvtpSubType_Acmp; })
+        .def_property_readonly_static("AvtpSubType_Maap", [](py::object) { return la::avdecc::protocol::AvtpSubType_Maap; })
+        .def_property_readonly_static("AvtpSubType_Experimental", [](py::object) { return la::avdecc::protocol::AvtpSubType_Experimental; })
+        .def_property_readonly_static("AaAecpMaxSingleTlvMemoryDataLength", [](py::object) { return la::avdecc::protocol::AaAecpMaxSingleTlvMemoryDataLength; });
+    // clang-format on
 
     bindAdpMessageType(m);
     bindAecpMessageType(m);

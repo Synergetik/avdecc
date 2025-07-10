@@ -176,8 +176,7 @@ void bindCompileOptions(py::module_& m)
         .value("AllowSendBigAecpPayloads", CompileOption::AllowSendBigAecpPayloads)
         .value("AllowRecvBigAecpPayloads", CompileOption::AllowRecvBigAecpPayloads)
         .value("EnableRedundancy", CompileOption::EnableRedundancy)
-        .value("EnableJsonSupport", CompileOption::EnableJsonSupport)
-        .export_values();
+        .value("EnableJsonSupport", CompileOption::EnableJsonSupport);
 
     bindEnumBitfield<CompileOption>(m, "CompileOptions");
 
