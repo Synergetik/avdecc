@@ -70,6 +70,19 @@ PYBIND11_MODULE(la_avdecc, m)
     m.def("getLibraryName", []() -> std::string { return internals::applicationLongName; }, "Gets the full name of the library.");
     m.def("getLibraryCopyright", []() -> std::string { return internals::readableCopyright; }, "Gets the copyright string of the library.");
     m.def("getInterfaceVersion", &getInterfaceVersion, "Gets the interface version of the library.");
+    m.def("getBuildDate", []() -> std::string { return internals::buildDate; }, "Gets the library build date.");
+    m.def("getGitHash", []() -> std::string { return internals::gitCommitHash; }, "Gets the library commit hash.");
+    m.def(
+        "getGitShortHash",
+        []() -> std::string {
+            std::string shortHash = internals::gitCommitHash.substr(0, 7);
+            if (!internals::gitCommitHash.empty() && internals::gitCommitHash.back() == '+')
+            {
+                shortHash += '+';
+            }
+            return shortHash;
+        },
+        "Gets the library short commit hash.");
 
     // la/avdecc/avdecc.hpp
     bindCompileOptions(m);

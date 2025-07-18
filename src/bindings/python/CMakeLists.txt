@@ -16,10 +16,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
+# Get the full git commit hash and check if the working directory is dirty
+execute_process(
+    COMMAND git rev-parse HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE CU_BUILD_GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND git diff --quiet
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE GIT_DIFF_RESULT
+)
+
+if (GIT_DIFF_RESULT EQUAL 1)
+    set(CU_BUILD_GIT_COMMIT_HASH "${CU_BUILD_GIT_COMMIT_HASH}+")
+endif()
+
 # Setup project
 cu_setup_project(${PYTHON_PROJECT_TARGET} ${LA_AVDECC_VERSION} "AVDECC Python Bindings Library")
 
 # Configure files based on CMakeLists.txt version number
+string(TIMESTAMP CU_BUILD_DATE "%Y-%m-%d" UTC)
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.hpp"

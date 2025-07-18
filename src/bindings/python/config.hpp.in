@@ -46,6 +46,8 @@ std::string const legalCopyright{ "@CU_PROJECT_LEGALCOPYRIGHT@" };
 std::string const readableCopyright{ "@CU_PROJECT_READABLE_COPYRIGHT@" };
 std::string const buildArchitecture{ "@CU_TARGET_ARCH@-bit" };
 std::string const buildNumber{ "@CU_BUILD_NUMBER@" };
+std::string const buildDate{ "@CU_BUILD_DATE@" };
+std::string const gitCommitHash{ "@CU_BUILD_GIT_COMMIT_HASH@" };
 #ifdef DEBUG
 std::string const buildConfiguration{ "Debug" };
 #else // !DEBUG
