@@ -54,6 +54,7 @@ void bindMilanInfo(py::module_& m);
 void bindMilanDynamicState(py::module_& m);
 void bindMediaClockReferenceInfo(py::module_& m);
 void bindEntityModelUniqueIdentifierExtensions(py::module_& m);
+void bindStreamFormatInfo(py::module_& m);
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 void bindEntityModel(py::module_& m)
@@ -86,6 +87,9 @@ void bindEntityModel(py::module_& m)
     bindMilanDynamicState(m);
     bindMediaClockReferenceInfo(m);
     bindEntityModelUniqueIdentifierExtensions(m);
+
+    // la/avdecc/internals/streamFormatInfo.hpp
+    bindStreamFormatInfo(m);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -116,8 +120,8 @@ void bindEntityDescriptor(py::module_& m)
         .def("__repr__", [](const EntityDescriptor& self) {
             std::ostringstream oss;
             oss << "<EntityDescriptor "
-                << "entityID=" << self.entityID << ", entityName='" << self.entityName << "', firmwareVersion='"
-                << self.firmwareVersion << "', serialNumber='" << self.serialNumber << "'>";
+                << "entityID=" << self.entityID << ", entityName='" << self.entityName << "', firmwareVersion='" << self.firmwareVersion << "', serialNumber='"
+                << self.serialNumber << "'>";
             return oss.str();
         });
 }
@@ -220,8 +224,7 @@ void bindStreamDescriptor(py::module_& m)
 #endif
         .def("__repr__", [](const StreamDescriptor& self) {
             std::ostringstream oss;
-            oss << "<StreamDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<StreamDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -241,8 +244,7 @@ void bindJackDescriptor(py::module_& m)
         .def_readwrite("baseControl", &JackDescriptor::baseControl)
         .def("__repr__", [](const JackDescriptor& self) {
             std::ostringstream oss;
-            oss << "<JackDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<JackDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -271,8 +273,7 @@ void bindAvbInterfaceDescriptor(py::module_& m)
         .def_readwrite("portNumber", &AvbInterfaceDescriptor::portNumber)
         .def("__repr__", [](const AvbInterfaceDescriptor& self) {
             std::ostringstream oss;
-            oss << "<AvbInterfaceDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<AvbInterfaceDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -293,8 +294,7 @@ void bindClockSourceDescriptor(py::module_& m)
         .def_readwrite("clockSourceLocationIndex", &ClockSourceDescriptor::clockSourceLocationIndex)
         .def("__repr__", [](const ClockSourceDescriptor& self) {
             std::ostringstream oss;
-            oss << "<ClockSourceDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<ClockSourceDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -316,8 +316,7 @@ void bindMemoryObjectDescriptor(py::module_& m)
         .def_readwrite("length", &MemoryObjectDescriptor::length)
         .def("__repr__", [](const MemoryObjectDescriptor& self) {
             std::ostringstream oss;
-            oss << "<MemoryObjectDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<MemoryObjectDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -349,8 +348,7 @@ void bindStringsDescriptor(py::module_& m)
         .def_readwrite("strings", &StringsDescriptor::strings)
         .def("__len__", [](const StringsDescriptor& self) { return self.strings.size(); })
         .def(
-            "__iter__",
-            [](StringsDescriptor& self) { return py::make_iterator(self.strings.begin(), self.strings.end()); },
+            "__iter__", [](StringsDescriptor& self) { return py::make_iterator(self.strings.begin(), self.strings.end()); },
             py::keep_alive<0, 1>()) // Keep container alive while iterator exists
         .def(
             "__getitem__",
@@ -449,8 +447,7 @@ void bindAudioClusterDescriptor(py::module_& m)
         .def_readwrite("format", &AudioClusterDescriptor::format)
         .def("__repr__", [](const AudioClusterDescriptor& self) {
             std::ostringstream oss;
-            oss << "<AudioClusterDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<AudioClusterDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -465,9 +462,7 @@ void bindAudioMapDescriptor(py::module_& m)
         .def_readwrite("mappings", &AudioMapDescriptor::mappings)
         .def("__len__", [](const AudioMapDescriptor& self) { return self.mappings.size(); })
         .def(
-            "__iter__",
-            [](AudioMapDescriptor& self) { return py::make_iterator(self.mappings.begin(), self.mappings.end()); },
-            py::keep_alive<0, 1>())
+            "__iter__", [](AudioMapDescriptor& self) { return py::make_iterator(self.mappings.begin(), self.mappings.end()); }, py::keep_alive<0, 1>())
         .def(
             "__getitem__",
             [](const AudioMapDescriptor& self, size_t i) -> const AudioMappings::value_type& {
@@ -502,8 +497,7 @@ void bindControlDescriptor(py::module_& m)
         .def_readwrite("valuesDynamic", &ControlDescriptor::valuesDynamic)
         .def("__repr__", [](const ControlDescriptor& self) {
             std::ostringstream oss;
-            oss << "<ControlDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<ControlDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -521,8 +515,7 @@ void bindClockDomainDescriptor(py::module_& m)
         .def_readwrite("clockSources", &ClockDomainDescriptor::clockSources)
         .def("__repr__", [](const ClockDomainDescriptor& self) {
             std::ostringstream oss;
-            oss << "<ClockDomainDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<ClockDomainDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -540,8 +533,7 @@ void bindTimingDescriptor(py::module_& m)
         .def_readwrite("ptpInstances", &TimingDescriptor::ptpInstances)
         .def("__repr__", [](const TimingDescriptor& self) {
             std::ostringstream oss;
-            oss << "<TimingDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<TimingDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -563,8 +555,7 @@ void bindPtpInstanceDescriptor(py::module_& m)
         .def_readwrite("basePtpPort", &PtpInstanceDescriptor::basePtpPort)
         .def("__repr__", [](const PtpInstanceDescriptor& self) {
             std::ostringstream oss;
-            oss << "<PtpInstanceDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<PtpInstanceDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -585,8 +576,7 @@ void bindPtpPortDescriptor(py::module_& m)
         .def_readwrite("profileIdentifier", &PtpPortDescriptor::profileIdentifier)
         .def("__repr__", [](const PtpPortDescriptor& self) {
             std::ostringstream oss;
-            oss << "<PtpPortDescriptor objectName='" << self.objectName
-                << "', localizedDescription=" << self.localizedDescription << ">";
+            oss << "<PtpPortDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
             return oss.str();
         });
 }
@@ -657,8 +647,7 @@ void bindAsPath(py::module_& m)
                  return self.sequence[idx];
              })
         .def(
-            "__iter__", [](AsPath& self) { return py::make_iterator(self.sequence.begin(), self.sequence.end()); },
-            py::keep_alive<0, 1>())
+            "__iter__", [](AsPath& self) { return py::make_iterator(self.sequence.begin(), self.sequence.end()); }, py::keep_alive<0, 1>())
         .def("__repr__", [](const AsPath& self) {
             std::ostringstream oss;
             oss << "<AsPath [";
@@ -729,10 +718,8 @@ void bindMediaClockReferenceInfo(py::module_& m)
         .def_readwrite("mediaClockDomainName", &MediaClockReferenceInfo::mediaClockDomainName)
         .def("__repr__", [](const MediaClockReferenceInfo& self) {
             std::ostringstream oss;
-            oss << "<MediaClockReferenceInfo userMediaClockPriority="
-                << (self.userMediaClockPriority ? std::to_string(*self.userMediaClockPriority) : "None")
-                << ", mediaClockDomainName="
-                << (self.mediaClockDomainName ? ("'" + std::string(*self.mediaClockDomainName) + "'") : "None") << ">";
+            oss << "<MediaClockReferenceInfo userMediaClockPriority=" << (self.userMediaClockPriority ? std::to_string(*self.userMediaClockPriority) : "None")
+                << ", mediaClockDomainName=" << (self.mediaClockDomainName ? ("'" + std::string(*self.mediaClockDomainName) + "'") : "None") << ">";
             return oss.str();
         });
 }
@@ -746,13 +733,11 @@ void bindEntityModelUniqueIdentifierExtensions(py::module_& m)
 
     UniqueIdentifierBinding->def_static(
         "makeEntityModelID",
-        [](std::uint32_t vendorID, std::uint8_t deviceID, std::uint32_t modelID) {
-            return makeEntityModelID(vendorID, deviceID, modelID);
-        },
+        [](std::uint32_t vendorID, std::uint8_t deviceID, std::uint32_t modelID) { return makeEntityModelID(vendorID, deviceID, modelID); },
         "Construct a UniqueIdentifier from vendorID, deviceID, and modelID. "
         "This helper builds an EntityModelID for use in ADP messages and descriptors.",
-        py::arg("vendorID"), "24-bit vendor OUI (8 MSBs are ignored)", py::arg("deviceID"),
-        "8-bit device ID (vendor-specific)", py::arg("modelID"), "32-bit model ID (vendor-specific)");
+        py::arg("vendorID"), "24-bit vendor OUI (8 MSBs are ignored)", py::arg("deviceID"), "8-bit device ID (vendor-specific)", py::arg("modelID"),
+        "32-bit model ID (vendor-specific)");
 
     UniqueIdentifierBinding->def(
         "splitEntityModelID", [](const UniqueIdentifier& self) { return splitEntityModelID(self); },
@@ -760,4 +745,122 @@ void bindEntityModelUniqueIdentifierExtensions(py::module_& m)
         "Helper to extract the OUI-24 vendorID, deviceID, and modelID from an EntityModelID-encoded identifier.\n"
         "Note: Only valid if the identifier was constructed using makeEntityModelID().",
         py::return_value_policy::copy);
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+/*-- StreamFormatInfo bindings ------------------------------------------------------------------------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------*/
+
+class PyStreamFormatInfo : public la::avdecc::entity::model::StreamFormatInfo
+{
+public:
+    using StreamFormat = la::avdecc::entity::model::StreamFormat;
+    using SamplingRate = la::avdecc::entity::model::SamplingRate;
+
+    PyStreamFormatInfo(StreamFormat const& streamFormat)
+        : _ref(StreamFormatInfo::create(streamFormat))
+    {}
+
+    StreamFormat getStreamFormat() const noexcept override
+    {
+        return _ref->getStreamFormat();
+    }
+
+    StreamFormat getAdaptedStreamFormat(std::uint16_t const channelsCount) const noexcept override
+    {
+        return _ref->getAdaptedStreamFormat(channelsCount);
+    }
+
+    Type getType() const noexcept override
+    {
+        return (Type)_ref->getType();
+    }
+
+    std::uint16_t getChannelsCount() const noexcept override
+    {
+        return _ref->getChannelsCount();
+    }
+
+    bool isUpToChannelsCount() const noexcept override
+    {
+        return _ref->isUpToChannelsCount();
+    }
+
+    SamplingRate getSamplingRate() const noexcept override
+    {
+        return _ref->getSamplingRate();
+    }
+
+    SampleFormat getSampleFormat() const noexcept override
+    {
+        return (SampleFormat)_ref->getSampleFormat();
+    }
+
+    bool useSynchronousClock() const noexcept override
+    {
+        return _ref->useSynchronousClock();
+    }
+
+    std::uint16_t getSampleSize() const noexcept override
+    {
+        return _ref->getSampleSize();
+    }
+
+    std::uint16_t getSampleBitDepth() const noexcept override
+    {
+        return _ref->getSampleBitDepth();
+    }
+
+private:
+    StreamFormatInfo::UniquePointer _ref;
+
+    void destroy() noexcept override {};
+};
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void bindStreamFormatInfo(py::module_& m)
+{
+    using namespace la::avdecc::entity::model;
+
+    auto streamFormatInfo = py::class_<PyStreamFormatInfo>(m, "StreamFormatInfo");
+
+    py::enum_<PyStreamFormatInfo::Type>(streamFormatInfo, "StreamFormatType")
+        .value("Unspecified", PyStreamFormatInfo::Type::None)
+        .value("IEC_61883_6", PyStreamFormatInfo::Type::IEC_61883_6)
+        .value("AAF", PyStreamFormatInfo::Type::AAF)
+        .value("ClockReference", PyStreamFormatInfo::Type::ClockReference)
+        .value("Unsupported", PyStreamFormatInfo::Type::Unsupported);
+
+    py::enum_<PyStreamFormatInfo::SampleFormat>(streamFormatInfo, "SampleFormat")
+        .value("Int8", PyStreamFormatInfo::SampleFormat::Int8)
+        .value("Int16", PyStreamFormatInfo::SampleFormat::Int16)
+        .value("Int24", PyStreamFormatInfo::SampleFormat::Int24)
+        .value("Int32", PyStreamFormatInfo::SampleFormat::Int32)
+        .value("Int64", PyStreamFormatInfo::SampleFormat::Int64)
+        .value("FixedPoint32", PyStreamFormatInfo::SampleFormat::FixedPoint32)
+        .value("FloatingPoint32", PyStreamFormatInfo::SampleFormat::FloatingPoint32)
+        .value("Unknown", PyStreamFormatInfo::SampleFormat::Unknown);
+
+    streamFormatInfo.def("getStreamFormat", &PyStreamFormatInfo::getStreamFormat)
+        .def(py::init<PyStreamFormatInfo::StreamFormat>(), py::arg("streamFormat"),
+             "Create a StreamFormatInfo instance from a StreamFormat object.")
+        .def_property_readonly("getAdaptedStreamFormat", &PyStreamFormatInfo::getAdaptedStreamFormat)
+        .def_property_readonly("type", &PyStreamFormatInfo::getType)
+        .def_property_readonly("channelsCount", &PyStreamFormatInfo::getChannelsCount)
+        .def_property_readonly("isUpToChannelsCount", &PyStreamFormatInfo::isUpToChannelsCount)
+        .def_property_readonly("samplingRate", &PyStreamFormatInfo::getSamplingRate)
+        .def_property_readonly("sampleFormat", &PyStreamFormatInfo::getSampleFormat)
+        .def_property_readonly("useSynchronousClock", &PyStreamFormatInfo::useSynchronousClock)
+        .def_property_readonly("sampleSize", &PyStreamFormatInfo::getSampleSize)
+        .def_property_readonly("sampleBitDepth", &PyStreamFormatInfo::getSampleBitDepth)
+        .def("__repr__", [](const PyStreamFormatInfo& self) {
+            std::ostringstream oss;
+            oss << "<StreamFormatInfo "
+                << "type=" << py::repr(py::cast(self.getType())) << ", "
+                << "sampleFormat=" << py::repr(py::cast(self.getSampleFormat())) << ", "
+                << "samplingRate=" << py::repr(py::cast(self.getSamplingRate())) << ", "
+                << "channelsCount=" << self.getChannelsCount() << ", "
+                << "sampleSize=" << self.getSampleSize() << ">";
+            return oss.str();
+        });
 }

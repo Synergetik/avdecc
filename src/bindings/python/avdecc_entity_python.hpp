@@ -31,6 +31,7 @@
 #include <optional>
 
 #include <la/avdecc/internals/entityModel.hpp>
+#include <la/avdecc/internals/streamFormatInfo.hpp>
 
 namespace py = pybind11;
 
