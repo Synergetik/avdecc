@@ -453,7 +453,9 @@ void bindAvdeccFixedString(py::module_& m)
         .def("__eq__", [](const AvdeccFixedString& self, const AvdeccFixedString& other) { return self == other; })
         .def("__eq__", [](const AvdeccFixedString& self, const std::string& other) { return self == other; })
         .def("__ne__", [](const AvdeccFixedString& self, const AvdeccFixedString& other) { return self != other; })
-        .def("__ne__", [](const AvdeccFixedString& self, const std::string& other) { return self != other; });
+        .def("__ne__", [](const AvdeccFixedString& self, const std::string& other) { return self != other; })
+
+        .def_property_readonly_static("MaxLength", [](const py::object&) { return AvdeccFixedString::MaxLength; });
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
