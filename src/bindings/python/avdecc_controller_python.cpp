@@ -1981,7 +1981,7 @@ void bindControllerEntityClass(py::module_& m)
     using namespace la::avdecc::entity;
     using namespace la::avdecc::protocol;
 
-    py::class_<ControllerEntity, LocalEntity, std::unique_ptr<ControllerEntity, py::nodelete>>(m, "ControllerEntity")
+    py::class_<ControllerEntity, LocalEntity, Interface, std::unique_ptr<ControllerEntity, py::nodelete>>(m, "ControllerEntity")
         .def("setControllerDelegate", &ControllerEntity::setControllerDelegate, py::arg("delegate"))
         .def("__repr__", [](const ControllerEntity& self) {
             std::ostringstream oss;
