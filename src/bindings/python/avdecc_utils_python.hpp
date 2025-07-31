@@ -51,16 +51,16 @@ void bindEnumBitfield(py::handle scope, const std::string& py_class_name)
         .def("reset", &Bitfield::reset, py::return_value_policy::reference_internal)
         .def("test", &Bitfield::test)
         .def("clear", &Bitfield::clear)
-        .def("empty", &Bitfield::empty)
-        .def("count", &Bitfield::count)
-        .def("value", &Bitfield::value)
+        .def_property_readonly("empty", &Bitfield::empty)
+        .def_property_readonly("count", &Bitfield::count)
+        .def_property_readonly("value", &Bitfield::value)
         .def("__or__", [](const Bitfield& a, const Bitfield& b) { return a | b; })
         .def("__and__", [](const Bitfield& a, const Bitfield& b) { return a & b; })
         .def("__eq__", &Bitfield::operator==)
         .def("__ne__", &Bitfield::operator!=)
         .def("__repr__", [=](const Bitfield& self) {
             std::ostringstream oss;
-            oss << "<" << py_class_name << " " << self.value() << ">";
+            oss << "<" << py_class_name << " " << static_cast<std::size_t>(self.value()) << ">";
             return oss.str();
         });
 
