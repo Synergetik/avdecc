@@ -468,12 +468,11 @@ void bindSamplingRate(py::module_& m)
         .def(py::init<SamplingRate::value_type>(), py::arg("value"))
         .def(py::init<std::uint8_t, std::uint32_t>(), py::arg("pull"), py::arg("baseFrequency"))
 
-        .def("setValue", &SamplingRate::setValue)
-        .def("getValue", &SamplingRate::getValue)
-        .def("getNominalSampleRate", &SamplingRate::getNominalSampleRate)
-        .def("getPullBaseFrequency", &SamplingRate::getPullBaseFrequency)
-        .def("getPull", &SamplingRate::getPull)
-        .def("getBaseFrequency", &SamplingRate::getBaseFrequency)
+        .def_property("value", &SamplingRate::getValue, &SamplingRate::setValue)
+        .def_property_readonly("nominalSampleRate", &SamplingRate::getNominalSampleRate)
+        .def_property_readonly("pullBaseFrequency", &SamplingRate::getPullBaseFrequency)
+        .def_property_readonly("pull", &SamplingRate::getPull)
+        .def_property_readonly("baseFrequency", &SamplingRate::getBaseFrequency)
         .def_property_readonly("isValid", &SamplingRate::isValid)
 
         .def_static("getNullSamplingRate", &SamplingRate::getNullSamplingRate)
@@ -482,10 +481,11 @@ void bindSamplingRate(py::module_& m)
         .def("__ne__", [](const SamplingRate& self, const SamplingRate& other) { return self != other; })
         .def("__lt__", [](const SamplingRate& self, const SamplingRate& other) { return self < other; })
         .def("__int__", [](const SamplingRate& s) { return static_cast<SamplingRate::value_type>(s); })
+        .def("__hash__", [](const SamplingRate& s) { return s.getValue(); })
 
         .def("__repr__", [](const SamplingRate& s) {
             std::ostringstream oss;
-            oss << "SamplingRate(" << std::hex << s.getValue() << ")";
+            oss << "SamplingRate(" << s.getNominalSampleRate() << ")";
             return oss.str();
         });
 }
@@ -499,8 +499,7 @@ void bindStreamFormat(py::module_& m)
         .def(py::init<>())
         .def(py::init<StreamFormat::value_type>(), py::arg("value"))
 
-        .def("setValue", &StreamFormat::setValue)
-        .def("getValue", &StreamFormat::getValue)
+        .def_property("value", &StreamFormat::getValue, &StreamFormat::setValue)
         .def_property_readonly("isValid", &StreamFormat::isValid)
 
         .def_static("getNullStreamFormat", &StreamFormat::getNullStreamFormat)
@@ -509,10 +508,11 @@ void bindStreamFormat(py::module_& m)
         .def("__ne__", [](const StreamFormat& self, const StreamFormat& other) { return self != other; })
         .def("__lt__", [](const StreamFormat& self, const StreamFormat& other) { return self < other; })
         .def("__int__", [](const StreamFormat& s) { return static_cast<StreamFormat::value_type>(s); })
+        .def("__hash__", [](const StreamFormat& s) { return s.getValue(); })
 
         .def("__repr__", [](const StreamFormat& s) {
             std::ostringstream oss;
-            oss << "StreamFormat(" << std::hex << s.getValue() << ")";
+            oss << "StreamFormat(0x" << std::hex << s.getValue() << ")";
             return oss.str();
         });
 }
