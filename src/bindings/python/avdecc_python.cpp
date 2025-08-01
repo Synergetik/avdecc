@@ -250,6 +250,10 @@ void bindMemoryBuffer(py::module_& m)
         .def_property_readonly("empty", &MemoryBuffer::empty, "True if the buffer is empty.")
         .def_property_readonly("isValid", &MemoryBuffer::isValid, "True if the buffer is allocated.")
 
+        .def_property_readonly(
+            "data", [](MemoryBuffer& self) { return py::bytes(reinterpret_cast<const char*>(self.data()), self.size()); },
+            "Returns the buffer as Python bytes.")
+
         .def("clear", &MemoryBuffer::clear, "Clears the buffer without deallocating memory.")
         .def("reserve", &MemoryBuffer::reserve, py::arg("capacity"), "Reserves buffer capacity.")
         .def("shrink_to_fit", &MemoryBuffer::shrink_to_fit, "Shrinks capacity to current size.")
@@ -274,10 +278,6 @@ void bindMemoryBuffer(py::module_& m)
 
         .def(
             "append_byte", [](MemoryBuffer& self, std::uint8_t v) { self.append(v); }, py::arg("byte"), "Appends a single byte.")
-
-        .def(
-            "data", [](MemoryBuffer& self) { return py::bytes(reinterpret_cast<const char*>(self.data()), self.size()); },
-            "Returns the buffer as Python bytes.")
 
         .def("__len__", &MemoryBuffer::size)
         .def("__bool__", &MemoryBuffer::isValid)

@@ -23,6 +23,7 @@
  */
 
 #include "avdecc_entity_python.hpp"
+#include <protocol/protocolAemControlValuesPayloads.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
@@ -738,9 +739,15 @@ void bindBaseControlValues(py::module_& m)
     py::class_<ControlValues> cls(m, "ControlValues");
 
     cls.def(py::init<>())
-        .def("getType", &ControlValues::getType)
-        .def("areDynamicValues", &ControlValues::areDynamicValues)
-        .def("countMustBeIdentical", &ControlValues::countMustBeIdentical)
+        .def(py::init([](py::bytes data, ControlValueType::Type type, std::uint16_t const count) {
+            std::string raw = data;
+            auto buffer = la::avdecc::MemoryBuffer(raw.data(), raw.size());
+            auto values = unpackDynamicControlValues(buffer, type, count);
+            return values.has_value() ? new la::avdecc::entity::model::ControlValues{values.value()} : new la::avdecc::entity::model::ControlValues{};
+        }))
+        .def_property_readonly("countMustBeIdentical", &ControlValues::countMustBeIdentical)
+        .def_property_readonly("dynamicValues", &ControlValues::areDynamicValues)
+        .def_property_readonly("type", &ControlValues::getType)
         .def_property_readonly("size", &ControlValues::size)
         .def_property_readonly("empty", &ControlValues::empty)
         .def_property_readonly("isValid", &ControlValues::isValid)
