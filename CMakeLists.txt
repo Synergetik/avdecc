@@ -61,6 +61,11 @@ option(ALLOW_SEND_BIG_AECP_PAYLOADS "Allow sending AECP payloads bigger than the
 ############ Override from command line "CMake -D<PARAM>=<VALUE>"
 
 # Configuration options
+if(BUILD_AVDECC_BINDINGS_PYTHON)
+	set(BUILD_AVDECC_BINDINGS_PYTHON_VERSION "3.11" CACHE STRING "Specify the Python version to build bindings against." FORCE)
+	set(BUILD_AVDECC_BINDINGS_PYTHON_PYBIND_TAG "v2.13.6" CACHE STRING "Specify the pybind11 tag or commit hash to fetch and use." FORCE)
+endif()
+
 if(NOT AVDECC_SWIG_LANGUAGES)
 	set(AVDECC_SWIG_LANGUAGES "csharp" CACHE STRING "Set the languages to compile as SWIG wrappers." FORCE)
 endif()
@@ -178,6 +183,8 @@ set(BUILD_NIH_TESTS OFF CACHE BOOL "Build unit tests." FORCE)
 set(BUILD_C_BINDINGS OFF CACHE BOOL "Build C Bindings." FORCE)
 set(BUILD_NIH_SWIG ${BUILD_AVDECC_BINDINGS_CSHARP} CACHE BOOL "Build SWIG Wrapper." FORCE)
 set(BUILD_NIH_PYTHON_BINDINGS ${BUILD_AVDECC_BINDINGS_PYTHON} CACHE BOOL "Build python bindings." FORCE)
+set(BUILD_NIH_PYTHON_BINDINGS_PYBIND_TAG ${BUILD_AVDECC_BINDINGS_PYTHON_PYBIND_TAG} CACHE STRING "Specify the pybind11 tag or commit hash to fetch and use." FORCE)
+set(BUILD_NIH_PYTHON_BINDINGS_VERSION ${BUILD_AVDECC_BINDINGS_PYTHON_VERSION} CACHE STRING "Build python bindings." FORCE)
 set(NIH_SWIG_LANGUAGES ${AVDECC_SWIG_LANGUAGES} CACHE STRING "Set the languages to compile as SWIG wrappers." FORCE)
 # Install options
 set(INSTALL_NIH_EXAMPLES OFF CACHE BOOL "Install examples." FORCE)
