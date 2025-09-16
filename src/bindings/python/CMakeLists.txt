@@ -96,8 +96,21 @@ target_compile_features(${PYTHON_PROJECT_TARGET} PUBLIC cxx_std_20)
 
 target_include_directories(${PYTHON_PROJECT_TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-# Using AVDECC library
+# Using static AVDECC library
 target_link_libraries(${PYTHON_PROJECT_TARGET} PRIVATE ${PYTHON_OUTPUT}_static)
+
+# Using NIH library
+target_include_directories(${PYTHON_PROJECT_TARGET} PRIVATE
+  $<TARGET_PROPERTY:la_networkInterfaceHelper_python,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+add_dependencies(${PYTHON_PROJECT_TARGET} la_networkInterfaceHelper_python_with_stubs)
+add_custom_command(TARGET ${PYTHON_PROJECT_TARGET} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          $<TARGET_FILE_DIR:la_networkInterfaceHelper_python>
+          $<TARGET_FILE_DIR:${PYTHON_PROJECT_TARGET}>
+  COMMENT "Copying NIH python artefacts"
+)
 
 # Add custom command to generate stubs
 add_custom_target(${PYTHON_PROJECT_TARGET}_with_stubs
