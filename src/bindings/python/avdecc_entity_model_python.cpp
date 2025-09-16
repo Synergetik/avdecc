@@ -24,6 +24,8 @@
 
 #include "avdecc_entity_python.hpp"
 
+#include <networkInterfaceHelper_python.hpp>
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -258,7 +260,9 @@ void bindAvbInterfaceDescriptor(py::module_& m)
         .def(py::init<>())
         .def_readwrite("objectName", &AvbInterfaceDescriptor::objectName)
         .def_readwrite("localizedDescription", &AvbInterfaceDescriptor::localizedDescription)
-        .def_readwrite("macAddress", &AvbInterfaceDescriptor::macAddress)
+        .def_property(
+            "macAddress", [](const AvbInterfaceDescriptor& self) { return MacAddress(self.macAddress); },
+            [](AvbInterfaceDescriptor& self, const MacAddress& mac) { self.macAddress = mac.data(); })
         .def_readwrite("interfaceFlags", &AvbInterfaceDescriptor::interfaceFlags)
         .def_readwrite("clockIdentity", &AvbInterfaceDescriptor::clockIdentity)
         .def_readwrite("priority1", &AvbInterfaceDescriptor::priority1)
@@ -573,7 +577,9 @@ void bindPtpPortDescriptor(py::module_& m)
         .def_readwrite("portType", &PtpPortDescriptor::portType)
         .def_readwrite("flags", &PtpPortDescriptor::flags)
         .def_readwrite("avbInterfaceIndex", &PtpPortDescriptor::avbInterfaceIndex)
-        .def_readwrite("profileIdentifier", &PtpPortDescriptor::profileIdentifier)
+        .def_property(
+            "profileIdentifier", [](const PtpPortDescriptor& self) { return MacAddress(self.profileIdentifier); },
+            [](PtpPortDescriptor& self, const MacAddress& mac) { self.profileIdentifier = mac.data(); })
         .def("__repr__", [](const PtpPortDescriptor& self) {
             std::ostringstream oss;
             oss << "<PtpPortDescriptor objectName='" << self.objectName << "', localizedDescription=" << self.localizedDescription << ">";
@@ -592,7 +598,9 @@ void bindStreamInfo(py::module_& m)
         .def_readwrite("streamFormat", &StreamInfo::streamFormat)
         .def_readwrite("streamID", &StreamInfo::streamID)
         .def_readwrite("msrpAccumulatedLatency", &StreamInfo::msrpAccumulatedLatency)
-        .def_readwrite("streamDestMac", &StreamInfo::streamDestMac)
+        .def_property(
+            "streamDestMac", [](const StreamInfo& self) { return MacAddress(self.streamDestMac); },
+            [](StreamInfo& self, const MacAddress& mac) { self.streamDestMac = mac.data(); })
         .def_readwrite("msrpFailureCode", &StreamInfo::msrpFailureCode)
         .def_readwrite("msrpFailureBridgeID", &StreamInfo::msrpFailureBridgeID)
         .def_readwrite("streamVlanID", &StreamInfo::streamVlanID)
@@ -842,8 +850,7 @@ void bindStreamFormatInfo(py::module_& m)
         .value("Unknown", PyStreamFormatInfo::SampleFormat::Unknown);
 
     streamFormatInfo.def("getStreamFormat", &PyStreamFormatInfo::getStreamFormat)
-        .def(py::init<PyStreamFormatInfo::StreamFormat>(), py::arg("streamFormat"),
-             "Create a StreamFormatInfo instance from a StreamFormat object.")
+        .def(py::init<PyStreamFormatInfo::StreamFormat>(), py::arg("streamFormat"), "Create a StreamFormatInfo instance from a StreamFormat object.")
         .def_property_readonly("getAdaptedStreamFormat", &PyStreamFormatInfo::getAdaptedStreamFormat)
         .def_property_readonly("type", &PyStreamFormatInfo::getType)
         .def_property_readonly("channelsCount", &PyStreamFormatInfo::getChannelsCount)

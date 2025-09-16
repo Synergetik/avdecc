@@ -27,6 +27,7 @@
 #include "utils.hpp"
 
 #include <la/avdecc/internals/entity.hpp>
+#include <networkInterfaceHelper_python.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Globals --------------------------------------------------------------------------------------------------------*/
@@ -653,7 +654,9 @@ void bindBaseEntity(py::module_& m)
 
     py::class_<Entity::InterfaceInformation>(cls, "InterfaceInformation")
         .def(py::init<>())
-        .def_readwrite("macAddress", &Entity::InterfaceInformation::macAddress, "The mac address this interface is attached to.")
+        .def_property(
+            "macAddress", [](const Entity::InterfaceInformation& self) { return MacAddress(self.macAddress); },
+            [](Entity::InterfaceInformation& self, const MacAddress& mac) { self.macAddress = mac.data(); }, "The mac address this interface is attached to.")
         .def_readwrite("validTime", &Entity::InterfaceInformation::validTime,
                        "The number of 2-seconds periods the entity's announcement is valid on this interface.")
         .def_readwrite("availableIndex", &Entity::InterfaceInformation::availableIndex, "The current available index for the entity on this interface.")
@@ -696,9 +699,11 @@ void bindBaseEntity(py::module_& m)
         .def("getControllerCapabilities", &Entity::getControllerCapabilities, "Returns the controller capabilities of the entity.")
         .def("getIdentifyControlIndex", &Entity::getIdentifyControlIndex, "Returns the optional identify control index if valid.")
         .def("getAssociationID", &Entity::getAssociationID, "Returns the optional association ID of the entity.")
-        .def("getMacAddress", &Entity::getMacAddress, py::arg("interfaceIndex"),
-             "Returns the MAC address associated with the given interface index. Returns an invalid MAC if not found.")
-        .def("getAnyMacAddress", &Entity::getAnyMacAddress, "Returns any available MAC address from the entity.")
+        .def(
+            "getMacAddress", [](const Entity& self, model::AvbInterfaceIndex const interfaceIndex) { return MacAddress(self.getMacAddress(interfaceIndex)); },
+            py::arg("interfaceIndex"), "Returns the MAC address associated with the given interface index. Returns an invalid MAC if not found.")
+        .def(
+            "getAnyMacAddress", [](const Entity& self) { return MacAddress(self.getAnyMacAddress()); }, "Returns any available MAC address from the entity.")
 
         // Setters
         .def("removeInterfaceInformation", &Entity::removeInterfaceInformation, py::arg("interfaceIndex"),
@@ -714,9 +719,14 @@ void bindBaseEntity(py::module_& m)
              "Sets the gPTP domain number for the given interface.")
 
         // Static
-        .def_static("generateEID", &Entity::generateEID, py::arg("macAddress"), py::arg("progID"), py::arg("useDeprecatedAlgorithm"),
-                    "Generates an Entity ID (EID) from a MAC address and a program ID.\n"
-                    "This method is provided for backward compatibility, use ProtocolInterface::getDynamicEID instead.");
+        .def_static(
+            "generateEID",
+            [](MacAddress const& macAddress, std::uint16_t const progID, bool const useDeprecatedAlgorithm) {
+                return Entity::generateEID(macAddress.data(), progID, useDeprecatedAlgorithm);
+            },
+            py::arg("macAddress"), py::arg("progID"), py::arg("useDeprecatedAlgorithm"),
+            "Generates an Entity ID (EID) from a MAC address and a program ID.\n"
+            "This method is provided for backward compatibility, use ProtocolInterface::getDynamicEID instead.");
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/

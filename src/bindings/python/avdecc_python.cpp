@@ -48,7 +48,8 @@ std::optional<py::exception<la::avdecc::Exception>> AvdeccExceptionBinding{std::
 /*-------------------------------------------------------------------------------------------------------------------*/
 /*-- Declarations ---------------------------------------------------------------------------------------------------*/
 /*-------------------------------------------------------------------------------------------------------------------*/
-void configureLibraryEnvironment(py::module_& m);
+void libraryConfigureEnvironment(py::module_& m);
+void libraryImportDependencies(py::module_& m);
 void bindCompileOptions(py::module_& m);
 void bindBaseException(py::module_& m);
 void bindMemoryBuffer(py::module_& m);
@@ -63,7 +64,8 @@ PYBIND11_MODULE(la_avdecc, m)
 {
     using namespace la::avdecc;
 
-    configureLibraryEnvironment(m);
+    libraryConfigureEnvironment(m);
+    libraryImportDependencies(m);
 
     m.doc() = "Python bindings for la::avdecc";
     m.def("getLibraryVersion", []() -> std::string { return internals::versionString; }, "Gets the library version string.");
@@ -108,7 +110,7 @@ PYBIND11_MODULE(la_avdecc, m)
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
-void configureLibraryEnvironment(py::module_& m)
+void libraryConfigureEnvironment(py::module_& m)
 {
     // Configure WatchDog intercept hook to check if python debugger is attached.
     using WatchDog = la::avdecc::watchDog::WatchDog;
@@ -174,6 +176,20 @@ void configureLibraryEnvironment(py::module_& m)
     // Mark Python runtime as initialized and available for native threads.
     // This flag must be set after the atexit hook is registered and all callbacks are in place.
     PythonRuntimeAvailable.store(true, std::memory_order_release);
+}
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+void libraryImportDependencies(py::module_& m)
+{
+    std::string const name = py::cast<std::string>(m.attr("__name__"));
+    auto const        dot  = name.rfind('.');
+
+    auto const importSibling = [&](const char* sibling) -> py::object {
+        std::string abs = (dot == std::string::npos) ? sibling : name.substr(0, dot) + "." + sibling;
+        return py::module_::import(abs.c_str());
+    };
+
+    importSibling("la_networkInterfaceHelper");
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
