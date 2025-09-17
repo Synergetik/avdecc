@@ -104,23 +104,16 @@ target_include_directories(${PYTHON_PROJECT_TARGET} PRIVATE
   $<TARGET_PROPERTY:la_networkInterfaceHelper_python,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-add_dependencies(${PYTHON_PROJECT_TARGET} la_networkInterfaceHelper_python_with_stubs)
-add_custom_command(TARGET ${PYTHON_PROJECT_TARGET} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-          $<TARGET_FILE_DIR:la_networkInterfaceHelper_python>
-          $<TARGET_FILE_DIR:${PYTHON_PROJECT_TARGET}>
-  COMMENT "Copying NIH python artefacts"
-)
-
 # Add custom command to generate stubs
 add_custom_target(${PYTHON_PROJECT_TARGET}_with_stubs
   COMMAND ${CMAKE_COMMAND} -E env
-          PYTHONPATH=$<TARGET_FILE_DIR:${PYTHON_PROJECT_TARGET}>
+          PYTHONPATH=$<TARGET_FILE_DIR:la_networkInterfaceHelper_python>
           "${Python_EXECUTABLE}" -m pybind11_stubgen
           "${PYTHON_OUTPUT}"
           --output-dir $<TARGET_FILE_DIR:${PYTHON_PROJECT_TARGET}>
   WORKING_DIRECTORY $<TARGET_FILE_DIR:${PYTHON_PROJECT_TARGET}>
   DEPENDS ${PYTHON_PROJECT_TARGET}
+  DEPENDS la_networkInterfaceHelper_python_with_stubs
   COMMENT "AVDECC: Generating Python stubs with pybind11-stubgen"
   VERBATIM
 )
