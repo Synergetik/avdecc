@@ -72,6 +72,7 @@ set (PUBLIC_HEADER_FILES
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_controller_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_utils_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/utils.hpp
+	${CU_ROOT_DIR}/src/bindings/python/std20_countr_zero.hpp
   ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
 )
 
@@ -92,7 +93,6 @@ source_group("Source Files" FILES ${SOURCE_FILES_COMMON})
 # Configure module
 pybind11_add_module(${PYTHON_PROJECT_TARGET} ${SOURCE_FILES_COMMON})
 set_target_properties(${PYTHON_PROJECT_TARGET} PROPERTIES OUTPUT_NAME ${PYTHON_OUTPUT})
-target_compile_features(${PYTHON_PROJECT_TARGET} PUBLIC cxx_std_20)
 
 target_include_directories(${PYTHON_PROJECT_TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 

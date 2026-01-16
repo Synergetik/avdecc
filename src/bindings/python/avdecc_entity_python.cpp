@@ -24,6 +24,7 @@
 
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
+#include "std20_countr_zero.hpp"
 #include "utils.hpp"
 
 #include <la/avdecc/internals/entity.hpp>
@@ -230,7 +231,7 @@ void bindConnectionFlag(py::module_& m)
         .value("ClEntriesValid", ConnectionFlag::ClEntriesValid, "connected_listeners_entries field is valid.")
         .value("NoSrp", ConnectionFlag::NoSrp, "SRP is not used for the stream.")
         .value("Udp", ConnectionFlag::Udp, "Stream is using UDP-based transport instead of AVTPDUs.")
-        .def_property_readonly("bit_length", [](ConnectionFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](ConnectionFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<ConnectionFlag>(m, "ConnectionFlags");
 }
@@ -258,7 +259,7 @@ void bindStreamFlag(py::module_& m)
         .value("TimingFieldValid", StreamFlag::TimingFieldValid, "Timing field contains a valid TIMING descriptor index.")
         .value("NoMediaClock", StreamFlag::NoMediaClock, "Stream does not use a media clock.")
         .value("SupportsNoSrp", StreamFlag::SupportsNoSrp, "Stream supports streaming without SRP reservation.")
-        .def_property_readonly("bit_length", [](StreamFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](StreamFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<StreamFlag>(m, "StreamFlags");
 }
@@ -272,7 +273,7 @@ void bindJackFlag(py::module_& m)
         .value("Unspecified", JackFlag::None, "No jack flags.")
         .value("ClockSyncSource", JackFlag::ClockSyncSource, "Jack can be used as a clock synchronization source.")
         .value("Captive", JackFlag::Captive, "Jack connection is hardwired and cannot be disconnected.")
-        .def_property_readonly("bit_length", [](JackFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](JackFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<JackFlag>(m, "JackFlags");
 }
@@ -292,7 +293,7 @@ void bindAvbInterfaceFlag(py::module_& m)
         .value("CanListenToSelf", AvbInterfaceFlag::CanListenToSelf, "Listener on interface can listen to talker on same interface.")
         .value("CanListenToOtherSelf", AvbInterfaceFlag::CanListenToOtherSelf,
                "Listener on interface can listen to talker on another interface within same entity.")
-        .def_property_readonly("bit_length", [](AvbInterfaceFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](AvbInterfaceFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<AvbInterfaceFlag>(m, "AvbInterfaceFlags");
 }
@@ -306,7 +307,7 @@ void bindClockSourceFlag(py::module_& m)
         .value("Unspecified", ClockSourceFlag::None, "No clock source flags.")
         .value("StreamID", ClockSourceFlag::StreamID, "The INPUT_STREAM Clock Source is identified by the stream_id.")
         .value("LocalID", ClockSourceFlag::LocalID, "The INPUT_STREAM Clock Source is identified by its local ID.")
-        .def_property_readonly("bit_length", [](ClockSourceFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](ClockSourceFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<ClockSourceFlag>(m, "ClockSourceFlags");
 }
@@ -323,7 +324,7 @@ void bindPortFlag(py::module_& m)
                "Indicates that the Port has an asynchronous sample rate convertor to convert sample rates between another Clock Domain and the Unit's.")
         .value("SyncSampleRateConv", PortFlag::SyncSampleRateConv,
                "Indicates that the Port has a synchronous sample rate convertor to convert between sample rates in the same Clock Domain.")
-        .def_property_readonly("bit_length", [](PortFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](PortFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<PortFlag>(m, "PortFlags");
 }
@@ -344,7 +345,7 @@ void bindPtpInstanceFlag(py::module_& m)
         .value("CanEnablePerformance", PtpInstanceFlag::CanEnablePerformance, "Can enable PTP performance monitoring.")
         .value("PerformanceMonitoring", PtpInstanceFlag::PerformanceMonitoring, "PTP instance supports performance monitoring.")
         .value("GrandmasterCapable", PtpInstanceFlag::GrandmasterCapable, "PTP instance is capable of being a grandmaster.")
-        .def_property_readonly("bit_length", [](PtpInstanceFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](PtpInstanceFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<PtpInstanceFlag>(m, "PtpInstanceFlags");
 }
@@ -373,7 +374,7 @@ void bindPtpPortFlag(py::module_& m)
         .value("SupportsOnestepTransmit", PtpPortFlag::SupportsOnestepTransmit, "Supports transmitting One-Step timestamps.")
         .value("SupportsOnestepReceive", PtpPortFlag::SupportsOnestepReceive, "Supports receiving One-Step timestamps.")
         .value("SupportsUnicastNegotiate", PtpPortFlag::SupportsUnicastNegotiate, "Supports unicast negotiation for PTP messages.")
-        .def_property_readonly("bit_length", [](PtpPortFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](PtpPortFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<PtpPortFlag>(m, "PtpPortFlags");
 }
@@ -406,7 +407,7 @@ void bindStreamInfoFlag(py::module_& m)
         .value("MsrpAccLatValid", StreamInfoFlag::MsrpAccLatValid, "The msrp_accumulated_latency field is valid.")
         .value("StreamIDValid", StreamInfoFlag::StreamIDValid, "The stream_id field is valid.")
         .value("StreamFormatValid", StreamInfoFlag::StreamFormatValid, "The stream_format field is valid and may be used to change the stream format.")
-        .def_property_readonly("bit_length", [](StreamInfoFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](StreamInfoFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<StreamInfoFlag>(m, "StreamInfoFlags");
 }
@@ -419,7 +420,7 @@ void bindStreamInfoFlagEx(py::module_& m)
     py::enum_<StreamInfoFlagEx>(m, "StreamInfoFlagEx", py::arithmetic())
         .value("Unspecified", StreamInfoFlagEx::None, "No flags.")
         .value("Registering", StreamInfoFlagEx::Registering,
-               "StreamInput: Registering a matching Talker Advertise or Talker Failed attribute.\n"
+               "StreamInput: Registering a matching Talker Advertise or Talker Failed attribute. "
                "StreamOutput: Declaring a Talker Advertise or Talker Failed attribute and registering a matching Listener attribute.");
 
     bindEnumBitfield<StreamInfoFlagEx>(m, "StreamInfoFlagsEx");
@@ -437,7 +438,7 @@ void bindAvbInfoFlag(py::module_& m)
         .value("SrpEnabled", AvbInfoFlag::SrpEnabled, "Indicates that IEEE 802.1Q SRP functionality is enabled.")
         .value("AvtpDown", AvbInfoFlag::AvtpDown, "The interface cannot transmit or receive AVTPDUs.")
         .value("AvtpDownValid", AvbInfoFlag::AvtpDownValid, "Indicates that the value of the AVTP_DOWN bit is valid.")
-        .def_property_readonly("bit_length", [](AvbInfoFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](AvbInfoFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<AvbInfoFlag>(m, "AvbInfoFlags");
 }
@@ -457,7 +458,7 @@ void bindEntityCounterValidFlag(py::module_& m)
         .value("EntitySpecific3", EntityCounterValidFlag::EntitySpecific3, "Entity-specific counter 3 is valid.")
         .value("EntitySpecific2", EntityCounterValidFlag::EntitySpecific2, "Entity-specific counter 2 is valid.")
         .value("EntitySpecific1", EntityCounterValidFlag::EntitySpecific1, "Entity-specific counter 1 is valid.")
-        .def_property_readonly("bit_length", [](EntityCounterValidFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](EntityCounterValidFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<EntityCounterValidFlag>(m, "EntityCounterValidFlags");
 }
@@ -483,7 +484,7 @@ void bindAvbInterfaceCounterValidFlag(py::module_& m)
         .value("EntitySpecific3", AvbInterfaceCounterValidFlag::EntitySpecific3, "Entity-specific counter 3 is valid.")
         .value("EntitySpecific2", AvbInterfaceCounterValidFlag::EntitySpecific2, "Entity-specific counter 2 is valid.")
         .value("EntitySpecific1", AvbInterfaceCounterValidFlag::EntitySpecific1, "Entity-specific counter 1 is valid.")
-        .def_property_readonly("bit_length", [](AvbInterfaceCounterValidFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](AvbInterfaceCounterValidFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<AvbInterfaceCounterValidFlag>(m, "AvbInterfaceCounterValidFlags");
 }
@@ -505,7 +506,7 @@ void bindClockDomainCounterValidFlag(py::module_& m)
         .value("EntitySpecific3", ClockDomainCounterValidFlag::EntitySpecific3, "Entity-specific counter 3 is valid.")
         .value("EntitySpecific2", ClockDomainCounterValidFlag::EntitySpecific2, "Entity-specific counter 2 is valid.")
         .value("EntitySpecific1", ClockDomainCounterValidFlag::EntitySpecific1, "Entity-specific counter 1 is valid.")
-        .def_property_readonly("bit_length", [](ClockDomainCounterValidFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](ClockDomainCounterValidFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<ClockDomainCounterValidFlag>(m, "ClockDomainCounterValidFlags");
 }
@@ -540,7 +541,7 @@ void bindStreamInputCounterValidFlag(py::module_& m)
         .value("EntitySpecific3", StreamInputCounterValidFlag::EntitySpecific3, "Entity-specific counter 3 is valid.")
         .value("EntitySpecific2", StreamInputCounterValidFlag::EntitySpecific2, "Entity-specific counter 2 is valid.")
         .value("EntitySpecific1", StreamInputCounterValidFlag::EntitySpecific1, "Entity-specific counter 1 is valid.")
-        .def_property_readonly("bit_length", [](StreamInputCounterValidFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](StreamInputCounterValidFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<StreamInputCounterValidFlag>(m, "StreamInputCounterValidFlags");
 }
@@ -554,18 +555,18 @@ void bindStreamOutputCounterValidFlag(py::module_& m)
         .value("Unspecified", StreamOutputCounterValidFlag::None, "No stream output counters are valid.")
         .value("StreamStart", StreamOutputCounterValidFlag::StreamStart, "Incremented each time the Talker starts streaming.")
         .value("StreamStop", StreamOutputCounterValidFlag::StreamStop,
-               "Incremented each time the Talker stops streaming.\n"
+               "Incremented each time the Talker stops streaming. "
                "PAAD-AE ensures STREAM_START == STREAM_STOP + 1 (streaming) or STREAM_START == STREAM_STOP (not streaming).")
         .value("MediaReset", StreamOutputCounterValidFlag::MediaReset,
-               "Incremented at the end of each observation interval where the 'mr' bit toggled in any transmitted AVTPDU.\n"
+               "Incremented at the end of each observation interval where the 'mr' bit toggled in any transmitted AVTPDU. "
                "Observation interval ≤ 1 second.")
         .value("TimestampUncertain", StreamOutputCounterValidFlag::TimestampUncertain,
-               "Incremented at the end of each observation interval where the 'tu' bit was set in any transmitted AVTPDU.\n"
+               "Incremented at the end of each observation interval where the 'tu' bit was set in any transmitted AVTPDU. "
                "Observation interval ≤ 1 second.")
         .value("FramesTx", StreamOutputCounterValidFlag::FramesTx,
-               "Incremented at the end of each observation interval if at least one AVTPDU was transmitted.\n"
+               "Incremented at the end of each observation interval if at least one AVTPDU was transmitted. "
                "Observation interval ≤ 1 second.")
-        .def_property_readonly("bit_length", [](StreamOutputCounterValidFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](StreamOutputCounterValidFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<StreamOutputCounterValidFlag>(m, "StreamOutputCounterValidFlags");
 }
@@ -600,7 +601,7 @@ void bindMilanInfoFeaturesFlag(py::module_& m)
         .value("Redundancy", MilanInfoFeaturesFlag::Redundancy, "The entity supports the Milan redundancy scheme.")
         .value("TalkerDynamicMappingsWhileRunning", MilanInfoFeaturesFlag::TalkerDynamicMappingsWhileRunning,
                "The entity supports changing dynamic mappings of talker streams while streaming.")
-        .def_property_readonly("bit_length", [](MilanInfoFeaturesFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](MilanInfoFeaturesFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<MilanInfoFeaturesFlag>(m, "MilanInfoFeaturesFlags");
 }
@@ -615,7 +616,7 @@ void bindMediaClockReferenceInfoFlag(py::module_& m)
         .value("UserMediaClockReferencePriorityValid", MediaClockReferenceInfoFlag::UserMediaClockReferencePriorityValid,
                "The value in the user_media_clock_reference_priority field is valid.")
         .value("MediaClockDomainNameValid", MediaClockReferenceInfoFlag::MediaClockDomainNameValid, "The value in the media_clock_domain_name field is valid.")
-        .def_property_readonly("bit_length", [](MediaClockReferenceInfoFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](MediaClockReferenceInfoFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
 
     bindEnumBitfield<MediaClockReferenceInfoFlag>(m, "MediaClockReferenceInfoFlags");
 }
@@ -846,7 +847,7 @@ void bindLocalEntity(py::module_& m)
         .value("ValidTime", LocalEntity::AdvertiseFlag::ValidTime, "The ValidTime field has changed.")
         .value("GptpGrandmasterID", LocalEntity::AdvertiseFlag::GptpGrandmasterID, "The gPTP GrandmasterID field has changed.")
         .value("GptpDomainNumber", LocalEntity::AdvertiseFlag::GptpDomainNumber, "The gPTP DomainNumber field has changed.")
-        .def_property_readonly("bit_length", [](LocalEntity::AdvertiseFlag self) { return std::countr_zero(static_cast<std::size_t>(self)) + 1; });
+        .def_property_readonly("bit_length", [](LocalEntity::AdvertiseFlag self) { return std20::countr_zero(static_cast<std::size_t>(self)) + 1; });
     bindEnumBitfield<LocalEntity::AdvertiseFlag>(cls, "AdvertiseFlags");
 
     cls.def("enableEntityAdvertising", with_released_gil(&LocalEntity::enableEntityAdvertising), py::arg("availableDuration"),
