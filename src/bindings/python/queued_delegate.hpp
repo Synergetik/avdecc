@@ -405,6 +405,22 @@ namespace la::avdecc::entity::controller
             job_queue_.process();
         }
 
+        template <class R, class... A>
+        std::function<R(A...)> invoke_defered(std::function<R(A...)> h) noexcept
+        {
+            // Capture 'this' (or a pointer) + move handler.
+            return [q = this, h = std::move(h)](A... a) mutable -> R {
+                if constexpr (std::is_void_v<R>)
+                {
+                    q->enqueueFn(h, std::forward<A>(a)...);
+                }
+                else
+                {
+                    static_assert(std::is_void_v<R>, "Non-void handlers are not supported");
+                }
+            };
+        }
+
     private:
         template <class MemFn, class... Args>
         void enqueue(MemFn mf, Args&&... args) noexcept
@@ -418,6 +434,20 @@ namespace la::avdecc::entity::controller
                 std::apply([&](auto&&... unpacked) { ((*target).*mf)(std::forward<decltype(unpacked)>(unpacked)...); }, tup);
             });
         };
+
+        template <class Fn, class... Args>
+        void enqueueFn(Fn&& fn, Args&&... args) noexcept
+        {
+            using F = std::decay_t<Fn>;
+            F f(std::forward<Fn>(fn));
+
+            using Tuple = std::tuple<std::decay_t<Args>...>;
+            Tuple tup(std::forward<Args>(args)...);
+
+            job_queue_.enqueue([f = std::move(f), tup = std::move(tup)]() mutable {
+                std::apply([&](auto&&... unpacked) { std::invoke(f, std::forward<decltype(unpacked)>(unpacked)...); }, tup);
+            });
+        }
 
         JobQueue        job_queue_;
         Delegate* const delegate_;
