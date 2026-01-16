@@ -26,6 +26,7 @@
 #include "avdecc_controller_python.hpp"
 #include "avdecc_entity_python.hpp"
 #include "avdecc_utils_python.hpp"
+#include "queued_delegate.hpp"
 
 #include "config.hpp"
 #include <la/avdecc/avdecc.hpp>
@@ -464,7 +465,11 @@ void bindEndStation(py::module_& m)
     using namespace la::avdecc;
     using namespace la::avdecc::protocol;
 
-    auto endStation = py::class_<EndStation, std::shared_ptr<EndStation>>(m, "EndStation");
+    using QueuedDelegate = la::avdecc::entity::controller::QueuedDelegate;
+
+    py::class_<QueuedDelegate, std::shared_ptr<QueuedDelegate>>(m, "QueuedDelegate");
+
+    auto endStation = py::class_<EndStation, std::shared_ptr<EndStation>>(m, "EndStation", py::dynamic_attr());
 
     py::enum_<EndStation::Error>(endStation, "Error")
         .value("NoError", EndStation::Error::NoError)
@@ -486,10 +491,31 @@ void bindEndStation(py::module_& m)
         .def(
             "addControllerEntity",
             [](EndStation& self, std::uint16_t progID, const UniqueIdentifier& entityModelID, entity::controller::Delegate* delegate) {
-                return self.addControllerEntity(progID, entityModelID, nullptr, delegate);
+                // create queued delegate wrapper
+                auto queued = std::make_shared<QueuedDelegate>(delegate);
+
+                // attach to the end station as a python attribute to keep it alive
+                py::object self_py = py::cast(&self, py::return_value_policy::reference);
+                py::setattr(self_py, "_queued_delegate", py::cast(queued));
+
+                return self.addControllerEntity(progID, entityModelID, nullptr, queued.get());
             },
             py::arg("progID"), py::arg("entityModelID"), py::arg("delegate"), py::return_value_policy::reference,
             "Adds a ControllerEntity with an empty EntityModelTree.")
+        .def("processDelegateEvents",
+             [](EndStation& self) {
+                 py::object self_py = py::cast(&self, py::return_value_policy::reference);
+
+                 if (!py::hasattr(self_py, "_queued_delegate"))
+                     return;
+
+                 auto queued = self_py.attr("_queued_delegate").cast<std::shared_ptr<QueuedDelegate>>();
+
+                 {
+                     py::gil_scoped_release nogil{};
+                     queued->processJobs();
+                 }
+             })
         .def_static(
             "create",
             [](const std::string& interfaceID, const std::optional<std::string>& executorName) -> std::shared_ptr<EndStation> {

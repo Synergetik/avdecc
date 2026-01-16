@@ -71,6 +71,8 @@ set (PUBLIC_HEADER_FILES
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_entity_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_controller_python.hpp
 	${CU_ROOT_DIR}/src/bindings/python/avdecc_utils_python.hpp
+	${CU_ROOT_DIR}/src/bindings/python/job_queue.hpp
+	${CU_ROOT_DIR}/src/bindings/python/queued_delegate.hpp
 	${CU_ROOT_DIR}/src/bindings/python/utils.hpp
 	${CU_ROOT_DIR}/src/bindings/python/std20_countr_zero.hpp
   ${CMAKE_CURRENT_BINARY_DIR}/config.hpp
