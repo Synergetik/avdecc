@@ -109,6 +109,11 @@ void CapabilityDelegate::setControllerDelegate(controller::Delegate* const deleg
 	_controllerDelegate = delegate;
 }
 
+controller::Delegate* const CapabilityDelegate::getControllerDelegate() const noexcept
+{
+	return _controllerDelegate;
+}
+
 /* Discovery Protocol (ADP) */
 /* Enumeration and Control Protocol (AECP) AEM */
 void CapabilityDelegate::acquireEntity(UniqueIdentifier const targetEntityID, bool const isPersistent, model::DescriptorType const descriptorType, model::DescriptorIndex const descriptorIndex, Interface::AcquireEntityHandler const& handler) const noexcept

@@ -723,6 +723,11 @@ void ControllerEntityImpl::setControllerDelegate(controller::Delegate* const del
 	static_cast<controller::CapabilityDelegate&>(*_controllerCapabilityDelegate).setControllerDelegate(delegate);
 }
 
+controller::Delegate* const ControllerEntityImpl::getControllerDelegate() const noexcept
+{
+	return static_cast<controller::CapabilityDelegate&>(*_controllerCapabilityDelegate).getControllerDelegate();
+}
+
 /* ************************************************************************** */
 /* protocol::ProtocolInterface::Observer overrides                            */
 /* ************************************************************************** */

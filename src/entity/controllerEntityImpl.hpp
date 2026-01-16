@@ -197,7 +197,7 @@ private:
 	virtual void getTalkerStreamConnection(model::StreamIdentification const& talkerStream, std::uint16_t const connectionIndex, GetTalkerStreamConnectionHandler const& handler) const noexcept override;
 	/* Other methods */
 	virtual void setControllerDelegate(controller::Delegate* const delegate) noexcept override;
-	controller::Delegate* getControllerDelegate() const noexcept;
+	virtual controller::Delegate* const getControllerDelegate() const noexcept override;
 
 	/* ************************************************************************** */
 	/* protocol::ProtocolInterface::Observer overrides                            */

@@ -765,6 +765,7 @@ public:
 
 	/* Other methods */
 	virtual void setControllerDelegate(controller::Delegate* const delegate) noexcept = 0;
+	virtual controller::Delegate* const getControllerDelegate() const noexcept = 0;
 
 	// Deleted compiler auto-generated methods
 	ControllerEntity(ControllerEntity&&) = delete;

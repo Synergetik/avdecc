@@ -52,6 +52,8 @@ public:
 	/* Controller methods                                                         */
 	/* ************************************************************************** */
 	void setControllerDelegate(controller::Delegate* const delegate) noexcept;
+	controller::Delegate* const getControllerDelegate() const noexcept;
+
 	/* Discovery Protocol (ADP) */
 	/* Enumeration and Control Protocol (AECP) AEM */
 	void acquireEntity(UniqueIdentifier const targetEntityID, bool const isPersistent, model::DescriptorType const descriptorType, model::DescriptorIndex const descriptorIndex, Interface::AcquireEntityHandler const& handler) const noexcept;
