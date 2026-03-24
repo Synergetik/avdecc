@@ -436,6 +436,7 @@ void bindAvdeccFixedString(py::module_& m)
         .def_property_readonly("size", &AvdeccFixedString::size)
         .def_property_readonly("empty", &AvdeccFixedString::empty)
         .def_property_readonly("data", [](const AvdeccFixedString& self) { return py::bytes(self.data(), self.size()); })
+        .def_property_readonly("length", [](const AvdeccFixedString& self) { return self.str().length(); })
 
         .def("__getitem__",
              [](const AvdeccFixedString& self, size_t i) {
