@@ -23,6 +23,7 @@
  */
 
 #include "avdecc_entity_python.hpp"
+#include <Python.h>
 #include <protocol/protocolAemControlValuesPayloads.hpp>
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -443,12 +444,21 @@ void bindAvdeccFixedString(py::module_& m)
                  return self[i];
              })
 
-        .def("__str__", [](const AvdeccFixedString& self) { return self.str(); })
+        .def("__str__",
+            [](const AvdeccFixedString& self) {
+                const auto s = self.str();
+                auto obj = PyUnicode_DecodeUTF8(s.data(), s.length(), "backslashreplace");
+
+                if (!obj) {
+                    throw py::error_already_set();
+                }
+                return py::reinterpret_steal<py::str>(obj);
+            })
         .def("__repr__",
              [](const AvdeccFixedString& self) {
-                 std::ostringstream oss;
-                 oss << "AvdeccFixedString(\"" << self.str() << "\")";
-                 return oss.str();
+                const auto s = self.str();
+                py::bytes b(s.data(), s.size());
+                return py::str("AvdeccFixedString({})").format(py::repr(b));
              })
 
         .def("__eq__", [](const AvdeccFixedString& self, const AvdeccFixedString& other) { return self == other; })
