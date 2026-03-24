@@ -417,20 +417,20 @@ void bindAvdeccFixedString(py::module_& m)
     py::class_<AvdeccFixedString>(m, "AvdeccFixedString")
         .def(py::init<>())
         .def(py::init<std::string const&>(), py::arg("string"))
-        .def(py::init([](py::bytes raw, size_t size) {
+        .def(py::init([](py::bytes raw) {
                  std::string buffer = raw;
-                 return AvdeccFixedString(static_cast<const void*>(buffer.data()), size);
+                 return AvdeccFixedString(static_cast<const void*>(buffer.data()), buffer.size());
              }),
-             py::arg("data"), py::arg("size"))
+             py::arg("data"))
 
         .def("assign", static_cast<void (AvdeccFixedString::*)(std::string const&)>(&AvdeccFixedString::assign), py::arg("string"))
         .def(
             "assignRaw",
-            [](AvdeccFixedString& self, py::bytes raw, size_t size) {
+            [](AvdeccFixedString& self, py::bytes raw) {
                 std::string buffer = raw;
-                self.assign(static_cast<const void*>(buffer.data()), size);
+                self.assign(static_cast<const void*>(buffer.data()), buffer.size());
             },
-            py::arg("data"), py::arg("size"))
+            py::arg("data"))
 
         .def_property_readonly("size", &AvdeccFixedString::size)
         .def_property_readonly("empty", &AvdeccFixedString::empty)
