@@ -859,7 +859,7 @@ void bindLocalEntity(py::module_& m)
         .def("discoverRemoteEntities", &LocalEntity::discoverRemoteEntities, "Requests discovery of all remote entities. Returns true if successful.")
         .def("discoverRemoteEntity", &LocalEntity::discoverRemoteEntity, py::arg("entityID"),
              "Requests discovery of a specific remote entity by its unique identifier. Returns true if successful.")
-        .def("forgetRemoteEntity", &LocalEntity::forgetRemoteEntity, py::arg("entityID"),
+        .def("forgetRemoteEntity", with_released_gil(&LocalEntity::forgetRemoteEntity), py::arg("entityID"),
              "Removes knowledge of a previously discovered remote entity. Returns true if successful.")
         .def(
             "setAutomaticDiscoveryDelay",
